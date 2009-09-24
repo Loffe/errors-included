@@ -2,29 +2,35 @@
 
 import socket, sys
 
-#host = ''
-port = 50001
-#backlog = 5
+host = ''
+port = 50000
+backlog = 5
 size = 1024
 s = None
-data = ''
 try:
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.bind(('',port))
-	s.listen(5)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((host,port))
+    s.listen(backlog)
 except socket.error, (value,message):
-	if s:
-		s.close()
-	print 'Could not open socket. '+message
-	sys.exit(1)
+    if s:
+        s.close()
+    print 'Could not open socket. ' + message
+    sys.exit(1)
 
-while data != 'close':
-	client, address = s.accept()
-	print address
-	data = client.recv(size)
-	if data:
-		# return the data
-		client.send(data)
-		print data
-		client.close()
+recv_data = ''
+send_data = ''
+while recv_data != 'close':
+    client, address = s.accept()
+    recv_data = client.recv(size)
+    if recv_data:
+        if recv_data == 'close':
+            send_data = 'closing server'
+        elif recv_data == 'ping':
+            send_data = 'pong'
+        else:
+            send_data = recv_data
+        client.send(send_data)
+        client.close()
+        print address[0], "says:", recv_data
+        print "Sent:", send_data
 s.close()
