@@ -1,5 +1,4 @@
 #!/usr/bin/env python 
-
 import socket, sys
 
 host = 'localhost'
@@ -8,6 +7,8 @@ size = 2048
 s = None
 while True:
 	data = raw_input()
+	if len(data) <= 1:
+		continue
 	try:
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((host,port))
@@ -21,5 +22,4 @@ while True:
 	data = s.recv(size)
 	print 'Recieved:', data
 	s.close()
-	
 	
