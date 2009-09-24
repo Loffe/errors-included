@@ -1,5 +1,4 @@
 #!/usr/bin/env python 
-
 import socket, sys
 
 host = 'localhost'
@@ -17,6 +16,8 @@ while True:
         print 'Could not open socket: ' + message
         sys.exit(1)
 
+    if len(data) <= 1:
+        continue
     s.send(send_data)
     recv_data = s.recv(size)
     print 'Recieved:', recv_data
