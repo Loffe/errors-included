@@ -3,9 +3,10 @@ import socket, sys
 
 host = 'localhost'
 port = 50000
-size = 2048
+size = 1024
 s = None
-while True:
+send_data = ""
+while send_data != "close":
     send_data = raw_input("Say: ")
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -16,7 +17,7 @@ while True:
         print 'Could not open socket: ' + message
         sys.exit(1)
 
-    if len(data) <= 1:
+    if len(send_data) <= 1:
         continue
     s.send(send_data)
     recv_data = s.recv(size)
