@@ -20,8 +20,8 @@ except socket.error, (value,message):
 
 recv_data = ''
 send_data = ''
+client, address = s.accept()
 while recv_data != 'close':
-    client, address = s.accept()
     recv_data = client.recv(size)
     if recv_data:
         if recv_data == 'close':
@@ -31,7 +31,6 @@ while recv_data != 'close':
         else:
             send_data = recv_data
         client.send(send_data)
-        client.close()
         print address[0], "says:", recv_data
         print "Sent:", send_data
 s.close()
