@@ -1,7 +1,7 @@
 #!/usr/bin/env python 
 import socket, sys
 
-host = 'localhost'
+host = '130.236.189.24'
 port = 50000
 size = 1024
 s = None
