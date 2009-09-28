@@ -55,6 +55,9 @@ class Picture:
     __path_to_picture = None
     __picture = None
     __commands = None
+    
+    def __init__(self, path):
+        self.set_path_to_picture(path)
 
     def set_path_to_picture(self, path):
         self.__path_to_picture = path
@@ -311,9 +314,8 @@ class MapData(Bounds, Name):
     def remove_objects(self):
         self.__objects = []
 
-    def add_object(self, object_id, map_object):
-        self.__objects.append({"id":object_id,
-                               "object":map_object})
+    def add_object(self, map_object):
+        self.__objects.append({"id":"unit", "object":map_object})
 
     def delete_object(self, object_id):
         for item in self.__objects:
@@ -337,20 +339,23 @@ class MapData(Bounds, Name):
 
 # Är den typen av objekt som lagras i MapData. T ex en ambulans som ska visas
 # på kartan eller "blockerad väg"-symbol.
-class MapObject(Picture, Name):
-    __coordinate = None
+class MapObject():
+    map_object_data= None
+    picture = None
+    visible = True
 
     # coordinate-variabeln är en dict enligt
     # {"latitude":float, "longitude":float}
     # type är objektets typ, anges med siffra. Kan vara en ambulans, polisbil,
     # ett träd eller vad man nu hittar på.
-    def __init__(self, coordinate, *path):
-        self.set_coordinate(coordinate)
+    def __init__(self, map_object_data):
+        self.map_object_data = map_object_data
+    '''
         if len(path) == 1:
             self.set_path_to_picture(*path)
         else:
             self.set_commands(path)
-
+        
     def set_coordinate(self, coordinate):
         self.__coordinate = coordinate
 
@@ -362,3 +367,11 @@ class MapObject(Picture, Name):
 
     def get_visible(self):
         return self.__visible
+    '''
+    
+class Unit(MapObject):
+    unit_data = None
+    
+    def __init__(self, unit_data):
+        self.unit_data = unit_data
+        self.picture = unit_data.picture

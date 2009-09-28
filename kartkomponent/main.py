@@ -14,12 +14,19 @@ map = data_storage.MapData(mapxml.get_name(),
 # (blir mittenpunkten på skärmen, dvs 50% x-led, 50% y-lyd.
 map.set_focus(15.5726, 58.4035)
 
-# Ritar ut tre objekt
+#Draw a totempole
+totem_coordinate = (15.5726, 58.4035)
+totem_map_object = data_storage.MapObject("Totem-Pole-32x32.png", totem_coordinate)
+#totem_picture = data_storage.Picture("ikoner/Totem-Pole-32x32.png")
+totem = data_storage.Unit(totem_map_object)
+map.add_object(totem)
 
+# Ritar ut tre objekt
+'''
 map.add_object("Ambulans1", data_storage.MapObject({"longitude":15.5726,
                                                     "latitude":58.4035},
                                                    "ikoner/Totem-Pole-32x32.png"))
-'''
+
 map.add_object("Brandbil1", data_storage.MapObject({"longitude":15.5729,
                                                     "latitude":58.40193},
                                                    "ikoner/brandbil.png"))

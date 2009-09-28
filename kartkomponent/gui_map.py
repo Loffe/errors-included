@@ -131,8 +131,8 @@ class Map(gtk.DrawingArea):
         # Ritar ut eventuella objekt
         objects = self.__map.get_objects()
         for item in objects:
-            x, y = self.gps_to_pixel(item["object"].get_coordinate()["longitude"],
-                                     item["object"].get_coordinate()["latitude"])
+            x, y = self.gps_to_pixel(item["object"].coordinate[0],
+                                     item["object"].coordinate[1])
 
             if x != 0 and y != 0:
                 item["object"].draw(self.context, x, y)
