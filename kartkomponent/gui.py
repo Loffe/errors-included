@@ -35,6 +35,8 @@ class Gui(hildon.Program):
         # Zoom +
         elif event.keyval == 65476:
             self.__map_change_zoom("+")
+        elif event.keyval == gtk.keysyms.Up:
+            print "p"
 
     def __init__(self, map):
         # Initierar hildon (GUI-biblioteket för N810)
@@ -45,6 +47,8 @@ class Gui(hildon.Program):
 
         # Skapar programmets fönster
         self.window = hildon.Window()
+        # Sets window title
+        self.window.set_title("Awesomest map evaahh!")
         # Någon storlek så att PyGTK inte klagar
         self.window.set_size_request(200, 200)
         # Funktion som körs när prorammet ska stängas av
