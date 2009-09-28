@@ -26,7 +26,6 @@ map.add_object(totem)
 map.add_object("Ambulans1", data_storage.MapObject({"longitude":15.5726,
                                                     "latitude":58.4035},
                                                    "ikoner/Totem-Pole-32x32.png"))
-
 map.add_object("Brandbil1", data_storage.MapObject({"longitude":15.5729,
                                                     "latitude":58.40193},
                                                    "ikoner/brandbil.png"))
