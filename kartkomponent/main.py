@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+import sys
 import data_storage
 import map_xml_reader
 import gui
+#sys.path.append("")
+import shared.data
 
 # Kartan
 print "Läser in kartinformation från kartdata/map.xml"
@@ -15,10 +18,11 @@ map = data_storage.MapData(mapxml.get_name(),
 map.set_focus(15.5726, 58.4035)
 
 #Draw a totempole
+
 totem_coordinate = (15.5726, 58.4035)
-totem_map_object = data_storage.MapObject("Totem-Pole-32x32.png", totem_coordinate)
+totem_unit_data = shared.data.UnitData(totem_coordinate, "Totem", 0) #data_storage.MapObject("Totem-Pole-32x32.png", totem_coordinate)
 #totem_picture = data_storage.Picture("ikoner/Totem-Pole-32x32.png")
-totem = data_storage.Unit(totem_map_object)
+totem = data_storage.Unit(totem_unit_data, data_storage.Picture("ikoner/Totem-Pole-32x32.png"))
 map.add_object(totem)
 
 # Ritar ut tre objekt

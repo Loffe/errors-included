@@ -3,6 +3,7 @@ import time
 import gtk
 import struct
 import math
+import shared.data
 
 # Tar reda på en PNG-bilds storlek
 def png_size(path):
@@ -370,8 +371,7 @@ class MapObject():
     '''
     
 class Unit(MapObject):
-    unit_data = None
     
-    def __init__(self, unit_data):
-        self.unit_data = unit_data
-        self.picture = unit_data.picture
+    def __init__(self, unit_data, picture):
+        self.map_object_data = unit_data
+        self.picture = picture
