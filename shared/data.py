@@ -10,16 +10,26 @@ class MapObjectData(object):
         self.timestamp = timestamp
 
     def __repr__(self):
-        return "<%s: %s, %s, %s>" % (self.__class__.__name__, self.coord, self.name, self.timestamp)
+        return "<%s: %s, %s, %s>" %
+            (self.__class__.__name__, self.coord, self.name, self.timestamp)
 
 class UnitData(MapObjectData):
-    pass
+    type = UnitType.ambulance
 
 class ObstacleData(MapObjectData):
-    pass
+    type = hippie_volkswagon
 
 class POIData(MapObjectData):
     pass
+
+class MissionData(object):
+    pass
+
+class UnitType(object):
+    commander, ambulance, other = range(2)
+
+class ObstacleType(object):
+    tree, hippie_volkswagon, broken_nuclear_power_plant = range(3)
 
 if __name__ == "__main__":
     print MapObjectData((15.5726, 58.4035), 'MapObject', 0)
