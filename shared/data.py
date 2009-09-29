@@ -10,8 +10,7 @@ class MapObjectData(object):
         self.timestamp = timestamp
 
     def __repr__(self):
-        return "<%s: %s, %s, %s>" %
-            (self.__class__.__name__, self.coord, self.name, self.timestamp)
+        return "<%s: %s, %s, %s>" % (self.__class__.__name__, self.coord, self.name, self.timestamp)
 
 class UnitData(MapObjectData):
     type = UnitType.ambulance
