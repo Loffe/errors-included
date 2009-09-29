@@ -4,6 +4,7 @@ import gtk
 import struct
 import math
 import shared.data
+import gobject
 
 # Tar reda på en PNG-bilds storlek
 def png_size(path):
@@ -58,7 +59,10 @@ class Picture:
     __commands = None
     
     def __init__(self, path):
-        self.set_path_to_picture(path)
+        if path == None:
+            self.__path_to_picture = "ikoner/default.png"
+        else:
+            self.__path_to_picture = path
 
     def set_path_to_picture(self, path):
         self.__path_to_picture = path
@@ -72,14 +76,15 @@ class Picture:
         context.stroke()
 
     def draw_picture(self, context, x, y):
-        context.set_source_pixbuf(self.get_picture(), x, y)
+        try:
+            context.set_source_pixbuf(self.get_picture(), x, y)
+        except gobject.GError, message:
+            self.__path_to_picture = "ikoner/default.png"
+            context.set_source_pixbuf(self.get_picture(), x, y)
         context.paint()
 
     def draw(self, context, x, y):
-        if self.get_path_to_picture():
-            self.draw_picture(context, x, y)
-        else:
-            self.draw_shapes(context, x, y, self.get_commands())
+        self.draw_picture(context, x, y)
 
     def set_commands(self, commands):
         self.__commands = commands
