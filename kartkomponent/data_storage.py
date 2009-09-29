@@ -337,7 +337,7 @@ class MapData(Bounds, Name):
 # Är den typen av objekt som lagras i MapData. T ex en ambulans som ska visas
 # på kartan eller "blockerad väg"-symbol.
 class MapObject():
-    map_object_data= None
+    map_object_data = None
     picture = None
     visible = True
 
@@ -377,3 +377,16 @@ class Obstacle(MapObject):
     def __init__(self, obstacle_data, picture):
         self.map_object_data = obstacle_data
         self.picture = picture
+        
+class POI(MapObject):
+    
+    def __init__(self, poi_data, picture):
+        self.map_object_data = poi_data
+        self.picture = picture
+        
+class Mission():
+    POIs = []
+    Units = []
+    mission_data = None
+    
+    

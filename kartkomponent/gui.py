@@ -3,6 +3,8 @@ import gtk
 import hildon
 import gobject
 import gui_map
+import data_storage
+import shared.data
 
 class Gui(hildon.Program):
     __map = None
@@ -35,8 +37,13 @@ class Gui(hildon.Program):
         # Zoom +
         elif event.keyval == 65476:
             self.__map_change_zoom("+")
+        # Our own functions
         elif event.keyval == gtk.keysyms.Up:
             print "p"
+            self.__map.add_object("Trailerpark",
+                data_storage.POI(shared.data.POIData((15.5766, 58.3900),
+                                "trailer1", 0), data_storage.Picture(
+                                    "ikoner/Trailer.png")))
 
     def __init__(self, map):
         # Initierar hildon (GUI-biblioteket för N810)

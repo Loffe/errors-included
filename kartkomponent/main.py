@@ -3,7 +3,6 @@ import sys
 import data_storage
 import map_xml_reader
 import gui
-#sys.path.append("")
 import shared.data
 
 # Kartan
@@ -20,18 +19,23 @@ map.set_focus(15.5726, 58.4035)
 #Draw a totempole
 
 totem_coordinate = (15.5726, 58.4035)
-totem_unit_data = shared.data.UnitData(totem_coordinate, "Totem", 0) #data_storage.MapObject("Totem-Pole-32x32.png", totem_coordinate)
-#totem_picture = data_storage.Picture("ikoner/Totem-Pole-32x32.png")
+totem_unit_data = shared.data.UnitData(totem_coordinate, "Totem", 0)
 totem = data_storage.Unit(totem_unit_data, data_storage.Picture("ikoner/Totem-Pole-32x32.png"))
 map.add_object("totem", totem)
 
 #Draw a tree
 
-tree_coordinate = (15.5726, 58.4046)
+tree_coordinate = (15.5726, 58.4050)
 tree_obstacle_data = shared.data.ObstacleData(tree_coordinate, "Tree", 0) #data_storage.MapObject("Totem-Pole-32x32.png", totem_coordinate)
-#totem_picture = data_storage.Picture("ikoner/Totem-Pole-32x32.png")
 tree = data_storage.Obstacle(tree_obstacle_data, data_storage.Picture("ikoner/Tree.png"))
 map.add_object("Tree", tree)
+
+# hej
+
+goal_coordinate = (15.5766, 58.3960)
+goal_poi_data = shared.data.POIData(goal_coordinate, "goal", 0)
+goal = data_storage.POI(goal_poi_data, data_storage.Picture("ikoner/Trailer.png"))
+map.add_object("Goal", goal)
 
 # Ritar ut tre objekt
 '''
