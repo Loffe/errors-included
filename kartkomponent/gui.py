@@ -42,8 +42,7 @@ class Gui(hildon.Program):
             print "p"
             self.__map.add_object("Trailerpark",
                 data_storage.POI(shared.data.POIData((15.5766, 58.3900),
-                                "trailer1", 0), data_storage.Picture(
-                                    "ikoner/Trailer.png")))
+                                "trailer1", 0)))
 
     def __init__(self, map):
         # Initierar hildon (GUI-biblioteket för N810)

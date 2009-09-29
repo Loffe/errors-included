@@ -373,22 +373,31 @@ class MapObject():
     
 class Unit(MapObject):
     
-    def __init__(self, unit_data, picture):
-        self.map_object_data = unit_data
-        self.picture = picture
+    def __init__(self, unit_data):
+        MapObject.__init__(self, unit_data)
+        path = "ikoner/default.png"
+        if unit_data.type == shared.data.UnitType.ambulance:
+            path = "ikoner/ambulans.png"
+        elif unit_data.type == shared.data.UnitType.commander:
+            path = "ikoner/Totem-Pole-32x32.png"
+        self.picture = Picture(path)    
 
 class Obstacle(MapObject):
     
-    def __init__(self, obstacle_data, picture):
-        self.map_object_data = obstacle_data
-        self.picture = picture
+    def __init__(self, obstacle_data):
+        MapObject.__init__(self, obstacle_data)
+        path = "ikoner/default.png"
+        if obstacle_data.type == shared.data.ObstacleType.tree:
+            path = "ikoner/Tree.png"
+        self.picture = Picture(path)
         
 class POI(MapObject):
     
-    def __init__(self, poi_data, picture):
-        self.map_object_data = poi_data
-        self.picture = picture
-        
+    def __init__(self, poi_data):
+        MapObject.__init__(self, poi_data)
+        path = "ikoner/default.png"
+        self.picture = Picture(path)
+
 class Mission():
     POIs = []
     Units = []
