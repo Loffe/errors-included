@@ -371,3 +371,9 @@ class Unit(MapObject):
     def __init__(self, unit_data, picture):
         self.map_object_data = unit_data
         self.picture = picture
+
+class Obstacle(MapObject):
+    
+    def __init__(self, obstacle_data, picture):
+        self.map_object_data = obstacle_data
+        self.picture = picture

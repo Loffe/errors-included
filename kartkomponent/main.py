@@ -25,6 +25,14 @@ totem_unit_data = shared.data.UnitData(totem_coordinate, "Totem", 0) #data_stora
 totem = data_storage.Unit(totem_unit_data, data_storage.Picture("ikoner/Totem-Pole-32x32.png"))
 map.add_object("totem", totem)
 
+#Draw a tree
+
+tree_coordinate = (15.5726, 58.4046)
+tree_obstacle_data = shared.data.ObstacleData(tree_coordinate, "Tree", 0) #data_storage.MapObject("Totem-Pole-32x32.png", totem_coordinate)
+#totem_picture = data_storage.Picture("ikoner/Totem-Pole-32x32.png")
+tree = data_storage.Obstacle(tree_obstacle_data, data_storage.Picture("ikoner/Tree.png"))
+map.add_object("Tree", tree)
+
 # Ritar ut tre objekt
 '''
 map.add_object("Ambulans1", data_storage.MapObject({"longitude":15.5726,
