@@ -1,4 +1,10 @@
 
+class UnitType(object):
+    commander, ambulance, other = range(3)
+
+class ObstacleType(object):
+    tree, hippie_volkswagon, broken_nuclear_power_plant = range(3)
+
 class MapObjectData(object):
     coord = None
     name = None
@@ -16,7 +22,7 @@ class UnitData(MapObjectData):
     type = UnitType.ambulance
 
 class ObstacleData(MapObjectData):
-    type = hippie_volkswagon
+    type = ObstacleType.hippie_volkswagon
 
 class POIData(MapObjectData):
     pass
@@ -24,14 +30,9 @@ class POIData(MapObjectData):
 class MissionData(object):
     pass
 
-class UnitType(object):
-    commander, ambulance, other = range(2)
-
-class ObstacleType(object):
-    tree, hippie_volkswagon, broken_nuclear_power_plant = range(3)
-
 if __name__ == "__main__":
     print MapObjectData((15.5726, 58.4035), 'MapObject', 0)
     print UnitData((15.5726, 58.4035), 'MapObject', 0)
     print ObstacleData((15.5726, 58.4035), 'MapObject', 0)
     print POIData((15.5726, 58.4035), 'MapObject', 0)
+    print UnitType.commander
