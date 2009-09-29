@@ -280,7 +280,7 @@ class Tiles:
 # på denna. Med generella objekt menas objekt som hela tiden ska vara på kartan,
 # som ej försvinner när exempelvis ett uppdrag avslutats.
 class MapData(Bounds, Name):
-    __objects = []
+    __objects = {}
     __mission_objects = []
     __levels = {}
     __redraw_function = None
@@ -313,20 +313,16 @@ class MapData(Bounds, Name):
         return self.__focus
 
     def remove_objects(self):
-        self.__objects = []
+        self.__objects = {}
 
-    def add_object(self, map_object):
-        self.__objects.append({"id":"unit", "object":map_object})
+    def add_object(self, id, map_object):
+        self.__objects[id] = map_object
 
     def delete_object(self, object_id):
-        for item in self.__objects:
-            if item["id"] == object_id:
-                self.__objects.remove(item)
+        del self.__objects[object_id]
 
     def get_object(self, object_id):
-        for item in self.__objects:
-            if item["id"] == object_id:
-                return self.__objects[item]
+        return self.__objects[object_id]
 
     def get_objects(self):
         return self.__objects

@@ -23,7 +23,7 @@ totem_coordinate = (15.5726, 58.4035)
 totem_unit_data = shared.data.UnitData(totem_coordinate, "Totem", 0) #data_storage.MapObject("Totem-Pole-32x32.png", totem_coordinate)
 #totem_picture = data_storage.Picture("ikoner/Totem-Pole-32x32.png")
 totem = data_storage.Unit(totem_unit_data, data_storage.Picture("ikoner/Totem-Pole-32x32.png"))
-map.add_object(totem)
+map.add_object("totem", totem)
 
 # Ritar ut tre objekt
 '''
