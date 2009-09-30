@@ -5,6 +5,9 @@ class UnitType(object):
 class ObstacleType(object):
     tree, hippie_volkswagon, broken_nuclear_power_plant = range(3)
 
+class POIType(object):
+    accident, pasta_wagon = range(2)
+
 class MapObjectData(object):
     coord = None
     name = None
@@ -25,7 +28,7 @@ class ObstacleData(MapObjectData):
     type = ObstacleType.hippie_volkswagon
 
 class POIData(MapObjectData):
-    pass
+    type = POIType.pasta_wagon
 
 class MissionData(object):
     pass
