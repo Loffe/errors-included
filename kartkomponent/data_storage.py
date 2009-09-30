@@ -375,6 +375,7 @@ class Unit(MapObject):
     
     def __init__(self, unit_data):
         MapObject.__init__(self, unit_data)
+        #default  icon can be changed here
         path = "ikoner/default.png"
         if unit_data.type == shared.data.UnitType.ambulance:
             path = "ikoner/ambulans.png"
@@ -386,6 +387,7 @@ class Obstacle(MapObject):
     
     def __init__(self, obstacle_data):
         MapObject.__init__(self, obstacle_data)
+        #default  icon can be changed here
         path = "ikoner/default.png"
         if obstacle_data.type == shared.data.ObstacleType.tree:
             path = "ikoner/Tree.png"
@@ -395,7 +397,10 @@ class POI(MapObject):
     
     def __init__(self, poi_data):
         MapObject.__init__(self, poi_data)
+        #default  icon can be changed here
         path = "ikoner/default.png"
+        if poi_data.type == shared.data.POIType.pasta_wagon:
+            path = "ikoner/Trailer.png"
         self.picture = Picture(path)
 
 class Mission():

@@ -37,7 +37,8 @@ map.add_object("Tree", tree)
 goal_coordinate = (15.5766, 58.3960)
 goal_poi_data = shared.data.POIData(goal_coordinate, "goal", 0)
 goal = data_storage.POI(goal_poi_data)
-map.add_object("Goal", goal)
+goal.map_object_data.type = shared.data.POIType.pasta_wagon
+map.add_object("PastaVagnen", goal)
 
 # Ritar ut tre objekt
 '''

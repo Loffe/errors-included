@@ -9,6 +9,7 @@ import shared.data
 class Gui(hildon.Program):
     __map = None
     __map_change_zoom = None
+    __map_redraw = None
 
     def on_window_state_change(self, widget, event, *args):
         if event.new_window_state & gtk.gdk.WINDOW_STATE_FULLSCREEN:
@@ -43,6 +44,7 @@ class Gui(hildon.Program):
             self.__map.add_object("Trailerpark",
                 data_storage.POI(shared.data.POIData((15.5766, 58.3900),
                                 "trailer1", 0)))
+            self.__map_redraw()
 
     def __init__(self, map):
         # Initierar hildon (GUI-biblioteket för N810)
@@ -93,7 +95,9 @@ class Gui(hildon.Program):
 
         # Sparar undan funktionen som möjliggör zoomning
         self.__map_change_zoom = map.change_zoom
-
+        # Save away the redrawfunction
+        self.__map_redraw = map.queue_draw
+        
         return frame
 
     # Skapar vyn för inställningar
