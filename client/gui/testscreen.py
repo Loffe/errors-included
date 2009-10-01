@@ -3,7 +3,7 @@ import gtk
 import socket
 
 class TestScreen(gtk.VBox, gui.Screen):
-
+    socket = None
     def __init__(self):
         gtk.VBox.__init__(self, False)
 
@@ -50,7 +50,9 @@ class TestScreen(gtk.VBox, gui.Screen):
         self.socket = s
 
     def send_message(self, event):
-        self.open_socket()
+        if self.socket == None:
+            self.open_socket()
+
         send_data = self.entry.get_text()
         if len(send_data) <= 1:
             return
