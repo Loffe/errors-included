@@ -208,6 +208,9 @@ class MapData():
         self.set_level(2, levels[2])
         self.set_level(3, levels[3])
         self.bounds = levels[1].bounds
+        # Ställer in vad kartkomponenten ska fokusera på (visa)
+        # (blir mittenpunkten på skärmen, dvs 50% x-led, 50% y-led.
+        self.set_focus(15.5726, 58.4035)
 
     # Ställer in Tiles-objekt för en bestämd nivå
     def set_level(self, level, tiles):
