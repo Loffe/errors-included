@@ -20,6 +20,7 @@ class ClientGui(hildon.Program):
         self.add_window(self.window)
 
         self.notebook = gtk.Notebook()
+        self.notebook.set_tab_pos(0)
         self.window.add(self.notebook)
         self.create_screens()
 
