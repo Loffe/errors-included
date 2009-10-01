@@ -11,6 +11,8 @@ class Wagh:
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.set_title("hej")
         window.set_default_size(500,400)
+
+
         window.connect("destroy", gtk.main_quit)
         vbox = gtk.VBox()
 
