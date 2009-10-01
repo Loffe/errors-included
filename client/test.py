@@ -29,80 +29,124 @@ class EntryExample:
         window.set_size_request(200, 100)
         window.set_title("Skapa uppdrag")
         window.connect("delete_event", lambda w,e: gtk.main_quit())
-        hscrollbar = gtk.HSscrollbar(adjustment=None)
-        window.add(hscrollbar)
-        hscrollbar.show()
+#        hscrollbar = gtk.HSscrollbar(adjustment=None)
+#        window.add(hscrollbar)
+#        hscrollbar.show()
+        swindow = gtk.ScrolledWindow()
+        swindow.show()
+        window.add(swindow)
 
-
-        vbox = gtk.VBox(False, 0)
-        window.add(vbox)
-        vbox.show()
+        table = gtk.Table(10, 2)
+        swindow.add_with_viewport(table)
+        table.show()
         
+        y = 0
         label, event_entry = self.new_entry("Handelse")
-        vbox.pack_start(label, True, True, 0)
-        vbox.pack_start(event_entry, True, True, 0)
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(event_entry, 1, 2, y, y+1)
+        y+=1
         
         label, location_entry = self.new_entry("Skadeplats")
-        vbox.pack_start(label, True, True, 0)
-        vbox.pack_start(location_entry, True, True, 0)
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(location_entry, 1, 2, y, y+1)
+        y+=1
         
         label, hurted_entry = self.new_entry("Antal skadade")
-        vbox.pack_start(label, True, True, 0)
-        vbox.pack_start(hurted_entry, True, True, 0)
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(hurted_entry, 1, 2, y, y+1)
+        y+=1
         
         label, contact_entry = self.new_entry("Kontaktperson(Namn & Nummer)")
-        vbox.pack_start(label, True, True, 0)
-        vbox.pack_start(contact_entry, True, True, 0)
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(contact_entry, 1, 2, y, y+1)
+        y+=1
         
         label, random_entry = self.new_entry("Ovrig information")
-        vbox.pack_start(label, True, True, 0)
-        vbox.pack_start(random_entry, True, True, 0)
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(random_entry, 1, 2, y, y+1)
+        y+=1
         
         label, random_entry = self.new_entry("Ovrig information")
-        vbox.pack_start(label, True, True, 0)
-        vbox.pack_start(random_entry, True, True, 0)
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(random_entry, 1, 2, y, y+1)
+        y+=1
         
         label, random_entry = self.new_entry("Ovrig information")
-        vbox.pack_start(label, True, True, 0)
-        vbox.pack_start(random_entry, True, True, 0)
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(random_entry, 1, 2, y, y+1)
+        y+=1
         
         label, random_entry = self.new_entry("Ovrig information")
-        vbox.pack_start(label, True, True, 0)
-        vbox.pack_start(random_entry, True, True, 0)
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(random_entry, 1, 2, y, y+1)
+        y+=1
         
-        #In med HANDELS-LABEL
-#        handelseLabel = gtk.Label("Handelse")
-#        vbox.pack_start(handelseLabel, True, True, 0)
-#        handelseLabel.show()
-#        handelse = gtk.Entry()
-#        handelse.set_max_length(50)
-#        handelse.connect("activate", self.enter_callback, handelse)
-#        handelse.set_text("")
-#        handelse.select_region(0, len(handelse.get_text()))
-#        vbox.pack_start(handelse, True, True, 0)
-#        handelse.show()
-        #In med SKADEPLATS-LABEL
-#        platsLabel = gtk.Label("Skadeplats")
-#        vbox.pack_start(platsLabel, True, True, 0)
-#        platsLabel.show()
-#        skadeplats = gtk.Entry()
-#        skadeplats.set_max_length(50)
-#        skadeplats.connect("activate", self.enter_callback, skadeplats)
-#        skadeplats.set_text("")
-#        skadeplats.select_region(0, len(skadeplats.get_text()))
-#        vbox.pack_start(skadeplats, True, True, 0)
-#        skadeplats.show()
+        label, random_entry = self.new_entry("Ovrig information")
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(random_entry, 1, 2, y, y+1)
+        y+=1
+        
+        
+        label, random_entry = self.new_entry("Ovrig information")
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(random_entry, 1, 2, y, y+1)
+        y+=1
+        
+        
+        label, random_entry = self.new_entry("Ovrig information")
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(random_entry, 1, 2, y, y+1)
+        y+=1
+        
+        
+        label, random_entry = self.new_entry("Ovrig information")
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(random_entry, 1, 2, y, y+1)
+        y+=1
+        
+        
+        label, random_entry = self.new_entry("Ovrig information")
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(random_entry, 1, 2, y, y+1)
+        y+=1
+        
+        
+        label, random_entry = self.new_entry("Ovrig information")
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(random_entry, 1, 2, y, y+1)
+        y+=1
+        
+        
+        label, random_entry = self.new_entry("Ovrig information")
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(random_entry, 1, 2, y, y+1)
+        y+=1
+        
+        label, random_entry = self.new_entry("Ovrig information")
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(random_entry, 1, 2, y, y+1)
+        y+=1
+        
+        label, random_entry = self.new_entry("Ovrig information")
+        table.attach(label, 0, 1, y, y+1)
+        table.attach(random_entry, 1, 2, y, y+1)
+        y+=1
+        
 
-        hbox = gtk.HBox(False, 0)
-        vbox.add(hbox)
-        hbox.show()
                                                                 
-        button = gtk.Button(stock=gtk.STOCK_CLOSE)
-        button.connect("clicked", lambda w: gtk.main_quit())
-        vbox.pack_start(button, True, True, 0)
-        button.set_flags(gtk.CAN_DEFAULT)
-        button.grab_default()
-        button.show()
+        close = gtk.Button(stock=gtk.STOCK_CLOSE)
+        close.connect("clicked", lambda w: gtk.main_quit())
+        table.attach(close, 0, 1, y, y+1)
+        close.set_flags(gtk.CAN_DEFAULT)
+        close.grab_default()
+        close.show()
+        
+        ok = gtk.Button(stock=gtk.STOCK_OK)
+        ok.connect("clicked", lambda w: gtk.main_quit())
+        table.attach(ok, 1, 2, y, y+1)
+        ok.set_flags(gtk.CAN_DEFAULT)
+        ok.grab_default()
+        ok.show()
         window.show()
 
 def main():

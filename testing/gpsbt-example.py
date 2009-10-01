@@ -1,29 +1,22 @@
 #!/usr/bin/env python
+#-*- coding: utf-8 -*-
 import gpsbt
 import time
 
-def main():
-    print 'Connecting...' 
+def gps_pos():
+    #Startar GPS:en
     context = gpsbt.start()
-    
-    if context == None:
-        print 'Problem while connecting!'
-        return
-
-    # ensure that GPS device is ready to connect and to receive commands
-    time.sleep(2)
+    #Väntar för att se att GPSen startats och kan ta emot kommandon
+    while context == None:
+        time.sleep(1) #2
     gpsdevice = gpsbt.gps()
-
-    # read 4 times and show information
-    for a in range(4):
-        gpsdevice.get_fix()
-        # print information stored under 'fix' variable
-        print 'Altitude: %.3f'%gpsdevice.fix.altitude
-        # dump all information available
-        print gpsdevice
-        time.sleep(2)
-
-    # ends Bluetooth connection
+    #Skriver ut Longitud och Latitud
+    x, y = gpsdevice.get_position()
+    print "Longitud: ",x
+    print "Latitud: ",y
+    # Stänger av GPS:en
     gpsbt.stop(context)
+    
+    return pos
 
-main()
+gps_pos()
