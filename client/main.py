@@ -6,6 +6,7 @@ import gobject
 
 import gui.mapgui
 import gui.testscreen
+import gui.missionscreen
 
 class ClientGui(hildon.Program):
     screens = []
@@ -35,6 +36,9 @@ class ClientGui(hildon.Program):
 
         test_screen = gui.testscreen.TestScreen()
         self.screens.append(test_screen)
+
+        mission_screen = gui.missionscreen.MissionScreen()
+        self.screens.append(mission_screen)
 
     def add_screen_to_tab(self, screen):
         self.notebook.insert_page(screen)
