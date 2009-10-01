@@ -1,6 +1,5 @@
-import gtk
-
 import gui
+import gtk
 import socket
 
 class TestScreen(gtk.VBox, gui.Screen):
@@ -10,6 +9,7 @@ class TestScreen(gtk.VBox, gui.Screen):
 
         ip_entry = gtk.Entry()
         self.pack_start(ip_entry, False)
+        ip_entry.set_text("130.236.189.24")
 
         textview = gtk.TextView()
         textview.set_editable(False)
@@ -20,12 +20,16 @@ class TestScreen(gtk.VBox, gui.Screen):
 
         button = gtk.Button("Send")
         button.connect("clicked", self.send_message)
+        self.set_flags(gtk.CAN_FOCUS)
+        self.connect("key_press_event", self.send_message)
+        self.set_events(gtk.gdk.KEY_PRESS_MASK)
+        
         self.pack_start(button, False)
 
         self.show_all()
 
         buffer = textview.get_buffer()
-        buffer.set_text("Hejsan\noch hall")
+        buffer.set_text("Hejsan\noch hall\n")
 
         self.ip_entry = ip_entry
         self.textview = textview
