@@ -9,7 +9,7 @@ class Picture(object):
     
     def __init__(self, path):
         if path == None:
-            self.path = "ikoner/default.png"
+            self.path = "map/map/data/icons/default.png"
         else:
             self.path = path
 
@@ -18,7 +18,7 @@ class Picture(object):
 #        try:
 #            context.set_source_pixbuf(self.get_picture(), x, y)
 #        except gobject.GError, message:
-#            self.path = "ikoner/default.png"
+#            self.path = "map/data/icons/default.png"
 #            context.set_source_pixbuf(self.get_picture(), x, y)
 #        context.paint()
 
@@ -261,11 +261,11 @@ class Unit(MapObject):
     def __init__(self, unit_data):
         MapObject.__init__(self, unit_data)
         # default  icon can be changed here
-        path = "ikoner/default.png"
+        path = "map/data/icons/default.png"
         if unit_data.type == shared.data.UnitType.ambulance:
-            path = "ikoner/ambulans.png"
+            path = "map/data/icons/ambulance.png"
         elif unit_data.type == shared.data.UnitType.commander:
-            path = "ikoner/Totem-Pole-32x32.png"
+            path = "map/data/icons/totempole.png"
         self.picture = Picture(path)    
 
 class Obstacle(MapObject):
@@ -273,9 +273,9 @@ class Obstacle(MapObject):
     def __init__(self, obstacle_data):
         MapObject.__init__(self, obstacle_data)
         # default  icon can be changed here
-        path = "ikoner/default.png"
+        path = "map/data/icons/default.png"
         if obstacle_data.type == shared.data.ObstacleType.tree:
-            path = "ikoner/Tree.png"
+            path = "map/data/icons/tree.png"
         self.picture = Picture(path)
         
 class POI(MapObject):
@@ -283,9 +283,9 @@ class POI(MapObject):
     def __init__(self, poi_data):
         MapObject.__init__(self, poi_data)
         # default  icon can be changed here
-        path = "ikoner/default.png"
+        path = "map/data/icons/default.png"
         if poi_data.type == shared.data.POIType.pasta_wagon:
-            path = "ikoner/Trailer.png"
+            path = "map/data/icons/pastawagon.png"
         self.picture = Picture(path)
 
 class Mission():

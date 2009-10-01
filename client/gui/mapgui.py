@@ -2,6 +2,7 @@
 import time
 import gtk
 import gui
+import shared.data
 import map.map_xml_reader
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
@@ -30,16 +31,21 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.zoom_level = 1
 
         # events ;O
+        self.set_flags(gtk.CAN_FOCUS)
         self.connect("expose_event", self.handle_expose_event)
         self.connect("button_press_event", self.handle_button_press_event)
         self.connect("button_release_event", self.handle_button_release_event)
         self.connect("motion_notify_event", self.handle_motion_notify_event)
+        self.connect("key_press_event", self.handle_key_press_event)
         self.set_events(gtk.gdk.BUTTON_PRESS_MASK |
                         gtk.gdk.BUTTON_RELEASE_MASK |
                         gtk.gdk.EXPOSURE_MASK |
                         gtk.gdk.LEAVE_NOTIFY_MASK |
                         gtk.gdk.POINTER_MOTION_MASK |
-                        gtk.gdk.POINTER_MOTION_HINT_MASK)
+                        gtk.gdk.POINTER_MOTION_HINT_MASK |
+                        gtk.gdk.KEY_PRESS_MASK)
+        
+
 
     def zoom(self, change):
         # Frigör minnet genom att ladda ur alla tiles för föregående nivå
@@ -55,6 +61,33 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
 
         # Ritar ny nivå
         self.queue_draw()
+
+    def handle_key_press_event(self, widget, event):
+#        # Ifall "fullscreen"-knappen på handdatorn har aktiverats.
+#        if event.keyval == gtk.keysyms.F6:
+#            if self.window_in_fullscreen:
+#                self.window.unfullscreen()
+#            else:
+#                self.window.fullscreen()
+#        # Pil vänster, byter vy
+#        if event.keyval == 65361:
+#            if (self.view.get_current_page() != 0):
+#                self.view.prev_page()
+#        # Pil höger, byter vy
+#        elif event.keyval == 65363:
+#            if (self.view.get_current_page() != 1):
+#                self.view.next_page()
+        # Zoom -
+        if event.keyval == 65477:
+            self.zoom("-")
+        # Zoom +
+        elif event.keyval == 65476:
+            self.zoom("+")
+        # Our own functions
+        elif event.keyval == gtk.keysyms.p:
+            self.mapdata.add_object("Trailerpark",
+                map.mapdata.POI(shared.data.POIData((15.5766, 58.3900),
+                                "trailer1", 0)))
 
     # Hanterar rörelse av kartbilden
     def handle_button_press_event(self, widget, event):
