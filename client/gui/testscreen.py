@@ -20,9 +20,6 @@ class TestScreen(gtk.VBox, gui.Screen):
 
         button = gtk.Button("Send")
         button.connect("clicked", self.send_message)
-        self.set_flags(gtk.CAN_FOCUS)
-        self.connect("key_press_event", self.send_message)
-        self.set_events(gtk.gdk.KEY_PRESS_MASK)
         
         self.pack_start(button, False)
 
