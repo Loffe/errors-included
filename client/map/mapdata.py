@@ -26,6 +26,7 @@ class Picture(object):
         if not self.pixbuf:
             self.load()
         context.set_source_pixbuf(self.pixbuf, x, y)
+        context.paint()
         
     def load(self):
         self.pixbuf = gtk.gdk.pixbuf_new_from_file(self.path)
@@ -42,7 +43,7 @@ class Tile(object):
 
     def __init__(self, id, path, bounds, type):
         self.name = id
-        self.picture.path = path
+        self.picture = Picture(path)
         self.bounds = bounds
         self.type = type
 

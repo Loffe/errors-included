@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+import time
 import gtk
 import gui
 import map.map_xml_reader
 
-class MapScreen(gui.Screen, gtk.DrawingArea):
+class MapScreen(gtk.DrawingArea, gui.Screen):
     bounds = {"min_latitude":0,
                 "max_latitude":0,
                 "min_longitude":0,
@@ -13,8 +14,8 @@ class MapScreen(gui.Screen, gtk.DrawingArea):
         gui.Screen.__init__(self, "Map")
         gtk.DrawingArea.__init__(self)
 
-        mapxml = map_xml_reader.MapXML("../map/data/map.xml")
-        self.mapdata = map.mapdata.MapData(mapxml.name, mapxml.get_levels())
+        mapxml = map.map_xml_reader.MapXML("map/data/map.xml")
+        self.mapdata = map.mapdata.MapData(mapxml.name, mapxml.levels)
         # queue_draw() ärvs från klassen gtk.DrawingArea
         # modellen anropar redraw när något ändras så att vyn uppdateras
         self.mapdata.redraw_function = self.queue_draw
@@ -128,7 +129,7 @@ class MapScreen(gui.Screen, gtk.DrawingArea):
             #img = tile.get_picture()
             x, y = self.gps_to_pixel(tile.bounds["min_longitude"],
                                      tile.bounds["min_latitude"])
-            tile.draw(self.context, x, y)
+            tile.picture.draw(self.context, x, y)
 
         # Ritar ut eventuella objekt
         objects = self.mapdata.objects
@@ -138,6 +139,7 @@ class MapScreen(gui.Screen, gtk.DrawingArea):
 
             if x != 0 and y != 0:
                 objects[item].picture.draw(self.context, x, y)
+
    
     def gps_to_pixel(self, lon, lat):
         cols = self.cols
