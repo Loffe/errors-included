@@ -217,13 +217,13 @@ class MapData():
         # add the unit itself
         commander_unit_data = shared.data.UnitData((0,0), "Commander", 0)
         commander_unit_data.type = shared.data.UnitType.commander
-        commander = data_storage.Unit(commander_unit_data)
+        commander = Unit(commander_unit_data)
         self.add_object("commmander", commander)
         # add the holy pasta-wagon
 
         pasta_poi_data = shared.data.POIData((15.5766, 58.3960), "pastawagon", 0)
         pasta_poi_data.type = shared.data.POIType.pasta_wagon
-        pastawagon = data_storage.POI(pasta_poi_data)
+        pastawagon = POI(pasta_poi_data)
         self.add_object("PastaVagnen", pastawagon)
 
     # Ställer in Tiles-objekt för en bestämd nivå
