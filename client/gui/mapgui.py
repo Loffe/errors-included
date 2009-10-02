@@ -93,7 +93,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
 
             self.mapdata.get_object("commander").map_object_data.coord = (x,y)
 
-            self.mapdata.set_focus(x, y)
+#            self.mapdata.set_focus(x, y)
             
 
     # Hanterar rörelse av kartbilden
