@@ -28,7 +28,7 @@ class Main:
         Thread(target=self.run).start()
 
     def run(self):
-        time.sleep(3)
+        #time.sleep(3)
         self.counter += 1
         self.button.set_label("Yess: " + self.counter)
         print "Hello thread"
