@@ -212,11 +212,11 @@ class MapData():
         # Ställer in vad kartkomponenten ska fokusera på (visa)
         # (blir mittenpunkten på skärmen, dvs 50% x-led, 50% y-led.
         self.set_focus(15.5726, 58.4035)
-        # add the unit itself
-        commander_unit_data = shared.data.UnitData((0,0), "Commander", 0)
-        commander_unit_data.type = shared.data.UnitType.commander
-        commander = Unit(commander_unit_data)
-        self.add_object("commander", commander)
+#        # add the unit itself
+#        commander_unit_data = shared.data.UnitData((0,0), "Commander", 0)
+#        commander_unit_data.type = shared.data.UnitType.commander
+#        commander = Unit(commander_unit_data)
+#        self.add_object("commander", commander)
         # add the holy pasta-wagon
         pasta_poi_data = shared.data.POIData((15.5766, 58.3960), "pastawagon", 0)
         pasta_poi_data.type = shared.data.POIType.pasta_wagon

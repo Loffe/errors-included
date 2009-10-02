@@ -4,6 +4,7 @@ import gtk
 import gui
 import shared.data
 import map.map_xml_reader
+import map.mapdata
 import gpsbt
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
@@ -90,8 +91,12 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                                 "trailer1", 0)))
         elif event.keyval == gtk.keysyms.g:
             x, y = self.get_gps_pos()
-
-            self.mapdata.get_object("commander").map_object_data.coord = (x,y)
+            # add the test location
+            testlocation_poi_data = shared.data.POIData((x, y), "testlocation", 0)
+            testlocation_poi_data.type = shared.data.POIType.pasta_wagon
+            testlocation = map.mapdata.POI(testlocation_poi_data)
+            self.mapdata.add_object("TestLocation", testlocation)
+#            self.mapdata.get_object("commander").map_object_data.coord = (x,y)
 
 #            self.mapdata.set_focus(x, y)
             
