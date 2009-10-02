@@ -9,7 +9,7 @@ import gui.testscreen
 import gui.missionscreen
 
 class ClientGui(hildon.Program):
-    screens = []
+    screens = {}
 
     def __init__(self):
         hildon.Program.__init__(self)
@@ -24,22 +24,22 @@ class ClientGui(hildon.Program):
         self.window.add(self.notebook)
         self.create_screens()
 
-        for screen in self.screens:
+        for screen in self.screens.keys():
             print "Adding screen"
             print(screen)
-            self.add_screen_to_tab(screen)
+            self.add_screen_to_tab(self.screens[screen])
 
         self.window.connect("destroy", gtk.main_quit)
 
     def create_screens(self):
         map_screen = gui.mapgui.MapScreen()
-        self.screens.append(map_screen)
+        self.screens['map'] = map_screen
 
         test_screen = gui.testscreen.TestScreen()
-        self.screens.append(test_screen)
+        self.screens['chat'] = test_screen
 
         mission_screen = gui.missionscreen.MissionScreen()
-        self.screens.append(mission_screen)
+        self.screens['mission'] = mission_screen
 
     def add_screen_to_tab(self, screen):
         self.notebook.insert_page(screen)
