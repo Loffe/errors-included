@@ -3,6 +3,7 @@ import time
 from threading import Thread
 
 class Main:
+    counter = 0
     def __init__(self):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.set_title("Hello world!")
@@ -28,7 +29,8 @@ class Main:
 
     def run(self):
         time.sleep(3)
-        self.button.set_label("Yess")
+        self.counter += 1
+        self.button.set_label("Yess: " + self.counter)
         print "Hello thread"
 
 Main()
