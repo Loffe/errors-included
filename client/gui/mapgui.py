@@ -90,9 +90,12 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                 map.mapdata.POI(shared.data.POIData((15.5766, 58.3900),
                                 "trailer1", 0)))
         elif event.keyval == gtk.keysyms.g:
-            x, y = self.get_gps_pos()
+            coord = self.get_gps_pos()
             # add the test location
-            testlocation_poi_data = shared.data.POIData((x, y), "testlocation", 0)
+            print "creating test location"
+            print "x:",coord[0]
+            print "y:",coord[1]
+            testlocation_poi_data = shared.data.POIData(coord, "testlocation", 0)
             testlocation_poi_data.type = shared.data.POIType.pasta_wagon
             testlocation = map.mapdata.POI(testlocation_poi_data)
             self.mapdata.add_object("TestLocation", testlocation)
@@ -153,6 +156,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
 
     def get_gps_pos(self):
         # start the gps
+        print "starting gps"
         context = gpsbt.start()
         # wait a while for the device to be ready for commands
         time.sleep(2)
@@ -161,10 +165,11 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         # get Longitud and Latitud
         x,y = (0,0)
         while (x,y) == (0,0):
+            "fetching gps pos"
             x, y = gpsdevice.get_position()
             time.sleep(1)
-        print "Longitud:",x
-        print "Latitud:",y
+        print "fetched gps x:",x
+        print "fetched gps y:",y
         # turn off the gps
         gpsbt.stop(context)
         # return the coords
