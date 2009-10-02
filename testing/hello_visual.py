@@ -1,6 +1,7 @@
 import gtk
 import time
 from threading import Thread
+import gobject
 
 class Main:
     counter = 0
@@ -28,9 +29,9 @@ class Main:
         Thread(target=self.run).start()
 
     def run(self):
-        #time.sleep(3)
+        time.sleep(2)
         self.counter += 1
-        self.button.set_label("Yess: " + str(self.counter))
+        gobject.idle_add(self.button.set_label,  "Yess: " + str(self.counter))
         print "Hello thread", self.counter
 
 Main()
