@@ -17,8 +17,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
 
         mapxml = map.map_xml_reader.MapXML("map/data/map.xml")
         self.mapdata = map.mapdata.MapData(mapxml.name, mapxml.levels)
-        # queue_draw() ärvs från klassen gtk.DrawingArea
-        # modellen anropar redraw när något ändras så att vyn uppdateras
+        # queue_draw() inherited from gtk.DrawingArea
         self.mapdata.redraw_function = self.queue_draw
         self.pos = {"x":0, "y":0}
         self.origin_position = None
@@ -88,6 +87,13 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
             self.mapdata.add_object("Trailerpark",
                 map.mapdata.POI(shared.data.POIData((15.5766, 58.3900),
                                 "trailer1", 0)))
+        elif event.keyval == gtk.keysyms.g:
+            x, y = self.get_gps_pos()
+
+            self.mapdata.get_object("commander").map_object_data.coord = (x,y)
+
+            self.mapdata.set_focus(x, y)
+            
 
     # Hanterar rörelse av kartbilden
     def handle_button_press_event(self, widget, event):
@@ -139,10 +145,24 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
 
         return False
 
-    # skicka in skiten här linus, gogo!
-    def set_gps_data(self, gps_data):
-        self.gps_data = gps_data
-        self.queue_draw()
+    def get_gps_pos(self):
+        # start the gps
+        context = gpsbt.start()
+        # wait a while for the device to be ready for commands
+        time.sleep(2)
+        # create a device
+        gpsdevice = gpsbt.gps()
+        # get Longitud and Latitud
+        x,y = (0,0)
+        while (x,y) == (0,0):
+            x, y = gpsdevice.get_position()
+            time.sleep(1)
+        print "Longitud:",x
+        print "Latitud:",y
+        # turn off the gps
+        gpsbt.stop(context)
+        # return the coords
+        return (x,y)
 
     def draw(self):
         # Hämtar alla tiles för en nivå

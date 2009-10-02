@@ -2,6 +2,8 @@
 import gtk
 import math
 import shared.data
+import gpsbt
+import time
 
 class Picture(object):
     path = None
@@ -212,6 +214,17 @@ class MapData():
         # Ställer in vad kartkomponenten ska fokusera på (visa)
         # (blir mittenpunkten på skärmen, dvs 50% x-led, 50% y-led.
         self.set_focus(15.5726, 58.4035)
+        # add the unit itself
+        commander_unit_data = shared.data.UnitData((0,0), "Commander", 0)
+        commander_unit_data.type = shared.data.UnitType.commander
+        commander = data_storage.Unit(commander_unit_data)
+        self.add_object("commmander", commander)
+        # add the holy pasta-wagon
+
+        pasta_poi_data = shared.data.POIData((15.5766, 58.3960), "pastawagon", 0)
+        pasta_poi_data.type = shared.data.POIType.pasta_wagon
+        pastawagon = data_storage.POI(pasta_poi_data)
+        self.add_object("PastaVagnen", pastawagon)
 
     # Ställer in Tiles-objekt för en bestämd nivå
     def set_level(self, level, tiles):
