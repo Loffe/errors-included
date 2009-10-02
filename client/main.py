@@ -51,5 +51,6 @@ class ClientGui(hildon.Program):
 
 # den här borde skapa nya vyer av mission och kartan
 if __name__ == "__main__":
+    gtk.gdk.threads_init()
     app = ClientGui()
     app.run()

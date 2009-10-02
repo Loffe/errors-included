@@ -5,7 +5,7 @@ import gui
 import shared.data
 import map.map_xml_reader
 import map.mapdata
-#import gpsbt
+import gpsbt
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
     bounds = {"min_latitude":0,
@@ -90,8 +90,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                 map.mapdata.POI(shared.data.POIData((15.5766, 58.3900),
                                 "trailer1", 0)))
         elif event.keyval == gtk.keysyms.g:
-            coord = (15.576045, 58.397593)
-            #self.get_gps_pos() # should get like (15.576045, 58.397593)
+            coord = self.get_gps_pos() # should get like (15.576045, 58.397593)
             
             # add the test location
             print "creating test location"
@@ -160,15 +159,15 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         print "starting gps"
         context = gpsbt.start()
         # wait a while for the device to be ready for commands
-        time.sleep(10)
+        time.sleep(2)
         # create a device
         gpsdevice = gpsbt.gps()
         # get Longitud and Latitud
         x,y = (0,0)
         print "searching for gps pos"
-#        while (x,y) == (0,0):
-        x, y = gpsdevice.get_position()
-#            time.sleep(1)
+        while (x,y) == (0,0):
+            x, y = gpsdevice.get_position()
+            time.sleep(1)
         print "fetched gps x:",x
         print "fetched gps y:",y
         # turn off the gps
