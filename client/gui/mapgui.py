@@ -100,7 +100,6 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
             testlocation = map.mapdata.POI(testlocation_poi_data)
             self.mapdata.add_object("TestLocation", testlocation)
 #            self.mapdata.get_object("commander").map_object_data.coord = (x,y)
-
 #            self.mapdata.set_focus(x, y)
             
 
@@ -165,7 +164,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         # get Longitud and Latitud
         x,y = (0,0)
         while (x,y) == (0,0):
-            "fetching gps pos"
+            print "fetching gps pos"
             x, y = gpsdevice.get_position()
             time.sleep(1)
         print "fetched gps x:",x
