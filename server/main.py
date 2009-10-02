@@ -16,7 +16,8 @@ class Server:
     def open_socket(self):
         try:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            if 'arm' not in sys.version.lower():
+                self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.server.bind((self.host, self.port))
             self.server.listen(5)
         except socket.error, (value, message):
@@ -38,7 +39,8 @@ class Server:
                     self.threads.append(c)
                 elif s == sys.stdin:
                     junk = sys.stdin.readline()
-                    running = False
+                    if junk.startswith("quit"):
+                        running = False
 
         print "Shutting down server"
         self.server.close()
