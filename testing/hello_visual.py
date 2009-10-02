@@ -16,6 +16,10 @@ class Main:
         self.button2 = gtk.Button("Quit")
         self.button2.connect("clicked", gtk.main_quit)
         vbox.pack_start(self.button2, False)
+
+        self.button3 = gtk.Button("Nothing")
+        vbox.pack_start(self.button3, False)
+
         window.show_all()
         
     def print_hi(self, w):
