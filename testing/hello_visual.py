@@ -24,14 +24,14 @@ class Main:
         window.show_all()
         
     def print_hi(self, w):
-        print "hello world"
+        print "hello world", self.counter
         Thread(target=self.run).start()
 
     def run(self):
         #time.sleep(3)
         self.counter += 1
-        self.button.set_label("Yess: " + self.counter)
-        print "Hello thread"
+        self.button.set_label("Yess: " + str(self.counter))
+        print "Hello thread", self.counter
 
 Main()
 gtk.main()
