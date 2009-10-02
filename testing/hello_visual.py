@@ -1,4 +1,6 @@
 import gtk
+import time
+from threading import Thread
 
 class Main:
     def __init__(self):
@@ -18,6 +20,12 @@ class Main:
         
     def print_hi(self, w):
         print "hello world"
+        Thread(target=self.run).start()
+
+    def run(self):
+        time.sleep(3)
+        self.button.set_label("Yess")
+        print "Hello thread"
 
 Main()
 gtk.main()
