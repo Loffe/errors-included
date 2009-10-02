@@ -2,8 +2,6 @@
 import gtk
 import math
 import shared.data
-import gpsbt
-import time
 
 class Picture(object):
     path = None

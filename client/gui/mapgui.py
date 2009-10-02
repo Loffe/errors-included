@@ -4,6 +4,7 @@ import gtk
 import gui
 import shared.data
 import map.map_xml_reader
+import gpsbt
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
     bounds = {"min_latitude":0,
