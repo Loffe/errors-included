@@ -292,3 +292,5 @@ class Mission():
     POIs = []
     Units = []
     mission_data = None
+    def __init__(self, mission_data):
+        self.mission_data = mission_data

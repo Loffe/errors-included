@@ -1,10 +1,19 @@
-import gtk
+# coding: utf-8
 
+import gtk
+import map.mapdata
+import shared.data
 import pygtk
 pygtk.require('2.0')
 import gui
 
 class MissionScreen(gtk.ScrolledWindow, gui.Screen):
+    event_entry = None
+    location_entry = None
+    hurted_entry = None
+    contact_entry = None
+    random_entry = None
+
     def new_entry(self, labeltext):
         label = gtk.Label(labeltext)
         label.show()
@@ -25,39 +34,51 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         table.show()
 
         y = 0
-        label, event_entry = self.new_entry("Handelse")
+
+        label, self.event_entry = self.new_entry("Händelse")
         table.attach(label, 0, 1, y, y+1)
-        table.attach(event_entry, 1, 2, y, y+1)
+        table.attach(self.event_entry, 1, 2, y, y+1)
         y+=1
 
-        label, location_entry = self.new_entry("Skadeplats")
+        label, self.location_entry = self.new_entry("Skadeplats")
         table.attach(label, 0, 1, y, y+1)
-        table.attach(location_entry, 1, 2, y, y+1)
+        table.attach(self.location_entry, 1, 2, y, y+1)
         y+=1
 
-        label, hurted_entry = self.new_entry("Antal skadade")
+        label, self.hurted_entry = self.new_entry("Antal skadade")
         table.attach(label, 0, 1, y, y+1)
-        table.attach(hurted_entry, 1, 2, y, y+1)
+        table.attach(self.hurted_entry, 1, 2, y, y+1)
         y+=1
 
-        label, contact_entry = self.new_entry("Kontaktperson(Namn & Nummer)")
+        label, self.contact_entry = self.new_entry("Kontaktperson(Namn & Nummer)")
         table.attach(label, 0, 1, y, y+1)
-        table.attach(contact_entry, 1, 2, y, y+1)
+        table.attach(self.contact_entry, 1, 2, y, y+1)
         y+=1
 
-        label, random_entry = self.new_entry("Ovrig information")
+        label, self.random_entry = self.new_entry("Övrig information")
         table.attach(label, 0, 1, y, y+1)
-        table.attach(random_entry, 1, 2, y, y+1)
+        table.attach(self.random_entry, 1, 2, y, y+1)
         y+=1
 
         close = gtk.Button(stock=gtk.STOCK_CLOSE)
-        close.connect("clicked", lambda w: gtk.main_quit())
+        close.connect("clicked", gtk.main_quit)
         table.attach(close, 0, 1, y, y+1)
         close.set_flags(gtk.CAN_DEFAULT)
         close.show()
 
         ok = gtk.Button(stock=gtk.STOCK_OK)
-        ok.connect("clicked", lambda w: gtk.main_quit())
+        ok.connect("clicked", self.add_mission)
         table.attach(ok, 1, 2, y, y+1)
         ok.set_flags(gtk.CAN_DEFAULT)
         ok.show()
+
+    def add_mission(self, event):
+        mission_data = shared.data.MissionData(self.event_entry.get_text(),
+                                               self.location_entry.get_text(),
+                                               self.hurted_entry.get_text(),
+                                               self.contact_entry.get_text(),
+                                               self.random_entry.get_text())
+
+        mission = map.mapdata.Mission(mission_data)
+
+        print "mission created"

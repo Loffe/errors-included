@@ -31,7 +31,18 @@ class POIData(MapObjectData):
     type = POIType.pasta_wagon
 
 class MissionData(object):
-    pass
+    number_of_wounded = None
+    POI = None
+    event_type = None
+    contact_person = None
+    other = None
+
+    def __init__(self, event_type, POI, number_of_wounded, contact_person, other):
+        self.event_type = event_type
+        self.POI = POI
+        self.number_of_wounded = number_of_wounded
+        self.contact_person = contact_person
+        self.other = other
 
 if __name__ == "__main__":
     print MapObjectData((15.5726, 58.4035), 'MapObject', 0)
