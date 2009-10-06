@@ -4,6 +4,8 @@ import socket
 import sys
 import threading
 
+all = []
+
 class Server:
     def __init__(self):
         self.host = ''
@@ -27,6 +29,7 @@ class Server:
             sys.exit()
 
     def run(self):
+        global all
         self.open_socket()
         input = [self.server, sys.stdin]
         running = True
@@ -37,6 +40,7 @@ class Server:
                     c = Client(self.server.accept())
                     c.start()
                     self.threads.append(c)
+                    all.append(c)
                 elif s == sys.stdin:
                     junk = sys.stdin.readline()
                     if junk.startswith("quit"):
@@ -56,14 +60,28 @@ class Client(threading.Thread):
         self.size = 1024
 
     def run(self):
+        global all
         running = True
         while running:
             data = self.client.recv(self.size)
             if data:
-                self.client.send(data)
+                self.send_message(data)
+                for c in all:
+                    if c != self:
+                        c.send_message(data)
+                print data
             else:
                 self.client.close()
+                all.remove(self)
                 running = False
+
+    def send_message(self, message):
+        global all
+        try:
+            self.client.send(message)
+        except socket.error, (value, message):
+            print (value, message)
+            all.remove(self)
 
 
 if __name__ == "__main__":
