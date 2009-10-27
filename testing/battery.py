@@ -9,8 +9,8 @@ dev_obj = bus.get_object ('org.freedesktop.Hal', uids[0])
  
 battery_left = dev_obj.GetProperty('battery.reporting.current')
 battery_lifetime =dev_obj.GetProperty('battery.reporting.design')
-battery2 = dev_obj.GetProperty('battery.charge_level.percentage')
-print "BATTERI I PROCENT: ", battery2
+laddar = dev_obj.GetProperty('battery.rechargeable.is_charging')
+print "Laddar?!?!: ", laddar
 print "Battery left (mAh): ", battery_left
 print "Battery lifetime (mAh): ", battery_lifetime
 percentage_left = battery_left*100/battery_lifetime
