@@ -1,4 +1,5 @@
 import dbus
+from future import __division__
  
 bus = dbus.SystemBus()
 hal_obj = bus.get_object ('org.freedesktop.Hal', '/org/freedesktop/Hal/Manager')
@@ -14,7 +15,7 @@ battery_left = dev_obj.GetProperty('battery.reporting.current')
 battery_lifetime =dev_obj.GetProperty('battery.reporting.design')
 print "Battery left: ", battery_left
 print "Battery lifetime: ", battery_lifetime
-percentage_left = battery_left/battery_lifetime
+percentage_left = battery_left*100/battery_lifetime
 print "Battery left (%): ", percentage_left
 #print 'charge last full',\
 #    dev_obj.GetProperty('battery.reporting.last_full')
