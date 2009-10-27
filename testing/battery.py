@@ -1,5 +1,5 @@
-import dbus
 from __future__ import division
+import dbus
  
 bus = dbus.SystemBus()
 hal_obj = bus.get_object ('org.freedesktop.Hal', '/org/freedesktop/Hal/Manager')
