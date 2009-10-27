@@ -17,7 +17,7 @@ percentage_left = battery_left*100/battery_lifetime
 print "Battery left (%): ", percentage_left
 
 
-dev_obj = bus.get_object ('org.freedesktop.Hal', udi)
+dev_obj = bus.get_object ('org.freedesktop.Hal', hal.FindDeviceByCapability ('laptop_panel'))
 
 # get an interface to the device
 dev = dbus.Interface (dev_obj, 'org.freedesktop.Hal.Device')
