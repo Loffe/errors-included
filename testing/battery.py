@@ -17,6 +17,21 @@ percentage_left = battery_left*100/battery_lifetime
 print "Battery left (%): ", percentage_left
 
 
+dev_obj = bus.get_object ('org.freedesktop.Hal', udi)
+
+# get an interface to the device
+dev = dbus.Interface (dev_obj, 'org.freedesktop.Hal.Device')
+print dev.GetProperty ('info.product')
+print "Brightness levels:", dev.GetProperty ('laptop_panel.num_levels')
+
+# get a difference interface to the device
+dev = dbus.Interface (dev_obj, 'org.freedesktop.Hal.Device.LaptopPanel')
+
+print "Current brightness:", dev.GetBrightness ()
+dev.SetBrightness (int (sys.argv[1]))
+print "New brightness:", dev.GetBrightness ()
+
+
 #print 'charge level percentage',\
 #      dev_obj.GetProperty('battery.charge_level.percentage')
 #print 'charge current', dev_obj.GetProperty('battery.reporting.current')
