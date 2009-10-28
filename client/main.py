@@ -7,7 +7,7 @@ import gobject
 import gui.mapgui
 import gui.testscreen
 import gui.missionscreen
-import gui.creategui
+
 
 class ClientGui(hildon.Program):
         
