@@ -4,7 +4,8 @@ import hildon
 import gtk
 
 def send_rpc(widget, osso_c):
-    osso_c.rpc_run("spam.eggs.osso_test_receiver",
+    rpc = osso.Rpc(osso_c)
+    rpc.rpc_run("spam.eggs.osso_test_receiver",
                    "/spam/eggs/osso_test_receiver",
                    "spam.eggs.osso_test_receiver",
                    "do_something")
