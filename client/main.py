@@ -10,28 +10,31 @@ import gui.missionscreen
 import gui.creategui
 
 class ClientGui(hildon.Program):
-    
-    def add_create_buttons(self, hbox):
-#        self.larm.show()
-#        self.hinder.show()
-#        self.poi.show()
-        print "Trykte pa lägg till-knappen"
         
     def show_map(self,hbox):
         print "Visar karta"
         self.map.show()
+        self.menu_add.hide_all()
         
     def show_mission(self,hbox):
         print "Visar mission"
         self.map.hide()
+        self.menu_add.hide_all()
+        
+    def add_create_buttons(self, hbox):
+        self.map.show()
+        self.menu_add.show_all()
+        print "Trykte pa lägg till-knappen"
     
     def show_send_screen(self,hbox):
         print "Visar skicka-sidan"
         self.map.hide()
+        self.menu_add.hide_all()
         
     def show_inkorg(self):
         print "Visar inkorgen"
         self.map.hide()
+        self.menu_add.hide_all()
 
     def __init__(self):
         hildon.Program.__init__(self)
@@ -77,15 +80,16 @@ class ClientGui(hildon.Program):
         vbox_right.add(self.map)
 
         # Add menu
-        menu_add = gtk.HBox(False, 3)
+        self.menu_add = gtk.HBox(False, 3)
         self.larm = gtk.Button("Larm")
         self.hinder = gtk.Button("Hinder")
         self.poi = gtk.Button("PoI")
-        menu_add.add(self.larm)
-        menu_add.add(self.hinder)
-        menu_add.add(self.poi)
+        self.menu_add.add(self.larm)
+        self.menu_add.add(self.hinder)
+        self.menu_add.add(self.poi)
+#        self.menu_add.hide_all()
         
-        vbox_right.add(menu_add)
+        vbox_right.add(self.menu_add)
         
 #        self.window.show_all()
 
@@ -94,6 +98,7 @@ class ClientGui(hildon.Program):
 
     def run(self):
         self.window.show_all()
+        self.menu_add.hide_all()
         gtk.main()
 
 
