@@ -30,6 +30,22 @@ class ClientGui(hildon.Program):
             self.add_screen_to_tab(self.screens[screen])
 
         self.window.connect("destroy", gtk.main_quit)
+        self.window.connect("key-press-event", self.on_key_press)
+        self.window.connect("window-state-event", self.on_window_state_change)
+        self.window_in_fullscreen = False
+
+    def on_key_press(self, widget, event, *args):
+        # react on fullscreen button press
+        if event.keyval == gtk.keysyms.F6:
+            if self.window_in_fullscreen:
+                self.window.unfullscreen()
+            else:
+                self.window.fullscreen()
+    def on_window_state_change(self, widget, event, *args):
+        if event.new_window_state & gtk.gdk.WINDOW_STATE_FULLSCREEN:
+            self.window_in_fullscreen = True
+        else:
+            self.window_in_fullscreen = False
 
     def create_screens(self):
         map_screen = gui.mapgui.MapScreen()
