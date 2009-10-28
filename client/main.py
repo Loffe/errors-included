@@ -11,30 +11,42 @@ import gui.creategui
 
 class ClientGui(hildon.Program):
         
-    def show_map(self,hbox):
+    def show_map(self,event):
         print "Visar karta"
         self.map.show()
         self.menu_add.hide_all()
+        self.new_larm.hide_all()
         
-    def show_mission(self,hbox):
+    def show_mission(self,event):
         print "Visar mission"
         self.map.hide()
         self.menu_add.hide_all()
+        self.new_larm.hide_all()
         
-    def add_create_buttons(self, hbox):
+    def add_create_buttons(self, event):
         self.map.show()
         self.menu_add.show_all()
+        self.new_larm.hide_all()
         print "Trykte pa lägg till-knappen"
     
-    def show_send_screen(self,hbox):
+    def show_send_screen(self,event):
         print "Visar skicka-sidan"
         self.map.hide()
         self.menu_add.hide_all()
+        self.new_larm.hide_all()
         
-    def show_inkorg(self):
+    def show_inkorg(self, event):
         print "Visar inkorgen"
         self.map.hide()
         self.menu_add.hide_all()
+        self.new_larm.hide_all()
+        
+    def report_larm(self, event):
+        self.map.hide()
+        self.menu_add.hide_all()
+        self.new_larm.show_all()
+        
+        
 
     def __init__(self):
         hildon.Program.__init__(self)
@@ -78,10 +90,16 @@ class ClientGui(hildon.Program):
         self.map = gui.mapgui.MapScreen()
         self.map.set_size_request(550,300)
         vbox_right.add(self.map)
+        
+        self.new_larm = gui.missionscreen.MissionScreen()
+        self.new_larm.set_size_request(550,300)
+        vbox_right.add(self.new_larm)
+        
 
         # Add menu
         self.menu_add = gtk.HBox(False, 3)
         self.larm = gtk.Button("Larm")
+        self.larm.connect("clicked", self.report_larm)
         self.hinder = gtk.Button("Hinder")
         self.poi = gtk.Button("PoI")
         self.menu_add.add(self.larm)
@@ -99,6 +117,7 @@ class ClientGui(hildon.Program):
     def run(self):
         self.window.show_all()
         self.menu_add.hide_all()
+        self.new_larm.hide_all()
         gtk.main()
 
 
