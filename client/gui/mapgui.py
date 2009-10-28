@@ -44,8 +44,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                         gtk.gdk.POINTER_MOTION_MASK |
                         gtk.gdk.POINTER_MOTION_HINT_MASK |
                         gtk.gdk.KEY_PRESS_MASK)
-        
-
+    
 
     def zoom(self, change):
         # Frigör minnet genom att ladda ur alla tiles för föregående nivå
