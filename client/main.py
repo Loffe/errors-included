@@ -11,6 +11,27 @@ import gui.creategui
 
 class ClientGui(hildon.Program):
     
+    def add_create_buttons(self, hbox):
+#        self.larm.show()
+#        self.hinder.show()
+#        self.poi.show()
+        print "Trykte pa lägg till-knappen"
+        
+    def show_map(self,hbox):
+        print "Visar karta"
+        self.map.show()
+        
+    def show_mission(self,hbox):
+        print "Visar mission"
+        self.map.hide()
+    
+    def show_send_screen(self,hbox):
+        print "Visar skicka-sidan"
+        self.map.hide()
+        
+    def show_inkorg(self):
+        print "Visar inkorgen"
+        self.map.hide()
 
     def __init__(self):
         hildon.Program.__init__(self)
@@ -19,27 +40,54 @@ class ClientGui(hildon.Program):
         self.window.set_size_request(200, 200)
 
         self.add_window(self.window)
+
+        # Panels
+        panels = gtk.HBox(False, 2)
+        self.window.add(panels)
         
-        hbox = gtk.HBox(False, 3)
+        # Left menu
         vbox = gtk.VBox(False,5)
-        hbox.add(vbox)
+        panels.add(vbox)
+
+#        hbox.set_homogeneous(False)
+#        vbox.set_homogeneous(False)
         karta = gtk.Button("Karta")
+        karta.connect("clicked", self.show_map)
         uppdrag = gtk.Button("Uppdrag")
+        uppdrag.connect("clicked", self.show_mission)
         lagg_till = gtk.Button("Lägg till")
+        lagg_till.connect("clicked", self.add_create_buttons)
         skicka = gtk.Button("Skicka")
+        skicka.connect("clicked", self.show_send_screen)
         inkorg = gtk.Button("Inkorg")
-        map = gui.mapgui.MapScreen()
-        map.set_size_request(550,200)
-        hbox.add(map)
+        inkorg.connect("clicked", self.show_inkorg)
+        
         vbox.add(karta)
         vbox.add(uppdrag)
         vbox.add(lagg_till)
         vbox.add(skicka)
         vbox.add(inkorg)
-
-        self.window.add(hbox)
         
-        self.window.show_all()
+        # Right panel
+        vbox_right = gtk.VBox(False, 2)
+        panels.add(vbox_right)
+        
+        self.map = gui.mapgui.MapScreen()
+        self.map.set_size_request(550,300)
+        vbox_right.add(self.map)
+
+        # Add menu
+        menu_add = gtk.HBox(False, 3)
+        self.larm = gtk.Button("Larm")
+        self.hinder = gtk.Button("Hinder")
+        self.poi = gtk.Button("PoI")
+        menu_add.add(self.larm)
+        menu_add.add(self.hinder)
+        menu_add.add(self.poi)
+        
+        vbox_right.add(menu_add)
+        
+#        self.window.show_all()
 
         self.window.connect("destroy", gtk.main_quit)
 
