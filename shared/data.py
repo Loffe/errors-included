@@ -1,4 +1,3 @@
-
 class UnitType(object):
     commander, ambulance, other = range(3)
 
@@ -43,6 +42,23 @@ class MissionData(object):
         self.number_of_wounded = number_of_wounded
         self.contact_person = contact_person
         self.other = other
+        
+class Message(object):
+    type = None
+    data = None    
+    
+    def __init__(self, raw_msg = None):
+        self.unpack(raw_msg)
+    
+    """ till JSON tror vi
+    """
+    def pack(self):
+        pass
+    
+    def unpack(self, raw_msg):
+        if raw_msg != None:
+            #packa upp
+            pass
 
 if __name__ == "__main__":
     print MapObjectData((15.5726, 58.4035), 'MapObject', 0)

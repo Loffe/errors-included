@@ -13,7 +13,7 @@ class Picture(object):
         else:
             self.path = path
 
-#ovärd?
+#ovärd? JA
 #    def draw_picture(self, context, x, y):
 #        try:
 #            context.set_source_pixbuf(self.get_picture(), x, y)
@@ -196,6 +196,8 @@ class MapData():
     bounds = None
     objects = {}
 #    __mission_objects = []
+    """ Contains all the tiles
+    """
     levels = {}
     redraw_function = None
     focus = {"latitude":0,
