@@ -76,14 +76,14 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
 #        elif event.keyval == 65363:
 #            if (self.view.get_current_page() != 1):
 #                self.view.next_page()
-        # Zoom -
-        if event.keyval == 65477:
-            self.zoom("-")
-        # Zoom +
-        elif event.keyval == 65476:
-            self.zoom("+")
+#         Zoom -
+#        if event.keyval == 65477:
+#            self.zoom("-")
+#         Zoom +
+#        elif event.keyval == 65476:
+#            self.zoom("+")
         # Our own functions
-        elif event.keyval == gtk.keysyms.p:
+        if event.keyval == gtk.keysyms.p:
             self.mapdata.add_object("Trailerpark",
                 map.mapdata.POI(shared.data.POIData((15.5766, 58.3900),
                                 "trailer1", 0)))
