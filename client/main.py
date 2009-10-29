@@ -5,9 +5,8 @@ import hildon
 import gobject
 import pango
 
-import gui.mapgui
-import gui.testscreen
-import gui.missionscreen
+from gui.mapscreen import MapScreen
+from gui.alarmscreen import AlarmScreen
 
 class ClientGui(hildon.Program):
     '''
@@ -75,14 +74,14 @@ class ClientGui(hildon.Program):
         self.screens["notifications"] = notifications
 
         # adding the map screen
-        self.map = gui.mapgui.MapScreen()
+        self.map = MapScreen()
         vbox_right.pack_start(self.map, True, True, 0)
         self.screens["map"] = self.map
 
-        # adding the mission screen
-        self.mission = gui.missionscreen.MissionScreen()
-        vbox_right.pack_start(self.mission, True, True, 0)
-        self.screens["mission"] = self.mission
+        # adding the alarm screen
+        self.alarm_screen = AlarmScreen()
+        vbox_right.pack_start(self.alarm_screen, True, True, 0)
+        self.screens["alarm"] = self.alarm_screen
         
         # Mission buttons and their menu
         self.mission_menu = gtk.HBox(False, 0)
@@ -152,13 +151,13 @@ class ClientGui(hildon.Program):
         self.toggle_show("add_object", ["notifications", "map","add_object_menu"], "Här kan du lägga till ett objekt")
         
     def create_alarm(self, event):
-        self.show(["mission"])
+        self.show(["alarm"])
     
     def create_obstacle(self, event):
         pass
     
     def create_mission(self, event):
-        self.show(["mission"])
+        pass
 
 
     # contacts view event handlers
