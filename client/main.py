@@ -3,37 +3,188 @@
 import gtk
 import hildon
 import gobject
+import pango
 
 import gui.mapgui
 import gui.testscreen
 import gui.missionscreen
 
-
 class ClientGui(hildon.Program):
-
-    def show_mission(self,event):
-        self.show(["map", "mission_menu"])
-        
-    def show_add_object(self, event):
-        self.show(["map","add_object_menu"])
-        #self.map.show()
-        #self.menu_add.show_all()
-        #self.new_larm.hide_all()
+    '''
+    The main GUI-process of the client
+    '''
     
-    def show_send_screen(self,event):
-        pass
-#        print "Visar skicka-sidan"
-#        self.show([])
-        
-    def show_inkorg(self, event):
-        pass
-#        print "Visar inkorgen"
-#        self.show([])
-        
-    def report_larm(self, event):
-        pass
-#        self.show([1])
+    ''' create GUI Structure
+    '''
+    def __init__(self):
+        '''
+        Constructor. Creates the GUI (window and containing components).
+        '''
+        hildon.Program.__init__(self)
+        self.window = hildon.Window()
+        self.window.set_title("ClientGui")
+        self.add_window(self.window)
 
+        # A dict containing all the containers (used for hiding/showing) 
+        self.screens = {}
+
+        # A dict containing all the buttons to show/hide
+        self.menu_buttons = {}
+
+        # Panels
+        panels = gtk.HBox(False, 0)
+        self.window.add(panels)
+
+        # Left menu
+        vbox = gtk.VBox(False,0)
+        panels.pack_start(vbox, False, False, 0)
+        vbox.set_size_request(150,350)
+
+        # Buttons (menu)
+        mission_button = gtk.ToggleButton("Uppdrag")
+        mission_button.connect("clicked", self.show_mission)
+        self.menu_buttons["mission"] = mission_button
+
+        add_object_button = gtk.ToggleButton("Skapa")
+        add_object_button.connect("clicked", self.show_add_object)
+        self.menu_buttons["add_object"] = add_object_button
+
+        contacts_button = gtk.ToggleButton("Kontakt")
+        contacts_button.connect("clicked", self.show_contacts)
+        self.menu_buttons["contacts"] = contacts_button
+
+        messages_button = gtk.ToggleButton("Meddelande")
+        messages_button.connect("clicked", self.show_messages)
+        self.menu_buttons["messages"] = messages_button
+
+        vbox.add(mission_button)
+        vbox.add(add_object_button)
+        vbox.add(contacts_button)
+        vbox.add(messages_button)
+
+        # Right panel
+        vbox_right = gtk.VBox(False, 0)
+        panels.pack_start(vbox_right, True, True, 0)
+        
+        # adding the notification bar
+        notifications = gtk.Label("Team Med Fel")
+        notifications.set_alignment(0,0)
+        notifications.modify_font(pango.FontDescription("sans 14"))
+        notifications.set_size_request(0, 25)
+        vbox_right.pack_start(notifications, False, False, 0)
+        self.screens["notifications"] = notifications
+
+        # adding the map screen
+        self.map = gui.mapgui.MapScreen()
+        vbox_right.pack_start(self.map, True, True, 0)
+        self.screens["map"] = self.map
+
+        # adding the mission screen
+        self.mission = gui.missionscreen.MissionScreen()
+        vbox_right.pack_start(self.mission, True, True, 0)
+        self.screens["mission"] = self.mission
+        
+        # Mission buttons and their menu
+        self.mission_menu = gtk.HBox(False, 0)
+        self.mission_menu.set_size_request(0, 75)
+        vbox_right.pack_start(self.mission_menu, False, False, 0)
+        self.screens["mission_menu"] = self.mission_menu
+
+        info_button = gtk.Button("Info")
+        status_button = gtk.Button("Status")
+        journal_button = gtk.Button("Patient\nJournal")
+        faq_button = gtk.Button("FAQ")
+        self.mission_menu.add(info_button)
+        self.mission_menu.add(status_button)
+        self.mission_menu.add(journal_button)
+        self.mission_menu.add(faq_button)
+
+        # Add object buttons and their menu
+        self.add_object_menu = gtk.HBox(False, 0)
+        self.add_object_menu.set_size_request(0, 75)
+        vbox_right.pack_start(self.add_object_menu, False, False, 0)
+        self.screens["add_object_menu"] = self.add_object_menu
+        
+        create_alarm_button = gtk.Button("Larm")
+        create_alarm_button.connect("clicked", self.create_alarm)
+        create_obstacle_button = gtk.Button("Hinder")
+        create_mission_button = gtk.Button("Uppdrag")
+        self.add_object_menu.add(create_alarm_button)
+        self.add_object_menu.add(create_obstacle_button)
+        self.add_object_menu.add(create_mission_button)
+
+        self.window.connect("destroy", gtk.main_quit)
+        self.window.connect("key-press-event", self.on_key_press)
+        self.window.connect("window-state-event", self.on_window_state_change)
+
+        # Change to default True?
+        self.window_in_fullscreen = False
+        
+    def run(self):
+        '''
+        Main GUI loop
+        '''
+        self.window.show_all()
+        self.show_default()
+        gtk.main()
+    
+    ''' Handle events
+    '''
+    # mission view event handlers
+    def show_mission(self,event):
+        self.toggle_show("mission", ["notifications", "map", "mission_menu"], "Här visas dina uppdrag")
+        
+    def show_mission_info(self, event):
+        pass
+    
+    def show_status(self, event):
+        pass
+    
+    def show_journals(self, event):
+        pass
+    
+    def show_faq(self, event):
+        pass
+
+
+    # add object view event handlers
+    def show_add_object(self, event):
+        self.toggle_show("add_object", ["notifications", "map","add_object_menu"], "Här kan du lägga till ett objekt")
+        
+    def create_alarm(self, event):
+        self.show(["mission"])
+    
+    def create_obstacle(self, event):
+        pass
+    
+    def create_mission(self, event):
+        self.show(["mission"])
+
+
+    # contacts view event handlers
+    def show_contacts(self,event):
+        self.toggle_show("contacts", [])
+
+
+    # messages view event handlers
+    def show_messages(self, event):
+        self.toggle_show("messages", [])
+
+
+    # show certain screen methods
+    def toggle_show(self, button_key, screen_keys, notification_text = ""):
+        if self.menu_buttons[button_key].get_active():
+            for menu_button in self.menu_buttons.keys():
+                if menu_button != button_key:
+                    self.menu_buttons[menu_button].set_active(False)
+            for key in self.screens.keys():
+                self.screens[key].hide_all()
+            self.screens["notifications"].set_label(notification_text)
+            for key in screen_keys:
+                self.screens[key].show_all()
+        else:
+            self.show_default()
+    
     def show(self, keys):
         for key in self.screens.keys():
             self.screens[key].hide_all()
@@ -43,94 +194,13 @@ class ClientGui(hildon.Program):
     def show_default(self):
         for key in self.screens.keys():
             self.screens[key].hide_all()
-        self.map.show()
+        self.screens["notifications"].set_label("Team Med Fel")
+        self.screens["notifications"].show()
+        self.screens["map"].show()
+#        self.map.show()
 
-    def __init__(self):
-        hildon.Program.__init__(self)
-        self.window = hildon.Window()
-        self.window.set_title("ClientGui")
-        self.window.set_size_request(200, 200)
 
-        self.add_window(self.window)
-
-        # A list containing all the containers (used for hiding/showing) 
-        self.screens = {}
-
-        # Panels
-        panels = gtk.HBox(False, 2)
-        self.window.add(panels)
-        
-        # Left menu
-        vbox = gtk.VBox(False,5)
-        panels.add(vbox)
-
-        # Buttons (menu)
-        mission_button = gtk.ToggleButton("Uppdrag")
-        mission_button.connect("clicked", self.show_mission)
-
-        add_object_button = gtk.ToggleButton("Skapa")
-        add_object_button.connect("clicked", self.show_add_object)
-
-        send_button = gtk.ToggleButton("Kontakt")
-        send_button.connect("clicked", self.show_send_screen)
-
-        inbox_button = gtk.ToggleButton("Meddelande")
-        inbox_button.connect("clicked", self.show_inkorg)
-        
-        vbox.add(mission_button)
-        vbox.add(add_object_button)
-        vbox.add(send_button)
-        vbox.add(inbox_button)
-
-        # Right panel
-        vbox_right = gtk.VBox(False, 2)
-        panels.add(vbox_right)
-
-        self.map = gui.mapgui.MapScreen()
-        self.map.set_size_request(550,300)
-        vbox_right.add(self.map)
-        self.screens["map"] = self.map
-        
-        self.mission = gui.missionscreen.MissionScreen()
-        self.mission.set_size_request(550,300)
-        vbox_right.add(self.mission)
-        self.screens["mission"] = self.mission
-        
-        # Mission buttons
-        self.mission_menu = gtk.HBox(False, 4)
-        info_button = gtk.Button("Info")
-#        info_button.connect("clicked", self.report_larm)
-        status_button = gtk.Button("Status")
-        journal_button = gtk.Button("Patient\nJournal")
-        faq_button = gtk.Button("FAQ")
-        self.mission_menu.add(info_button)
-        self.mission_menu.add(status_button)
-        self.mission_menu.add(journal_button)
-        self.mission_menu.add(faq_button)
-        
-        vbox_right.add(self.mission_menu)
-        self.screens["mission_menu"] = self.mission_menu
-
-        # Add object buttons
-        self.add_object_menu = gtk.HBox(False, 3)
-        create_alarm_button = gtk.Button("Larm")
-        create_alarm_button.connect("clicked", self.report_larm)
-        create_obstacle_button = gtk.Button("Hinder")
-        create_mission_button = gtk.Button("Uppdrag")
-        self.add_object_menu.add(create_alarm_button)
-        self.add_object_menu.add(create_obstacle_button)
-        self.add_object_menu.add(create_mission_button)
-
-        vbox_right.add(self.add_object_menu)
-        self.screens["add_object_menu"] = self.add_object_menu
-
-        self.window.connect("destroy", gtk.main_quit)
-        self.window.connect("key-press-event", self.on_key_press)
-        self.window.connect("window-state-event", self.on_window_state_change)
-
-        # Change to default True?
-        self.window_in_fullscreen = False
-
+    # handle key press events
     def on_key_press(self, widget, event, *args):
         # react on fullscreen button press
         if event.keyval == gtk.keysyms.F6:
@@ -150,11 +220,6 @@ class ClientGui(hildon.Program):
             self.window_in_fullscreen = True
         else:
             self.window_in_fullscreen = False  
-
-    def run(self):
-        self.window.show_all()
-        self.show_default()
-        gtk.main()
 
 # den här borde skapa nya vyer av mission och kartan
 if __name__ == "__main__":
