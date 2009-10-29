@@ -11,17 +11,17 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
     event_entry = None
     location_entry = None
     hurted_entry = None
-    contact_entry = None
+    name_entry = None
+    number_entry = None
     random_entry = None
 
     def new_entry(self, labeltext):
         label = gtk.Label(labeltext)
-#        label.show()
         entry = gtk.Entry()
         entry.set_max_length(100)
-        #entry.connect("activate", self.enter_callback, entry)
         entry.set_text("")
         entry.select_region(0, len(entry.get_text()))
+        
 #        entry.show()
         return (label, entry)
 
@@ -29,55 +29,55 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         gtk.ScrolledWindow.__init__(self)
         # create a new window
 
-        table = gtk.Table(10, 2)
-        self.add_with_viewport(table)
-        table.show()
-
-        y = 0
+        hbox = gtk.HBox(False,2)
+        self.add_with_viewport(hbox)
+        left_box = gtk.VBox(True,8)
+        right_box = gtk.VBox(True,8)
+        hbox.add(left_box)
+        hbox.add(right_box)
+        
 
         label, self.event_entry = self.new_entry("Händelse")
-        table.attach(label, 0, 1, y, y+1)
-        table.attach(self.event_entry, 1, 2, y, y+1)
-        label.hide()
-        y+=1
-
+        left_box.add(label)
+        right_box.add(self.event_entry)
+        
         label, self.location_entry = self.new_entry("Skadeplats")
-        table.attach(label, 0, 1, y, y+1)
-        table.attach(self.location_entry, 1, 2, y, y+1)
-        label.hide()
-        y+=1
+        left_box.add(label)
+        right_box.add(self.location_entry)
 
         label, self.hurted_entry = self.new_entry("Antal skadade")
-        table.attach(label, 0, 1, y, y+1)
-        table.attach(self.hurted_entry, 1, 2, y, y+1)
-        label.hide()
-        y+=1
-
-        label, self.contact_entry = self.new_entry("Kontaktperson(Namn & Nummer)")
-        table.attach(label, 0, 1, y, y+1)
-        table.attach(self.contact_entry, 1, 2, y, y+1)
-        label.hide()
-        y+=1
+        left_box.add(label)
+        right_box.add(self.hurted_entry)
+        
+        contact = gtk.Label("Kontaktperson:")
+        invisible_label = gtk.Label("")
+        left_box.add(contact)
+        right_box.add(invisible_label)
+        
+        label, self.name_entry = self.new_entry("Namn")
+        left_box.add(label)
+        right_box.add(self.name_entry)
+        
+        label, self.number_entry = self.new_entry("Nummer")
+        left_box.add(label)
+        right_box.add(self.number_entry)
 
         label, self.random_entry = self.new_entry("Övrig information")
-        table.attach(label, 0, 1, y, y+1)
-        table.attach(self.random_entry, 1, 2, y, y+1)
-        label.hide()
-        y+=1
+        left_box.add(label)
+        right_box.add(self.random_entry)
 
         close = gtk.Button(stock=gtk.STOCK_CLOSE)
+        close.set_size_request(10,10)
         close.connect("clicked", gtk.main_quit)
-        table.attach(close, 0, 1, y, y+1)
+        left_box.add(close)
         close.set_flags(gtk.CAN_DEFAULT)
-        close.hide()
 
         ok = gtk.Button(stock=gtk.STOCK_OK)
         ok.connect("clicked", self.add_mission)
-        table.attach(ok, 1, 2, y, y+1)
+        right_box.add(ok)
         ok.set_flags(gtk.CAN_DEFAULT)
-        ok.show()
         
-        table.hide_all()
+        self.show_all()
 
     def add_mission(self, event):
         mission_data = shared.data.MissionData(self.event_entry.get_text(),
