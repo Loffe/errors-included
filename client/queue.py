@@ -19,6 +19,9 @@ class Queue(threading.Thread):
         self.socket.connect((host,port))
         self.running = True
 
+    def close(self):
+        self.socket.close()
+
     def mainloop(self):
         t = threading.Thread(target=self.listener)
         t.start()
@@ -31,8 +34,12 @@ class Queue(threading.Thread):
         self.socket.close()
 
     def listener(self):
+        self.socket.settimeout(1.0)
         while self.running:
-            data = self.socket.recv(1000)
+            try:
+                data = self.socket.recv(1000)
+            except socket.timeout:
+                continue
             print data
             if data == "Hejsan10":
                 self.running = False
