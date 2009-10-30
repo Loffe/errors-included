@@ -18,10 +18,9 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
     number_entry = None
     random_entry = None
 
-    def __init__(self, back_button_function = None, ok_button_function = None):
+    def __init__(self):
         '''
-        Constructor. Create the missionscreen and its entries.
-        @param back_button_function: The functionality of the back-button.
+        Constructor. Create the alarmscreen and its entries.
         '''
         gtk.ScrolledWindow.__init__(self)
 
@@ -79,15 +78,5 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         label, self.random_entry = new_entry("Övrigt:")
         left_box.add(label)
         right_box.add(self.random_entry)
-
-        back_button = gtk.Button("Bakåt")
-#        back_button.set_size_request(10,10)
-        back_button.connect("clicked", back_button_function)
-        left_box.add(back_button)
-
-        ok_button = gtk.Button("OK")
-        ok_button.connect("clicked", ok_button_function)
-        right_box.add(ok_button)
-        ok_button.set_flags(gtk.CAN_DEFAULT)
         
         self.show_all()

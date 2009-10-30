@@ -2,7 +2,7 @@ class UnitType(object):
     commander, ambulance, other = range(3)
 
 class ObstacleType(object):
-    tree, hippie_volkswagon, broken_nuclear_power_plant = range(3)
+    tree, broken_bridge, bad_road, other = range(4)
 
 class POIType(object):
     accident, pasta_wagon = range(2)
@@ -24,7 +24,7 @@ class UnitData(MapObjectData):
     type = UnitType.ambulance
 
 class ObstacleData(MapObjectData):
-    type = ObstacleType.hippie_volkswagon
+    type = ObstacleType.tree
 
 class POIData(MapObjectData):
     type = POIType.pasta_wagon

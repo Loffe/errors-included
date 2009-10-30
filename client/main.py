@@ -80,20 +80,18 @@ class ClientGui(hildon.Program):
         self.screens["map"] = self.map
 
         # add the alarm screen
-        self.alarm_screen = AlarmScreen(self.show_add_object,
-                                        self.show_add_object)
+        self.alarm_screen = AlarmScreen()
         vbox_right.pack_start(self.alarm_screen, True, True, 0)
         self.screens["alarm"] = self.alarm_screen
         
         # add the obstacle screen
-        self.obstacle_screen = ObstacleScreen(self.show_add_object,
-                                        self.show_add_object)
+        self.obstacle_screen = ObstacleScreen()
         vbox_right.pack_start(self.obstacle_screen, True, True, 0)
         self.screens["obstacle"] = self.obstacle_screen
         
         # Mission buttons and their menu
         self.mission_menu = gtk.HBox(False, 0)
-        self.mission_menu.set_size_request(0, 75)
+        self.mission_menu.set_size_request(0, 60)
         vbox_right.pack_start(self.mission_menu, False, False, 0)
         self.screens["mission_menu"] = self.mission_menu
 
@@ -108,7 +106,7 @@ class ClientGui(hildon.Program):
 
         # Add object buttons and their menu
         self.add_object_menu = gtk.HBox(False, 0)
-        self.add_object_menu.set_size_request(0, 75)
+        self.add_object_menu.set_size_request(0, 60)
         vbox_right.pack_start(self.add_object_menu, False, False, 0)
         self.screens["add_object_menu"] = self.add_object_menu
         
@@ -120,6 +118,22 @@ class ClientGui(hildon.Program):
         self.add_object_menu.add(create_alarm_button)
         self.add_object_menu.add(create_obstacle_button)
         self.add_object_menu.add(create_mission_button)
+        
+        # add back- and ok-button (used in alarmscreen, obstaclescreen etc)
+        self.buttons_box = gtk.HBox(False, 10)
+        self.buttons_box.set_size_request(0, 60)
+        self.screens["buttons"] = self.buttons_box
+        
+        back_button = gtk.Button("Bakåt")
+        back_button.connect("clicked", self.show_add_object)
+        self.buttons_box.pack_start(back_button)
+
+        ok_button = gtk.Button("OK")
+        ok_button.connect("clicked", self.show_add_object)
+        ok_button.set_flags(gtk.CAN_DEFAULT)
+        self.buttons_box.pack_start(ok_button)
+        
+        vbox_right.pack_start(self.buttons_box, False, False, 0)
 
         self.window.connect("destroy", gtk.main_quit)
         self.window.connect("key-press-event", self.on_key_press)
@@ -165,10 +179,10 @@ class ClientGui(hildon.Program):
     
     # add object buttons event handlers
     def create_alarm(self, event):
-        self.show(["alarm"])
+        self.show(["alarm", "buttons"])
     
     def create_obstacle(self, event):
-        self.show(["obstacle"])
+        self.show(["obstacle", "buttons"])
     
     def create_mission(self, event):
         pass
