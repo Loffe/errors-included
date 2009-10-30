@@ -79,7 +79,8 @@ class ClientGui(hildon.Program):
         self.screens["map"] = self.map
 
         # adding the alarm screen
-        self.alarm_screen = AlarmScreen()
+        self.alarm_screen = AlarmScreen(self.show_add_object,
+                                        self.show_add_object)
         vbox_right.pack_start(self.alarm_screen, True, True, 0)
         self.screens["alarm"] = self.alarm_screen
         
@@ -131,8 +132,10 @@ class ClientGui(hildon.Program):
     '''
     # mission view event handlers
     def show_mission(self,event):
-        self.toggle_show("mission", ["notifications", "map", "mission_menu"], "Här visas dina uppdrag")
-        
+        self.toggle_show("mission", ["notifications", "map", "mission_menu"], 
+                         "Här visas dina uppdrag")
+    
+    # mission buttons event handlers
     def show_mission_info(self, event):
         pass
     
@@ -148,8 +151,11 @@ class ClientGui(hildon.Program):
 
     # add object view event handlers
     def show_add_object(self, event):
-        self.toggle_show("add_object", ["notifications", "map","add_object_menu"], "Här kan du lägga till ett objekt")
-        
+        self.toggle_show("add_object", 
+                         ["notifications", "map","add_object_menu"], 
+                         "Här kan du lägga till ett objekt")
+    
+    # add object buttons event handlers
     def create_alarm(self, event):
         self.show(["alarm"])
     
@@ -172,6 +178,12 @@ class ClientGui(hildon.Program):
 
     # show certain screen methods
     def toggle_show(self, button_key, screen_keys, notification_text = ""):
+        '''
+        Toggle clicked button, show specified screens and set notification.
+        @param button_key: the key of the clicked button.
+        @param screen_keys: the screens to show.
+        @param notification_text: the notification text to set.
+        '''
         if self.menu_buttons[button_key].get_active():
             for menu_button in self.menu_buttons.keys():
                 if menu_button != button_key:
@@ -185,19 +197,24 @@ class ClientGui(hildon.Program):
             self.show_default()
     
     def show(self, keys):
+        '''
+        Show specified screens.
+        @param keys: a list with keys to the screens to show. 
+        '''
         for key in self.screens.keys():
             self.screens[key].hide_all()
         for key in keys:
             self.screens[key].show_all()
             
     def show_default(self):
+        '''
+        Show only default screens (GUI-background).
+        '''
         for key in self.screens.keys():
             self.screens[key].hide_all()
         self.screens["notifications"].set_label("Team Med Fel")
         self.screens["notifications"].show()
         self.screens["map"].show()
-#        self.map.show()
-
 
     # handle key press events
     def on_key_press(self, widget, event, *args):
@@ -207,10 +224,10 @@ class ClientGui(hildon.Program):
                 self.window.unfullscreen()
             else:
                 self.window.fullscreen()
-        # Zoom -
+        # Zoom out (-)
         if event.keyval == gtk.keysyms.F8:
             self.map.zoom("-")
-        # Zoom +
+        # Zoom in (+)
         elif event.keyval == gtk.keysyms.F7:
             self.map.zoom("+")  
 

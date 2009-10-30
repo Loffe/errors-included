@@ -8,7 +8,7 @@ import pango
 
 class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
     '''
-    The screen in which you create a new alarm
+    The screen in which you create a new alarm.
     '''
     # the entries
     event_entry = None
@@ -18,9 +18,10 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
     number_entry = None
     random_entry = None
 
-    def __init__(self):
+    def __init__(self, back_button_function, ok_button_function):
         '''
         Constructor. Create the missionscreen and its entries.
+        @param back_button_function: The functionality of the back-button.
         '''
         gtk.ScrolledWindow.__init__(self)
 
@@ -79,23 +80,14 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         left_box.add(label)
         right_box.add(self.random_entry)
 
-        close = gtk.Button(stock=gtk.STOCK_CLOSE)
-        close.set_size_request(10,10)
-        close.connect("clicked", gtk.main_quit)
-        left_box.add(close)
-        close.set_flags(gtk.CAN_DEFAULT)
+        back_button = gtk.Button("Bakåt")
+#        back_button.set_size_request(10,10)
+        back_button.connect("clicked", back_button_function)
+        left_box.add(back_button)
 
-        ok = gtk.Button(stock=gtk.STOCK_OK)
-        ok.connect("clicked", self.create_alarm)
-        right_box.add(ok)
-        ok.set_flags(gtk.CAN_DEFAULT)
+        ok_button = gtk.Button("OK")
+        ok_button.connect("clicked", ok_button_function)
+        right_box.add(ok_button)
+        ok_button.set_flags(gtk.CAN_DEFAULT)
         
         self.show_all()
-        
-    ''' Handle Events
-    '''
-    def create_alarm(self, event):
-        '''
-        Call when OK-button is pressed. Create the alarm using information from entries.
-        '''
-        pass
