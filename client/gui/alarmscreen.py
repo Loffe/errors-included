@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 
 import gtk
 import map.mapdata
@@ -8,7 +8,7 @@ import pango
 
 class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
     '''
-    The screen in which you create a new alarm
+    The screen in which you create a new alarm.
     '''
     # the entries
     event_entry = None
@@ -20,7 +20,7 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
 
     def __init__(self):
         '''
-        Constructor. Create the missionscreen and its entries.
+        Constructor. Create the alarmscreen and its entries.
         '''
         gtk.ScrolledWindow.__init__(self)
 
@@ -78,24 +78,5 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         label, self.random_entry = new_entry("Övrigt:")
         left_box.add(label)
         right_box.add(self.random_entry)
-
-        close = gtk.Button(stock=gtk.STOCK_CLOSE)
-        close.set_size_request(10,10)
-        close.connect("clicked", gtk.main_quit)
-        left_box.add(close)
-        close.set_flags(gtk.CAN_DEFAULT)
-
-        ok = gtk.Button(stock=gtk.STOCK_OK)
-        ok.connect("clicked", self.create_alarm)
-        right_box.add(ok)
-        ok.set_flags(gtk.CAN_DEFAULT)
         
         self.show_all()
-        
-    ''' Handle Events
-    '''
-    def create_alarm(self, event):
-        '''
-        Call when OK-button is pressed. Create the alarm using information from entries.
-        '''
-        pass
