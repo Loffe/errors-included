@@ -7,6 +7,7 @@ import pango
 
 from gui.mapscreen import MapScreen
 from gui.alarmscreen import AlarmScreen
+from gui.messagescreen import MessageScreen
 from gui.obstaclescreen import ObstacleScreen
 
 class ClientGui(hildon.Program):
@@ -83,7 +84,12 @@ class ClientGui(hildon.Program):
         self.alarm_screen = AlarmScreen()
         vbox_right.pack_start(self.alarm_screen, True, True, 0)
         self.screens["alarm"] = self.alarm_screen
-        
+
+        # adding messages screen
+        self.message_screen = MessageScreen()
+        vbox_right.pack_start(self.message_screen, True, True, 0)
+        self.screens["message"] = self.message_screen
+
         # add the obstacle screen
         self.obstacle_screen = ObstacleScreen()
         vbox_right.pack_start(self.obstacle_screen, True, True, 0)
@@ -96,7 +102,9 @@ class ClientGui(hildon.Program):
         self.screens["mission_menu"] = self.mission_menu
 
         info_button = gtk.Button("Info")
+        info_button.connect("clicked", self.show_mission_info)
         status_button = gtk.Button("Status")
+        status_button.connect("clicked", self.show_status)
         journal_button = gtk.Button("Patient\nJournal")
         faq_button = gtk.Button("FAQ")
         self.mission_menu.add(info_button)
@@ -168,7 +176,55 @@ class ClientGui(hildon.Program):
         pass
     
     def show_status(self, event):
-        pass
+        
+
+        
+        dialog = gtk.Dialog("Samtal",
+                 self.window,  #the toplevel wgt of your app
+                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
+                 ("     Svara     ", 77, "  Upptaget  ", 666))
+        who = gtk.Label("DT ringer...")
+        who.show()
+        dialog.set_size_request(400,200)
+        #dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+
+        dialog.vbox.pack_start(who)
+        question = gtk.Label("Vill du svara?")
+        question.show()
+        dialog.vbox.pack_start(question)
+        dialog.show()
+        result = dialog.run()
+        if result == 77:
+           print "svara"
+           
+           
+           
+           
+           
+           dia = gtk.Dialog("Samtal",
+                 self.window,  #the toplevel wgt of your app
+                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
+                 ("       Lägg på       ", 11))
+        
+           dia.set_size_request(400,200)
+
+
+        
+           qu = gtk.Label("Vill du lägga på?")
+           qu.show()
+           dia.vbox.pack_start(qu)
+           dia.show()
+           result = dia.run()
+           
+           dia.destroy()
+           
+           
+           
+           
+           
+        elif result == 666:
+            print "upptaget"
+        dialog.destroy()
     
     def show_journals(self, event):
         pass
@@ -201,7 +257,7 @@ class ClientGui(hildon.Program):
 
     # messages view event handlers
     def show_messages(self, event):
-        self.toggle_show("messages", [])
+        self.toggle_show("messages", ["notifications", "message"], "Här visas dina meddelanden")
 
 
     # show certain screen methods
