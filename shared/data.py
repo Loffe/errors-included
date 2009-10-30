@@ -2,7 +2,7 @@ class UnitType(object):
     commander, ambulance, other = range(3)
 
 class ObstacleType(object):
-    tree, broken_bridge, bad_road, other = range(4)
+    tree, bridge, road, other = range(4)
 
 class POIType(object):
     accident, pasta_wagon = range(2)

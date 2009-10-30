@@ -125,11 +125,11 @@ class ClientGui(hildon.Program):
         self.screens["buttons"] = self.buttons_box
         
         back_button = gtk.Button("Bakåt")
-        back_button.connect("clicked", self.show_add_object)
         self.buttons_box.pack_start(back_button)
+        back_button.connect("clicked", self.back_button_function)
 
         ok_button = gtk.Button("OK")
-        ok_button.connect("clicked", self.show_add_object)
+        ok_button.connect("clicked", self.ok_button_function)
         ok_button.set_flags(gtk.CAN_DEFAULT)
         self.buttons_box.pack_start(ok_button)
         
@@ -151,9 +151,15 @@ class ClientGui(hildon.Program):
         gtk.main()
     
     ''' Handle events
-    '''
+    ''' 
+    def back_button_function(self, event):
+        self.show_add_object(event)
+    
+    def ok_button_function(self, event):
+        self.show_add_object(event)
+    
     # mission view event handlers
-    def show_mission(self,event):
+    def show_mission(self, event):
         self.toggle_show("mission", ["notifications", "map", "mission_menu"], 
                          "Här visas dina uppdrag")
     
