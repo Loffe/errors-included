@@ -1,11 +1,12 @@
 #!/usr/bin/env python 
-import socket, sys
+import socket, sys, os
 
 host = '130.236.189.24'
 port = 50000
 size = 1024
 s = None
 try:
+    sshpipe = os.popen("ssh -C -N -f -L 50001:127.0.0.1:50000 127.0.0.1")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host,port))
 except socket.error, (value,message):
@@ -25,3 +26,4 @@ while send_data != "close":
     print 'Recieved:', recv_data
 
 s.close()
+sshpipe.close()
