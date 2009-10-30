@@ -1,9 +1,9 @@
 #!/usr/bin/env python 
 
-import socket, sys
+import socket, sys, os
 
 host = ''
-port = 50000
+port = 50001
 backlog = 5
 size = 1024
 s = None
