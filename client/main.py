@@ -7,6 +7,7 @@ import pango
 
 from gui.mapscreen import MapScreen
 from gui.alarmscreen import AlarmScreen
+from gui.obstaclescreen import ObstacleScreen
 
 class ClientGui(hildon.Program):
     '''
@@ -73,16 +74,22 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(notifications, False, False, 0)
         self.screens["notifications"] = notifications
 
-        # adding the map screen
+        # add the map screen
         self.map = MapScreen()
         vbox_right.pack_start(self.map, True, True, 0)
         self.screens["map"] = self.map
 
-        # adding the alarm screen
+        # add the alarm screen
         self.alarm_screen = AlarmScreen(self.show_add_object,
                                         self.show_add_object)
         vbox_right.pack_start(self.alarm_screen, True, True, 0)
         self.screens["alarm"] = self.alarm_screen
+        
+        # add the obstacle screen
+        self.obstacle_screen = ObstacleScreen(self.show_add_object,
+                                        self.show_add_object)
+        vbox_right.pack_start(self.obstacle_screen, True, True, 0)
+        self.screens["obstacle"] = self.obstacle_screen
         
         # Mission buttons and their menu
         self.mission_menu = gtk.HBox(False, 0)
@@ -108,6 +115,7 @@ class ClientGui(hildon.Program):
         create_alarm_button = gtk.Button("Larm")
         create_alarm_button.connect("clicked", self.create_alarm)
         create_obstacle_button = gtk.Button("Hinder")
+        create_obstacle_button.connect("clicked", self.create_obstacle)
         create_mission_button = gtk.Button("Uppdrag")
         self.add_object_menu.add(create_alarm_button)
         self.add_object_menu.add(create_obstacle_button)
@@ -160,7 +168,7 @@ class ClientGui(hildon.Program):
         self.show(["alarm"])
     
     def create_obstacle(self, event):
-        pass
+        self.show(["obstacle"])
     
     def create_mission(self, event):
         pass

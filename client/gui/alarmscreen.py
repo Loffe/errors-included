@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 
 import gtk
 import map.mapdata
@@ -18,7 +18,7 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
     number_entry = None
     random_entry = None
 
-    def __init__(self, back_button_function, ok_button_function):
+    def __init__(self, back_button_function = None, ok_button_function = None):
         '''
         Constructor. Create the missionscreen and its entries.
         @param back_button_function: The functionality of the back-button.
