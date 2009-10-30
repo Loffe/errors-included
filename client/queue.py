@@ -11,8 +11,8 @@ class Queue(threading.Thread):
     def __init__(self):
         pass
 
-    def send(self, msg):
-        self.out.append(msg)
+    def enqueue(self, msg):
+        self.output.append(msg)
 
     def connect_to_server(self, host, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -25,11 +25,10 @@ class Queue(threading.Thread):
     def mainloop(self):
         t = threading.Thread(target=self.listener)
         t.start()
-        i = 0
         while self.running:
-            self.socket.send("Hejsan" + str(i))
-            i+=1
-            time.sleep(1)
+            if len(self.output) > 0:
+                msg = self.output.pop()
+                self.socket.send(msg)
 
         self.socket.close()
 
@@ -40,7 +39,5 @@ class Queue(threading.Thread):
                 data = self.socket.recv(1000)
             except socket.timeout:
                 continue
-            print data
-            if data == "Hejsan10":
-                self.running = False
+            self.input.append(data)
 
