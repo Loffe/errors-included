@@ -252,7 +252,7 @@ class ClientGui(hildon.Program):
 
     # contacts view event handlers
     def show_contacts(self,event):
-        self.toggle_show("contacts", [])
+        self.toggle_show("contacts", ["notifications"], "Här visas dina kontakter och du kan ringa till dem")
 
 
     # messages view event handlers
