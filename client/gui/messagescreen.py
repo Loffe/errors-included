@@ -79,16 +79,6 @@ class MessageScreen(gtk.ScrolledWindow, gui.Screen):
         left_box.add(label)
         right_box.add(self.random_entry)
 
-        close = gtk.Button(stock=gtk.STOCK_CLOSE)
-        close.set_size_request(10,10)
-        close.connect("clicked", gtk.main_quit)
-        left_box.add(close)
-        close.set_flags(gtk.CAN_DEFAULT)
-
-        ok = gtk.Button(stock=gtk.STOCK_OK)
-        ok.connect("clicked", self.show_messages)
-        right_box.add(ok)
-        ok.set_flags(gtk.CAN_DEFAULT)
         
         self.show_all()
         
