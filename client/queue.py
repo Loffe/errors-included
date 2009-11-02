@@ -1,10 +1,12 @@
+import config
+import dbus
+import dbus.mainloop.glib
+import dbus.service
 import gobject
 import socket
+import subprocess
 import threading
 import time
-import dbus
-import dbus.service
-import dbus.mainloop.glib
 
 class Queue(dbus.service.Object):
     output = []
@@ -19,6 +21,13 @@ class Queue(dbus.service.Object):
         return "message queued :)"
 
     def connect_to_server(self, host, port):
+        if config.server.ssh == True:
+            subprocess.call(["ssh",
+                             "-C", "-f",
+                             "-L", str(config.server.localport)+":127.0.0.1:"+str(port),
+                             host, "sleep", "10"])
+            host = "127.0.0.1"
+            port = config.server.localport
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((host,port))
         self.running = True
