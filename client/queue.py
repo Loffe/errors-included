@@ -1,6 +1,8 @@
 import socket
 import threading
 import time
+import config
+import subprocess
 
 class Queue(threading.Thread):
     output = []
@@ -15,6 +17,11 @@ class Queue(threading.Thread):
         self.output.append(msg)
 
     def connect_to_server(self, host, port):
+        if config.server.ssh == True:
+            sshpipe = subprocess.call(["ssh",
+                                    "-C", "-f",
+                                    "-L", str(config.server.localport)+":127.0.0.1:"+str(config.server.port),
+                                    config.server.ip, "sleep", "10"])
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((host,port))
         self.running = True
