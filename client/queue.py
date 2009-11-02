@@ -27,11 +27,11 @@ class Queue(dbus.service.Object):
         self.socket.close()
 
     def mainloop(self):
-        #t = threading.Thread(target=self.listener)
-        #t.start()
-        #dbus_t = threading.Thread(target=self.dbus_main)
-        #dbus_t.start()
-        self.dbus_main()
+        t = threading.Thread(target=self.listener)
+        t.start()
+        dbus_t = threading.Thread(target=self.dbus_main)
+        dbus_t.start()
+        #self.dbus_main()
 
         while self.running:
             if len(self.output) > 0:
