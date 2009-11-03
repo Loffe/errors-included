@@ -40,6 +40,9 @@ class Queue(dbus.service.Object):
         try:
             self.socket.connect(self.server)
             self.running = True
+            gobject.idle_add(self._send)
+            gobject.idle_add(self._recv)
+            print "Connected :D"
         except socket.error, (errno, errmsg):
             self._handle_error(errno)
         return False
