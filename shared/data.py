@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import simplejson as json
 from datetime import datetime
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker, relation
@@ -11,7 +12,7 @@ class Database(object):
     '''
     A sqlite3 database using sqlalchemy.
     '''
-    
+
     def __init__(self):
         '''
         Create database engine and session.
@@ -71,6 +72,14 @@ class MapObjectData(Base):
         self.coords = coord
         self.name = u""+name
         self.timestamp = timestamp
+        
+    def to_dict(self):
+        dict = {}
+#        dict["coords"] = self.coords
+        for var in self.__dict__.keys():
+            if not var.startswith("_"):
+                dict[var] = self.__dict__[var]
+        return dict
 
     def __repr__(self):
         return "<%s: %s, %s, %s, %s>" % (self.__class__.__name__.encode("utf-8"), 
@@ -79,7 +88,7 @@ class MapObjectData(Base):
 
 class UnitData(MapObjectData):
     '''
-    All units have data objects extending this class.
+    All units have data objects of this class.
     '''
     __tablename__ = 'UnitData'
     __mapper_args__ = {'polymorphic_identity': 'UnitData'}
@@ -92,6 +101,9 @@ class UnitData(MapObjectData):
         self.type = type
 
 class ObstacleData(MapObjectData):
+    '''
+    All obstacles have data objects of this class.
+    '''
     __tablename__ = 'ObstacleData'
     __mapper_args__ = {'polymorphic_identity': 'ObstacleData'}
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
@@ -103,6 +115,9 @@ class ObstacleData(MapObjectData):
         self.type = type
 
 class POIData(MapObjectData):
+    '''
+    All Points of Interest (POIs) have data objects of this class.
+    '''
     __tablename__ = 'POIData'
     __mapper_args__ = {'polymorphic_identity': 'POIData'}
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
@@ -114,6 +129,9 @@ class POIData(MapObjectData):
         self.type = type
 
 class MissionData(Base):
+    '''
+    All missions have data objects of this class. 
+    '''
     __tablename__ = 'MissionData'
     id = Column(Integer, primary_key=True)
 
@@ -133,21 +151,31 @@ class MissionData(Base):
         self.other = u""+other
         
 class Message(object):
-    type = None
-    data = None    
+    '''
+    All messages must be instances of this class.
+    Enables packing and unpacking of raw messages.
+    '''
+    # The data to send (a dict containing all variables)
+    data = None
     
-    def __init__(self, raw_msg = None):
-        self.unpack(raw_msg)
+    def __init__(self, object = None, raw_message = None):
+        '''
+        Create a message.
+        @param object:
+        @param raw_message:
+        '''
+        if self.raw_message != None:
+            self.unpack(raw_message)
+        else:
+            self.data = object.to_dict()
     
-    """ till JSON tror vi
-    """
     def pack(self):
-        pass
+        return json.dumps(self.data)
     
-    def unpack(self, raw_msg):
-        if raw_msg != None:
-            #packa upp
-            pass
+    def unpack(self, raw_message = None):
+        if raw_message != None:
+            self.data = json.loads(raw_message)
+            # convert temp to type and object
 
 def create_database():
     db = Database()

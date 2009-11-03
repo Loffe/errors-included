@@ -184,13 +184,14 @@ class ClientGui(hildon.Program):
         name = "hinder"
         timestamp = datetime(2009,11,3,10,40)
         type = self.obstacle_screen.selected_type
-        print type
 
         data = ObstacleData(coord, name, timestamp, type)
 
         obstacle = Obstacle(data)
 
         self.db.add(data)
+        
+        print data.to_dict()
     
     # mission view event handlers
     def show_mission(self, event):
