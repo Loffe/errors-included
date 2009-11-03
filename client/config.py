@@ -1,8 +1,15 @@
+"""
+This package handles configuration variables. The settings are stored in
+the file settings.py which is not i version control. You have to create it yourself.
+"""
 class Config(object):
     pass
 
-server = Config()
-server.ip = 'sysi-14'
-server.port = 50000
-server.localport = 50001
-server.ssh = True
+try:
+    import settings
+except ImportError:
+    print "No settings.py file available"
+    import sys
+    sys.exit(1)
+
+server = settings.server
