@@ -1,6 +1,7 @@
 """
 This package handles configuration variables. The settings are stored in
-the file settings.py which is not i version control. You have to create it yourself.
+the file settings.py which is not in version control. You have to create it yourself by
+copying settingsexample.py.
 """
 class Config(object):
     pass

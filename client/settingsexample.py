@@ -1,3 +1,7 @@
+"""
+Don't touch and really don't commit changes. If you create new variables
+in settings.py you must also add them here
+"""
 from config import Config
 
 server = Config()
