@@ -58,7 +58,6 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         
         # create entries
         label, self.event_entry = new_entry("     Händelse:")
-        label.set_alignment(0, 0.5)
         label.modify_font(pango.FontDescription("sans 12"))
         hbox2 = gtk.HBox(True,0)
         main_box.add(hbox2)
@@ -66,7 +65,6 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         hbox2.pack_start(self.event_entry,True,True,0)
         
         label, self.location_entry = new_entry("     Skadeplats:")
-        label.set_alignment(0, 0.5)
         label.modify_font(pango.FontDescription("sans 12"))
         hbox3 = gtk.HBox(True,0)
         main_box.add(hbox3)
@@ -74,7 +72,6 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         hbox3.pack_start(self.location_entry,True,True,0)
 
         label, self.hurted_entry = new_entry("     Antal skadade:")
-        label.set_alignment(0, 0.5)
         label.modify_font(pango.FontDescription("sans 12"))
         hbox4 = gtk.HBox(True,0)
         main_box.add(hbox4)
