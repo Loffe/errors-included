@@ -17,14 +17,20 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
-        def new_entry(labeltext):
+        def new_entry(labeltext, parent):
+            hbox = gtk.HBox(True, 0)
             label = gtk.Label(labeltext)
             label.set_alignment(0, 0.5)
+            label.modify_font(pango.FontDescription("sans 12"))
+
             entry = gtk.Entry()
             entry.set_max_length(300)
             entry.set_text("")
             entry.select_region(0, len(entry.get_text()))
-            return (label, entry)
+            hbox.add(label)
+            hbox.add(entry)
+            parent.add(hbox)
+            return entry
         
         # create layout boxes
         main_box = gtk.VBox(False,0)
@@ -57,26 +63,11 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         #hbox1.pack_start(invisible_label,True,True,0)
         
         # create entries
-        label, self.event_entry = new_entry("     Händelse:")
-        label.modify_font(pango.FontDescription("sans 12"))
-        hbox2 = gtk.HBox(True,0)
-        main_box.add(hbox2)
-        hbox2.pack_start(label,True,True,0)
-        hbox2.pack_start(self.event_entry,True,True,0)
-        
-        label, self.location_entry = new_entry("     Skadeplats:")
-        label.modify_font(pango.FontDescription("sans 12"))
-        hbox3 = gtk.HBox(True,0)
-        main_box.add(hbox3)
-        hbox3.pack_start(label,True,True,0)
-        hbox3.pack_start(self.location_entry,True,True,0)
+        self.event_entry = new_entry("     Händelse:", main_box)
 
-        label, self.hurted_entry = new_entry("     Antal skadade:")
-        label.modify_font(pango.FontDescription("sans 12"))
-        hbox4 = gtk.HBox(True,0)
-        main_box.add(hbox4)
-        hbox4.add(label)
-        hbox4.add(self.hurted_entry)
+        self.location_entry = new_entry("     Skadeplats:", main_box)
+
+        self.hurted_entry = new_entry("     Antal skadade:", main_box)
 
         contact = gtk.Label("Kontaktperson:")
         contact.set_alignment(0, 0.5)
@@ -87,29 +78,12 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         hbox5.pack_start(contact,True,True,0)
         #hbox5.add(invisible_label)
 
-        
-        label, self.name_entry = new_entry("     Namn:")
-        label.set_alignment(0, 0.5)
-        label.modify_font(pango.FontDescription("sans 12"))
-        hbox6 = gtk.HBox(True,0)
-        main_box.add(hbox6)
-        hbox6.add(label)
-        hbox6.add(self.name_entry)
-        
-        label, self.number_entry = new_entry("     Nummer:")
-        label.set_alignment(0, 0.5)
-        label.modify_font(pango.FontDescription("sans 12"))
-        hbox7 = gtk.HBox(True,0)
-        main_box.add(hbox7)
-        hbox7.add(label)
-        hbox7.add(self.number_entry)
+        self.name_entry = new_entry("     Namn:", main_box)
 
-        label, self.random_entry = new_entry("Övrigt:")
-        hbox8 = gtk.HBox(True,0)
-        main_box.add(hbox8)
-        hbox8.add(label)
-        hbox8.add(self.random_entry)
-        
+        self.number_entry = new_entry("     Nummer:", main_box)
+
+        self.random_entry = new_entry("Övrigt:", main_box)
+
         select_unit_button = SelectUnitButton()
         main_box.add(select_unit_button)
         
