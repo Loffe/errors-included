@@ -49,6 +49,7 @@ class SelectUnitDialog(gtk.Dialog):
     def select_units(self, event):
         result = self.run()
         if result == 77:
+            
             self.hide()
             print "Skapade uppdrag"
         elif result == 666:
