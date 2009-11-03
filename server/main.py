@@ -54,6 +54,7 @@ class Server:
 
 class Client(threading.Thread):
     def __init__(self, (client, address)):
+        print "Client: connected", address
         threading.Thread.__init__(self)
         self.client = client
         self.address = address
