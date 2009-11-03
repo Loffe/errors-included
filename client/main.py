@@ -14,6 +14,7 @@ from gui.mapscreen import MapScreen
 from gui.alarmscreen import AlarmScreen
 from gui.messagescreen import MessageScreen
 from gui.obstaclescreen import ObstacleScreen
+from gui.missionscreen import MissionScreen
 
 class ClientGui(hildon.Program):
     '''
@@ -103,6 +104,11 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.obstacle_screen, True, True, 0)
         self.screens["obstacle"] = self.obstacle_screen
         
+        # add the create_mission screen
+        self.mission_screen = MissionScreen()
+        vbox_right.pack_start(self.mission_screen, True, True, 0)
+        self.screens["make_mission"] = self.mission_screen
+        
         # Mission buttons and their menu
         self.mission_menu = gtk.HBox(False, 0)
         self.mission_menu.set_size_request(0, 60)
@@ -131,6 +137,7 @@ class ClientGui(hildon.Program):
         create_obstacle_button = gtk.Button("Hinder")
         create_obstacle_button.connect("clicked", self.create_obstacle)
         create_mission_button = gtk.Button("Uppdrag")
+        create_mission_button.connect("clicked", self.create_mission)
         self.add_object_menu.add(create_alarm_button)
         self.add_object_menu.add(create_obstacle_button)
         self.add_object_menu.add(create_mission_button)
@@ -266,12 +273,12 @@ class ClientGui(hildon.Program):
         self.show(["obstacle", "buttons"])
     
     def create_mission(self, event):
-        pass
+        self.show(["make_mission", "buttons"])
 
 
     # contacts view event handlers
     def show_contacts(self,event):
-        self.toggle_show("contacts", [])
+        self.toggle_show("contacts", ["notifications"], "Här visas dina kontakter och du kan ringa till dem")
 
 
     # messages view event handlers
