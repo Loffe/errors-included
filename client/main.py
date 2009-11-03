@@ -10,7 +10,10 @@ from gui.alarmscreen import AlarmScreen
 from gui.messagescreen import MessageScreen
 from gui.obstaclescreen import ObstacleScreen
 
+import queueinterface
+
 class ClientGui(hildon.Program):
+    queue = queueinterface.interface
     '''
     The main GUI-process of the client
     '''
