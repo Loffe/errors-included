@@ -36,9 +36,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         main_box = gtk.VBox(False,0)
         self.add_with_viewport(main_box)
         hbox = gtk.HBox(False,0)
-        #right_box = gtk.VBox(True,0)
         main_box.pack_start(hbox,True,True,0)
-        #main_box.add(right_box)
         
         # create type label
         type_label = gtk.Label("Inkomna larm:")
@@ -50,17 +48,12 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         combo_box.set_size_request(300,50)
         hbox.pack_start(combo_box, True,True, 0)
         
-#        label, self.location_entry = new_entry("Nytt uppdrag:")
-#        left_box.add(label)
-#        right_box.add(self.location_entry)
-        
         new_mission_label = gtk.Label("Nytt uppdrag:")
         new_mission_label.set_alignment(0, 0.5)
         #invisible_label = gtk.Label("")
         hbox1 = gtk.HBox(True,0)
         main_box.add(hbox1)
         hbox1.pack_start(new_mission_label,True,True,0)
-        #hbox1.pack_start(invisible_label,True,True,0)
         
         # create entries
         self.event_entry = new_entry("     Händelse:", main_box)
@@ -71,12 +64,9 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
 
         contact = gtk.Label("Kontaktperson:")
         contact.set_alignment(0, 0.5)
-        #label.modify_font(pango.FontDescription("sans 12"))
-        #invisible_label = gtk.Label("")
         hbox5 = gtk.HBox(True,0)
         main_box.add(hbox5)
         hbox5.pack_start(contact,True,True,0)
-        #hbox5.add(invisible_label)
 
         self.name_entry = new_entry("     Namn:", main_box)
 

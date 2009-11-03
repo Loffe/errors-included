@@ -20,9 +20,6 @@ class SelectUnitButton(gtk.HBox):
         self.add(choose_units_button)
         self.add(unit_label)
     
-    
-    
-    
 class SelectUnitDialog(gtk.Dialog):
     
     
@@ -45,6 +42,11 @@ class SelectUnitDialog(gtk.Dialog):
         self.vbox.pack_start(unit2)
         self.vbox.pack_start(unit3)
         self.vbox.pack_start(unit4)
+    
+    def run(self):
+        #loopa listan
+        print "loopa"
+        gtk.Dialog.run(self)
            
     def select_units(self, event):
         result = self.run()
