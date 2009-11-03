@@ -4,6 +4,9 @@ from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker, relation
 from sqlalchemy.ext.declarative import declarative_base
 
+# Create a base class to extend in order to be able to save to the database. 
+Base = declarative_base()
+
 class Database(object):
     '''
     A sqlite3 database using sqlalchemy.
@@ -16,20 +19,26 @@ class Database(object):
         self.engine = create_engine('sqlite:///database.db', echo=False)
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
-
-# Create a base class to extend in order to be able to save to the database. 
-Base = declarative_base()
+        
+    def add(self, object):
+        self.session.add(object)
+        self.session.commit()
+        
+    def delete(self, object):
+        self.session.delete(object)
+        self.session.commit()
 
 class UnitType(object):
-    commander, ambulance, other = range(3)
+    ambulance, commander, other = range(3)
 
 class ObstacleType(object):
-    tree, bridge, road, other = range(4)
+    # always sort in alphabetic order!!!
+    bridge, other, road, tree = range(4)
 
 class POIType(object):
     accident, pasta_wagon = range(2)
 
-class MapObjectData(object):
+class MapObjectData(Base):
     '''
     All objects visible on map have data objects extending this class.
     '''
@@ -46,9 +55,9 @@ class MapObjectData(object):
     def get_coords(self):
         return (self.coordx, self.coordy)
     
-    def set_coords(self, x, y):
-        self.coordx = x
-        self.coordy = y
+    def set_coords(self, coords):
+        self.coordx = coords[0]
+        self.coordy = coords[1]
     
     coords = property(get_coords, set_coords)
 
@@ -68,24 +77,24 @@ class MapObjectData(object):
                                      self.coordx, self.coordy, self.name.encode("utf-8"), 
                                      self.timestamp)
 
-class UnitData(MapObjectData):
-    '''
-    All units have data objects extending this class.
-    '''
-    __tablename__ = 'UnitData'
-    id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
-    __mapper_args__ = {'polymorphic_identity': 'UnitData'}
-
-    type = Column(Integer)
-
-    def __init__(self, coord, name, timestamp, type = UnitType.ambulance):
-        MapObjectData.__init__(self, coord, name, timestamp)
-        self.type = type
+#class UnitData(MapObjectData):
+#    '''
+#    All units have data objects extending this class.
+#    '''
+#    __tablename__ = 'UnitData'
+#    id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
+#    __mapper_args__ = {'polymorphic_identity': 'UnitData'}
+#
+#    type = Column(Integer)
+#
+#    def __init__(self, coord, name, timestamp, type = UnitType.ambulance):
+#        MapObjectData.__init__(self, coord, name, timestamp)
+#        self.type = type
 
 class ObstacleData(MapObjectData):
     __tablename__ = 'ObstacleData'
-    id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
     __mapper_args__ = {'polymorphic_identity': 'ObstacleData'}
+    id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
     
     type = Column(Integer)
 
@@ -93,35 +102,35 @@ class ObstacleData(MapObjectData):
         MapObjectData.__init__(self, coord, name, timestamp)
         self.type = type
 
-class POIData(MapObjectData):
-    __tablename__ = 'POIData'
-    id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
-    __mapper_args__ = {'polymorphic_identity': 'POIData'}
-    
-    type = Column(Integer)
-
-    def __init__(self, coord, name, timestamp, type = POIType.pasta_wagon):
-        MapObjectData.__init__(self, coord, name, timestamp)
-        self.type = type
-
-class MissionData(Base):
-    __tablename__ = 'MissionData'
-    id = Column(Integer, primary_key=True)
-    
-    number_of_wounded = Column(Integer)
-    poi_id = Column(Integer, ForeignKey('POIData.id'))
-    poi = relation(POIData)
-    event_type = Column(UnicodeText)
-    contact_person = Column(UnicodeText)
-    other = Column(UnicodeText)
-
-    def __init__(self, event_type, POI, number_of_wounded, contact_person, 
-                 other):
-        self.event_type = event_type
-        self.POI = POI
-        self.number_of_wounded = number_of_wounded
-        self.contact_person = contact_person
-        self.other = other
+#class POIData(MapObjectData):
+#    __tablename__ = 'POIData'
+#    id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
+#    __mapper_args__ = {'polymorphic_identity': 'POIData'}
+#    
+#    type = Column(Integer)
+#
+#    def __init__(self, coord, name, timestamp, type = POIType.pasta_wagon):
+#        MapObjectData.__init__(self, coord, name, timestamp)
+#        self.type = type
+#
+#class MissionData(Base):
+#    __tablename__ = 'MissionData'
+#    id = Column(Integer, primary_key=True)
+#    
+#    number_of_wounded = Column(Integer)
+#    poi_id = Column(Integer, ForeignKey('POIData.id'))
+#    poi = relation(POIData)
+#    event_type = Column(UnicodeText)
+#    contact_person = Column(UnicodeText)
+#    other = Column(UnicodeText)
+#
+#    def __init__(self, event_type, POI, number_of_wounded, contact_person, 
+#                 other):
+#        self.event_type = event_type
+#        self.poi = POI
+#        self.number_of_wounded = number_of_wounded
+#        self.contact_person = contact_person
+#        self.other = other
         
 class Message(object):
     type = None
@@ -140,5 +149,7 @@ class Message(object):
             #packa upp
             pass
 
-if __name__ == "__main__":
-    pass
+def create_database():
+    db = Database()
+    Base.metadata.create_all(db.engine)
+    return db

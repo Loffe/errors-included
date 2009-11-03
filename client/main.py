@@ -5,6 +5,11 @@ import hildon
 import gobject
 import pango
 
+import datetime
+
+from shared.data import *
+from map.mapdata import *
+
 from gui.mapscreen import MapScreen
 from gui.alarmscreen import AlarmScreen
 from gui.messagescreen import MessageScreen
@@ -25,6 +30,9 @@ class ClientGui(hildon.Program):
         self.window = hildon.Window()
         self.window.set_title("ClientGui")
         self.add_window(self.window)
+        
+        # create the database
+        self.db = shared.data.create_database()
 
         # A dict containing all the containers (used for hiding/showing) 
         self.screens = {}
@@ -164,7 +172,18 @@ class ClientGui(hildon.Program):
         self.show_add_object(event)
     
     def ok_button_function(self, event):
-        self.show_add_object(event)
+#        self.show_add_object(event)
+        coord = (15.5724, 58.4050)
+        name = u"hinder"
+        timestamp = datetime(2009,11,3,10,40)
+        type = self.obstacle_screen.selected_type
+        print type
+
+        data = ObstacleData(coord, name, timestamp, type)
+
+        obstacle = Obstacle(data)
+
+        self.db.add(data)
     
     # mission view event handlers
     def show_mission(self, event):
