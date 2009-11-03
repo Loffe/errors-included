@@ -11,8 +11,12 @@ import time
 class Queue(dbus.service.Object):
     output = []
     input = []
+    server = ()
     socket = None
     running = False
+
+    def __init__(self, host, port):
+        self.server = (host, port)
 
     @dbus.service.method(dbus_interface='com.example.Queue',
                          in_signature='v', out_signature='s')
@@ -20,7 +24,11 @@ class Queue(dbus.service.Object):
         self.output.append(msg)
         return "message queued :)"
 
-    def connect_to_server(self, host, port):
+    def connect_to_server(self):
+        if not self.server:
+            raise Exception("No server is set. Cannot connect")
+        print "Connecting"
+
         if config.server.ssh == True:
             subprocess.call(["ssh",
                              "-C", "-f",
@@ -29,8 +37,15 @@ class Queue(dbus.service.Object):
             host = "127.0.0.1"
             port = config.server.localport
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((host,port))
-        self.running = True
+        try:
+            self.socket.connect(self.server)
+            self.running = True
+            gobject.idle_add(self._send)
+            gobject.idle_add(self._recv)
+            print "Connected :D"
+        except socket.error, (errno, errmsg):
+            self._handle_error(errno)
+        return False
 
     def __del__(self):
         self.close()
@@ -40,12 +55,16 @@ class Queue(dbus.service.Object):
         self.socket.close()
 
     def _send(self):
+        if not self._check_connection():
+            return
         if len(self.output) > 0:
             msg = self.output.pop()
             self.socket.send(msg)
         return True
 
     def _recv(self):
+        if not self._check_connection():
+            return
         self.socket.settimeout(1.0)
         try:
             data = self.socket.recv(1000)
@@ -55,8 +74,9 @@ class Queue(dbus.service.Object):
         return True
 
     def mainloop(self):
-        gobject.idle_add(self._send)
-        gobject.idle_add(self._recv)
+        if self._check_connection():
+            gobject.idle_add(self._send)
+            gobject.idle_add(self._recv)
 
         def _sigterm_cb(self):
             gobject.idle_add(mainloop.quit)
@@ -76,3 +96,13 @@ class Queue(dbus.service.Object):
                 mainloop.run()
             except KeyboardInterrupt:
                 mainloop.quit()
+
+    def _check_connection(self):
+        if self.running == True:
+            return True
+        if not self.connect_to_server():
+            gobject.timeout_add(config.queue.reconnect_interval, self._check_connection)
+
+    def _handle_error(self, errno, errmsg=None):
+        if errno == 111:
+            print "Connection refused"

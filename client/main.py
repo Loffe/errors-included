@@ -5,6 +5,7 @@ import hildon
 import gobject
 import pango
 
+from gui.gui import Screen
 from gui.mapscreen import MapScreen
 from gui.alarmscreen import AlarmScreen
 from gui.messagescreen import MessageScreen
@@ -174,7 +175,10 @@ class ClientGui(hildon.Program):
         self.show_add_object(event)
     
     def ok_button_function(self, event):
-        self.show_add_object(event)
+        for screen in self.screens.values():
+            if screen.props.visible and isinstance(screen, Screen):
+                screen.ok_button_function(event)
+        #self.show_add_object(event)
     
     # mission view event handlers
     def show_mission(self, event):

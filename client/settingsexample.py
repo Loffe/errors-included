@@ -9,3 +9,6 @@ server.ip = '127.0.0.1'
 server.port = 50000
 server.localport = 50001
 server.ssh = False
+
+queue = Config()
+queue.reconnect_interval = 10*1000
