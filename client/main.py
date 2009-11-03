@@ -11,7 +11,10 @@ from gui.messagescreen import MessageScreen
 from gui.obstaclescreen import ObstacleScreen
 from gui.missionscreen import MissionScreen
 
+import queueinterface
+
 class ClientGui(hildon.Program):
+    queue = queueinterface.interface
     '''
     The main GUI-process of the client
     '''
