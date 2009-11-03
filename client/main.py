@@ -251,7 +251,7 @@ class ClientGui(hildon.Program):
     def show_add_object(self, event):
         self.toggle_show("add_object", 
                          ["notifications", "map","add_object_menu"], 
-                         "Här kan du lägga till ett objekt")
+                         "Välj en koordinat och sedan typ av objekt")
     
     # add object buttons event handlers
     def create_alarm(self, event):
