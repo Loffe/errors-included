@@ -69,7 +69,7 @@ class MapObjectData(Base):
         @param timestamp: The time this object was created.
         '''
         self.coords = coord
-        self.name = name
+        self.name = u""+name
         self.timestamp = timestamp
 
     def __repr__(self):
@@ -77,19 +77,19 @@ class MapObjectData(Base):
                                      self.coordx, self.coordy, self.name.encode("utf-8"), 
                                      self.timestamp)
 
-#class UnitData(MapObjectData):
-#    '''
-#    All units have data objects extending this class.
-#    '''
-#    __tablename__ = 'UnitData'
-#    id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
-#    __mapper_args__ = {'polymorphic_identity': 'UnitData'}
-#
-#    type = Column(Integer)
-#
-#    def __init__(self, coord, name, timestamp, type = UnitType.ambulance):
-#        MapObjectData.__init__(self, coord, name, timestamp)
-#        self.type = type
+class UnitData(MapObjectData):
+    '''
+    All units have data objects extending this class.
+    '''
+    __tablename__ = 'UnitData'
+    __mapper_args__ = {'polymorphic_identity': 'UnitData'}
+    id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
+
+    type = Column(Integer)
+
+    def __init__(self, coord, name, timestamp, type = UnitType.ambulance):
+        MapObjectData.__init__(self, coord, name, timestamp)
+        self.type = type
 
 class ObstacleData(MapObjectData):
     __tablename__ = 'ObstacleData'
@@ -102,35 +102,35 @@ class ObstacleData(MapObjectData):
         MapObjectData.__init__(self, coord, name, timestamp)
         self.type = type
 
-#class POIData(MapObjectData):
-#    __tablename__ = 'POIData'
-#    id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
-#    __mapper_args__ = {'polymorphic_identity': 'POIData'}
-#    
-#    type = Column(Integer)
-#
-#    def __init__(self, coord, name, timestamp, type = POIType.pasta_wagon):
-#        MapObjectData.__init__(self, coord, name, timestamp)
-#        self.type = type
-#
-#class MissionData(Base):
-#    __tablename__ = 'MissionData'
-#    id = Column(Integer, primary_key=True)
-#    
-#    number_of_wounded = Column(Integer)
-#    poi_id = Column(Integer, ForeignKey('POIData.id'))
-#    poi = relation(POIData)
-#    event_type = Column(UnicodeText)
-#    contact_person = Column(UnicodeText)
-#    other = Column(UnicodeText)
-#
-#    def __init__(self, event_type, POI, number_of_wounded, contact_person, 
-#                 other):
-#        self.event_type = event_type
-#        self.poi = POI
-#        self.number_of_wounded = number_of_wounded
-#        self.contact_person = contact_person
-#        self.other = other
+class POIData(MapObjectData):
+    __tablename__ = 'POIData'
+    __mapper_args__ = {'polymorphic_identity': 'POIData'}
+    id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
+    
+    type = Column(Integer)
+
+    def __init__(self, coord, name, timestamp, type = POIType.pasta_wagon):
+        MapObjectData.__init__(self, coord, name, timestamp)
+        self.type = type
+
+class MissionData(Base):
+    __tablename__ = 'MissionData'
+    id = Column(Integer, primary_key=True)
+
+    number_of_wounded = Column(Integer)
+    poi_id = Column(Integer, ForeignKey('POIData.id'))
+    poi = relation(POIData)
+    event_type = Column(UnicodeText)
+    contact_person = Column(UnicodeText)
+    other = Column(UnicodeText)
+
+    def __init__(self, event_type, POI, number_of_wounded, contact_person, 
+                 other):
+        self.event_type = u""+event_type
+        self.poi = POI
+        self.number_of_wounded = number_of_wounded
+        self.contact_person = u""+contact_person
+        self.other = u""+other
         
 class Message(object):
     type = None

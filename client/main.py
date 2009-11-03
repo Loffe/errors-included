@@ -174,7 +174,7 @@ class ClientGui(hildon.Program):
     def ok_button_function(self, event):
 #        self.show_add_object(event)
         coord = (15.5724, 58.4050)
-        name = u"hinder"
+        name = "hinder"
         timestamp = datetime(2009,11,3,10,40)
         type = self.obstacle_screen.selected_type
         print type
