@@ -9,7 +9,7 @@ try:
     import settings
 except ImportError:
     print "No settings.py file available"
-    import sys
-    sys.exit(1)
+    print "Using settingsexample.py instead"
+    import settingsexample as settings
 
 server = settings.server
