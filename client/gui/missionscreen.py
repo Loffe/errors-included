@@ -4,6 +4,8 @@ import gobject
 import shared.data
 import gui
 import pango
+from selectunit import SelectUnitButton
+from selectunit import SelectUnitDialog
 
 class MissionScreen(gtk.ScrolledWindow, gui.Screen):
     
@@ -111,27 +113,8 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         hbox8.add(label)
         hbox8.add(self.random_entry)
         
-        
-        choose_units_button = gtk.Button("Välj enheter")
-        label = choose_units_button.get_child()
-#        choose_units_button.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("red"))
-        label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("blue"))
-
-#        choose_units_button.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("green"))
-
-        choose_units_button.connect("clicked", self.select_units)
-        unit_label = gtk.Label("Valda enheter")
-
-#        eb = gtk.EventBox()
-#        eb.add(choose_units_button)
-#        eb.modify_bg(gtk.STATE_SELECTED | gtk.STATE_NORMAL | gtk.STATE_ACTIVE, gtk.gdk.color_parse("green"))
-
-        hbox9 = gtk.HBox(False,0)
-        main_box.add(hbox9)
-        invisible_label = gtk.Label("  ")
-        hbox9.add(invisible_label)
-        hbox9.add(choose_units_button)
-        hbox9.add(unit_label)
+        select_unit_button = SelectUnitButton()
+        main_box.add(select_unit_button)
         
         # add selectable types
         for type in shared.data.ObstacleType.__dict__.keys():
@@ -158,40 +141,4 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         # set the selected type
         self.selected_type = combobox.get_active()
         
-    def select_units(self, event):
-        dialog = gtk.Dialog("Välj enheter",
-                 None,  #the toplevel wgt of your app
-                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
-                 ("     Avbryt     ", 666, "  Ok  ", 77))
-        
-        #Units to choose
 
-        unit1 = gtk.ToggleButton("Enhet 1")
-        unit1.show()
-        unit2 = gtk.ToggleButton("Enhet 2")
-        unit2.show()
-        unit3 = gtk.ToggleButton("Enhet 3")
-        unit3.show()
-        unit4 = gtk.ToggleButton("Enhet 4")
-        unit4.show()
-        dialog.vbox.pack_start(unit1)
-        dialog.vbox.pack_start(unit2)
-        dialog.vbox.pack_start(unit3)
-        dialog.vbox.pack_start(unit4)
-        #dialog.add(table)
-        
-        
-        
-        
-        dialog.set_size_request(400,400)
-
-
-        dialog.show()
-        result = dialog.run()
-        if result == 77:
-            print "Skapade uppdrag"
-            dialog.destroy()
-           
-        elif result == 666:
-            print "Avbrot"
-        dialog.destroy()
