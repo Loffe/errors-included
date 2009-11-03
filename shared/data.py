@@ -79,6 +79,7 @@ class MapObjectData(Base):
         for var in self.__dict__.keys():
             if not var.startswith("_"):
                 dict[var] = self.__dict__[var]
+        dict["class"] = self.__class__
         return dict
 
     def __repr__(self):
@@ -149,7 +150,8 @@ class MissionData(Base):
         self.number_of_wounded = number_of_wounded
         self.contact_person = u""+contact_person
         self.other = u""+other
-        
+
+# UNSTABLE!
 class Message(object):
     '''
     All messages must be instances of this class.
@@ -172,10 +174,14 @@ class Message(object):
     def pack(self):
         return json.dumps(self.data)
     
+    ## SHIIIIET!  PROLLY DOESN*T WOOOÖÖRK
     def unpack(self, raw_message = None):
         if raw_message != None:
             self.data = json.loads(raw_message)
             # convert temp to type and object
+            data_class = self.data["class"]
+            object = data_class.__new__(self.data.values.sort())
+        return object
 
 def create_database():
     db = Database()
