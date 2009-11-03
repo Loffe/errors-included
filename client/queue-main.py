@@ -14,6 +14,6 @@ if __name__ == "__main__":
         q.mainloop()
     except KeyboardInterrupt:
         q.running = False
-        q.close()
+        del q
         print "Aborting"
 

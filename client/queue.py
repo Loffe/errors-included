@@ -32,34 +32,37 @@ class Queue(dbus.service.Object):
         self.socket.connect((host,port))
         self.running = True
 
+    def __del__(self):
+        self.close()
+
     def close(self):
+        print "Closing socket to server"
         self.socket.close()
+
+    def _send(self):
+        if len(self.output) > 0:
+            msg = self.output.pop()
+            self.socket.send(msg)
+        return True
+
+    def _recv(self):
+        self.socket.settimeout(1.0)
+        try:
+            data = self.socket.recv(1000)
+        except socket.timeout:
+            return True
+        self.input.append(data)
+        return True
 
     def mainloop(self):
-        t = threading.Thread(target=self.listener)
-        t.start()
-        dbus_t = threading.Thread(target=self.dbus_main)
-        dbus_t.start()
-        #self.dbus_main()
+        gobject.idle_add(self._send)
+        gobject.idle_add(self._recv)
 
-        while self.running:
-            if len(self.output) > 0:
-                msg = self.output.pop()
-                self.socket.send(msg)
+        def _sigterm_cb(self):
+            gobject.idle_add(mainloop.quit)
+        import signal
+        signal.signal(signal.SIGTERM, _sigterm_cb)
 
-        self.socket.close()
-
-    def listener(self):
-        self.socket.settimeout(1.0)
-        while self.running:
-            try:
-                data = self.socket.recv(1000)
-            except socket.timeout:
-                continue
-            self.input.append(data)
-
-
-    def dbus_main(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
         session_bus = dbus.SessionBus()
@@ -68,4 +71,8 @@ class Queue(dbus.service.Object):
 
         mainloop = gobject.MainLoop()
         print "Running example queue service."
-        mainloop.run()
+        while mainloop.is_running():
+            try:
+                mainloop.run()
+            except KeyboardInterrupt:
+                mainloop.quit()
