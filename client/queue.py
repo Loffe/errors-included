@@ -50,7 +50,7 @@ class Queue(dbus.service.Object):
         try:
             data = self.socket.recv(1000)
         except socket.timeout:
-            pass
+            return True
         self.input.append(data)
         return True
 
