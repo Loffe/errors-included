@@ -36,18 +36,12 @@ class SelectUnitDialog(gtk.Dialog):
 
         self.db = db
 
-        unit1 = gtk.ToggleButton("Enhet 1")
-        unit1.show()
-        unit2 = gtk.ToggleButton("Enhet 2")
-        unit2.show()
-        unit3 = gtk.ToggleButton("Enhet 3")
-        unit3.show()
-        unit4 = gtk.ToggleButton("Enhet 4")
-        unit4.show()
-        self.vbox.pack_start(unit1)
-        self.vbox.pack_start(unit2)
-        self.vbox.pack_start(unit3)
-        self.vbox.pack_start(unit4)
+        units = self.db.get_all_units()
+
+        for u in units:
+            unit_button = gtk.ToggleButton("%s (%d)" % (u.name, u.id))
+            unit_button.show()
+            self.vbox.pack_start(unit_button)
     
     def run(self):
         #loopa listan
