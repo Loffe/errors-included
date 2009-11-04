@@ -17,14 +17,19 @@ class SelectUnitButton(gtk.HBox):
         choose_units_button = gtk.Button("Välj enheter")
         label = choose_units_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("blue"))
-        select_dialog = SelectUnitDialog(self.db)
-        choose_units_button.connect("clicked", select_dialog.select_units)
+        self.select_dialog = SelectUnitDialog(self.db)
+        choose_units_button.connect("clicked", self.select_dialog.select_units)
         unit_label = gtk.Label("Valda enheter")
         self.add(choose_units_button)
         self.add(unit_label)
+
+    def clear_selected(self):
+        self.select_dialog.clear_selected()
     
 class SelectUnitDialog(gtk.Dialog):
     db = None
+    selected_units = []
+    buttons = {}
     
     
     def __init__(self, db):
@@ -42,19 +47,34 @@ class SelectUnitDialog(gtk.Dialog):
             unit_button = gtk.ToggleButton("%s (%d)" % (u.name, u.id))
             unit_button.show()
             self.vbox.pack_start(unit_button)
+            self.buttons[u.id] = unit_button
     
     def run(self):
         #loopa listan
         print "loopa"
-        gtk.Dialog.run(self)
+        return gtk.Dialog.run(self)
+
+    def clear_selected(self):
+        for b in self.buttons.values():
+            b.set_active(False)
            
     def select_units(self, event):
         result = self.run()
         if result == 77:
-            
+            self.selected_units = []
+            for key in self.buttons.keys():
+                b = self.buttons[key]
+                if b.get_active():
+                    self.selected_units.append(key)
             self.hide()
-            print "Skapade uppdrag"
+            print "Skapade uppdrag till", self.selected_units
         elif result == 666:
+            for key in self.buttons.keys():
+                b = self.buttons[key]
+                if key in self.selected_units:
+                    b.set_active(True)
+                else:
+                    b.set_active(False)
             print "Avbrot"
         self.hide()
 
