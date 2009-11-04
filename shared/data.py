@@ -8,6 +8,26 @@ from sqlalchemy.ext.declarative import declarative_base
 # Create a base class to extend in order to be able to save to the database. 
 Base = declarative_base()
 
+class Packable(object):
+    '''
+    Extend this class to be able to pack/unpack a message containing it.
+    '''
+    def to_dict(self):
+        dict = {}
+#        dict["coords"] = self.coords
+        for var in self.__dict__.keys():
+            if not var.startswith("_"):
+                v = self.__dict__[var]
+                try:
+                    dict[var] = self.__dict__[var].to_dict()
+                except AttributeError:
+                    if type(v) == datetime:
+                        dict[var] = v.strftime("%s")
+                    else:
+                        dict[var] = v
+        dict["class"] = self.__class__.__name__
+        return dict
+
 class Database(object):
     '''
     A sqlite3 database using sqlalchemy.
@@ -39,7 +59,7 @@ class ObstacleType(object):
 class POIType(object):
     accident, pasta_wagon = range(2)
 
-class MapObjectData(Base):
+class MapObjectData(Base, Packable):
     '''
     All objects visible on map have data objects extending this class.
     '''
@@ -62,25 +82,17 @@ class MapObjectData(Base):
     
     coords = property(get_coords, set_coords)
 
-    def __init__(self, coord, name, timestamp):
+    def __init__(self, coordx, coordy, name, timestamp):
         '''
         Constructor. Creates a map object.
         @param coord: The coordinates of this object.
         @param name: The name of this object.
         @param timestamp: The time this object was created.
         '''
-        self.coords = coord
+        self.coordx = coordx
+        self.coordy = coordy
         self.name = u""+name
         self.timestamp = timestamp
-        
-    def to_dict(self):
-        dict = {}
-#        dict["coords"] = self.coords
-        for var in self.__dict__.keys():
-            if not var.startswith("_"):
-                dict[var] = self.__dict__[var]
-        dict["class"] = self.__class__
-        return dict
 
     def __repr__(self):
         return "<%s: %s, %s, %s, %s>" % (self.__class__.__name__.encode("utf-8"), 
@@ -97,8 +109,8 @@ class UnitData(MapObjectData):
 
     type = Column(Integer)
 
-    def __init__(self, coord, name, timestamp, type = UnitType.ambulance):
-        MapObjectData.__init__(self, coord, name, timestamp)
+    def __init__(self, coordx, coordy, name, timestamp, type = UnitType.ambulance):
+        MapObjectData.__init__(self, coordx, coordy, name, timestamp)
         self.type = type
 
 class ObstacleData(MapObjectData):
@@ -111,8 +123,8 @@ class ObstacleData(MapObjectData):
     
     type = Column(Integer)
 
-    def __init__(self, coord, name, timestamp, type = ObstacleType.tree):
-        MapObjectData.__init__(self, coord, name, timestamp)
+    def __init__(self, coordx, coordy, name, timestamp, type = ObstacleType.tree):
+        MapObjectData.__init__(self, coordx, coordy, name, timestamp)
         self.type = type
 
 class POIData(MapObjectData):
@@ -125,11 +137,11 @@ class POIData(MapObjectData):
     
     type = Column(Integer)
 
-    def __init__(self, coord, name, timestamp, type = POIType.pasta_wagon):
-        MapObjectData.__init__(self, coord, name, timestamp)
+    def __init__(self, coordx, coordy, name, timestamp, type = POIType.pasta_wagon):
+        MapObjectData.__init__(self, coordx, coordy, name, timestamp)
         self.type = type
 
-class MissionData(Base):
+class MissionData(Base, Packable):
     '''
     All missions have data objects of this class. 
     '''
@@ -143,15 +155,32 @@ class MissionData(Base):
     contact_person = Column(UnicodeText)
     other = Column(UnicodeText)
 
-    def __init__(self, event_type, POI, number_of_wounded, contact_person, 
-                 other):
+    def __init__(self, event_type, poi, number_of_wounded, contact_person, 
+                 other = ""):
         self.event_type = u""+event_type
-        self.poi = POI
+        self.poi = poi
         self.number_of_wounded = number_of_wounded
         self.contact_person = u""+contact_person
         self.other = u""+other
+    
+    def __repr__(self):
+        return "<%s: %s, %s, %s, %s, %s>" % (self.__class__.__name__.encode("utf-8"), 
+                                     self.poi.coordx, self.poi.coordy, self.event_type, 
+                                     self.number_of_wounded, self.contact_person)
 
-# UNSTABLE!
+# UNFINIISHED
+class Event(Packable):
+    def __init__(self, type, event, parameters, timestamp = datetime.now()):
+        self.type = type
+        self.event = event
+        self.parameters = parameters
+        self.timestamp = timestamp
+
+    def __repr__(self):
+        return "<%s: %s, %s, %s, %s>" % (self.__class__.__name__.encode("utf-8"), 
+                                         self.type, self.event.encode("utf-8"),
+                                         self.parameters, self.timestamp)
+
 class Message(object):
     '''
     All messages must be instances of this class.
@@ -159,31 +188,77 @@ class Message(object):
     '''
     # The data to send (a dict containing all variables)
     data = None
+    object = None
     
-    def __init__(self, object = None, raw_message = None):
+    def __init__(self, object = None):
         '''
         Create a message.
-        @param object:
-        @param raw_message:
+        @param object: the object to use as message.
         '''
-        if self.raw_message != None:
-            self.unpack(raw_message)
-        else:
+        if object != None:
             self.data = object.to_dict()
     
     def pack(self):
+        '''
+        Pack this message to a simplejson string.
+        '''
         return json.dumps(self.data)
-    
-    ## SHIIIIET!  PROLLY DOESN*T WOOOÖÖRK
-    def unpack(self, raw_message = None):
-        if raw_message != None:
-            self.data = json.loads(raw_message)
-            # convert temp to type and object
-            data_class = self.data["class"]
-            object = data_class.__new__(self.data.values.sort())
+
+    def unpack(self, raw_message):
+        '''
+        Unpack a simplejson string to an object.
+        @param raw_message: the simplejson string
+        '''
+        self.data = json.loads(raw_message)
+        data_class = self.data["class"]
+        object = None
+        
+        def create_map_object_data(dict):
+            '''
+            Create a POIData object from a specified dictionary.
+            @param dict: the dictionary to use.
+            '''
+            # remove added class key (and value)
+            classname = dict["class"]
+            del dict["class"]
+            # replace timestamp string with a real datetime
+            dict["timestamp"] = datetime.fromtimestamp(float(dict["timestamp"]))
+            return globals()[classname](**dict)
+        
+        # Class MissionData
+        if data_class == "MissionData":
+            # remove added class keys (and values)
+            del self.data["class"]
+            
+            # create the poi from its dict
+            self.data["poi"] = create_map_object_data(self.data["poi"])
+            
+            # create the mission data object
+            object = MissionData(**self.data)
+
+        # Class extends MapObjectData
+        else:
+            object = create_map_object_data(self.data)
+            
+        # set and return the message object
+        self.object = object
         return object
 
 def create_database():
+    '''
+    Create the database.
+    '''
     db = Database()
     Base.metadata.create_all(db.engine)
     return db
+
+if __name__ == '__main__':
+    poi_data = POIData(12,113, "goal", datetime.now(), POIType.accident)
+    mission_data = MissionData("accident", poi_data, 7, "Me Messon", "")
+    m = Message(object = mission_data)
+    raw = m.pack()
+    print "messsage_data", type(m.data), m.data
+    print "raw", type(raw), raw
+    m = Message()
+    m.unpack(raw)
+    print "unpacked", m.object
