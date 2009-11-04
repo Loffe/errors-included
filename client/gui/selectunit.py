@@ -18,13 +18,18 @@ class SelectUnitButton(gtk.HBox):
         label = choose_units_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("blue"))
         self.select_dialog = SelectUnitDialog(self.db)
-        choose_units_button.connect("clicked", self.select_dialog.select_units)
-        unit_label = gtk.Label("Valda enheter")
+        choose_units_button.connect("clicked", self.select_units)
+        self.unit_label = gtk.Label("Valda enheter")
         self.add(choose_units_button)
-        self.add(unit_label)
+        self.add(self.unit_label)
 
     def clear_selected(self):
         self.select_dialog.clear_selected()
+
+    def select_units(self, event):
+        selected_units = self.select_dialog.select_units()
+        self.unit_label.set_text(", ".join([u.name for u in selected_units]))
+
     
 class SelectUnitDialog(gtk.Dialog):
     db = None
@@ -58,7 +63,7 @@ class SelectUnitDialog(gtk.Dialog):
         for b in self.buttons.values():
             b.set_active(False)
            
-    def select_units(self, event):
+    def select_units(self):
         result = self.run()
         if result == 77:
             self.selected_units = []
@@ -77,4 +82,6 @@ class SelectUnitDialog(gtk.Dialog):
                     b.set_active(False)
             print "Avbrot"
         self.hide()
+
+        return self.db.get_units(self.selected_units)
 

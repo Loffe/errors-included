@@ -35,6 +35,13 @@ class Database(object):
             list.append(u)
         return list
 
+    def get_units(self, unit_ids):
+        list = []
+        q = self.session.query(UnitData).filter(UnitData.id.in_(unit_ids))
+        for u in q:
+            list.append(u)
+        return list
+
 class UnitType(object):
     ambulance, commander, other = range(3)
 
