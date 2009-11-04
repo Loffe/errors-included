@@ -50,9 +50,13 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         right_box.add(self.location_entry)
         
         # add selectable types
+        types = []
         for type in shared.data.ObstacleType.__dict__.keys():
             if type[0] != "_":
-                combo_box.append_text(type)
+                types.append(type)
+        types.sort()
+        for type in types:
+            combo_box.append_text(type)
 
         # add event handler
         combo_box.connect('changed', self.select_type)

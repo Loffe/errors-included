@@ -5,6 +5,11 @@ import hildon
 import gobject
 import pango
 
+import datetime
+
+from shared.data import *
+from map.mapdata import *
+
 from gui.gui import Screen
 from gui.mapscreen import MapScreen
 from gui.alarmscreen import AlarmScreen
@@ -16,6 +21,7 @@ import queueinterface
 
 class ClientGui(hildon.Program):
     queue = queueinterface.interface
+    db = None
     '''
     The main GUI-process of the client
     '''
@@ -30,6 +36,9 @@ class ClientGui(hildon.Program):
         self.window = hildon.Window()
         self.window.set_title("ClientGui")
         self.add_window(self.window)
+        
+        # create the database
+        self.db = shared.data.create_database()
 
         # A dict containing all the containers (used for hiding/showing) 
         self.screens = {}
