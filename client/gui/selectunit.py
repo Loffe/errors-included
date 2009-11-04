@@ -6,29 +6,35 @@ import gui
 import pango
 
 class SelectUnitButton(gtk.HBox):
+    db = None
     
-    def __init__(self):
+    def __init__(self, db):
         
         gtk.HBox.__init__(self)
+
+        self.db = db
         
         choose_units_button = gtk.Button("Välj enheter")
         label = choose_units_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("blue"))
-        select_dialog = SelectUnitDialog()
+        select_dialog = SelectUnitDialog(self.db)
         choose_units_button.connect("clicked", select_dialog.select_units)
         unit_label = gtk.Label("Valda enheter")
         self.add(choose_units_button)
         self.add(unit_label)
     
 class SelectUnitDialog(gtk.Dialog):
+    db = None
     
     
-    def __init__(self):
+    def __init__(self, db):
         gtk.Dialog.__init__(self, "Välj enheter",
                  None,  #the toplevel wgt of your app
                  gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
                  ("     Avbryt     ", 666, "  Ok  ", 77))
         self.set_size_request(400,400)
+
+        self.db = db
 
         unit1 = gtk.ToggleButton("Enhet 1")
         unit1.show()
@@ -58,4 +64,3 @@ class SelectUnitDialog(gtk.Dialog):
             print "Avbrot"
         self.hide()
 
- 

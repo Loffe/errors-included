@@ -10,9 +10,11 @@ from selectunit import SelectUnitDialog
 class MissionScreen(gtk.ScrolledWindow, gui.Screen):
     
     selected_type = None
+    db = None
     
-    def __init__(self):
+    def __init__(self, db):
         gtk.ScrolledWindow.__init__(self)
+        self.db = db
         
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -74,7 +76,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
 
         self.random_entry = new_entry("Övrigt:", main_box)
 
-        select_unit_button = SelectUnitButton()
+        select_unit_button = SelectUnitButton(self.db)
         main_box.add(select_unit_button)
         
         # add selectable types

@@ -110,7 +110,7 @@ class ClientGui(hildon.Program):
         self.screens["obstacle"] = self.obstacle_screen
         
         # add the create_mission screen
-        self.mission_screen = MissionScreen()
+        self.mission_screen = MissionScreen(self.db)
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
         
