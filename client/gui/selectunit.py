@@ -28,7 +28,11 @@ class SelectUnitButton(gtk.HBox):
 
     def select_units(self, event):
         selected_units = self.select_dialog.select_units()
-        self.unit_label.set_text(", ".join([u.name for u in selected_units]))
+        names = [u.name for u in selected_units][:3]
+        text = ", ".join(names)
+        if len(selected_units) > 3:
+            text += "..."
+        self.unit_label.set_text(text)
 
     
 class SelectUnitDialog(gtk.Dialog):
