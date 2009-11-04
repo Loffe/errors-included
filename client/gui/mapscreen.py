@@ -71,6 +71,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.origin_position = self.mapdata.focus
         self.last_movement_timestamp = time.time()
         self.allow_movement = True
+        self.get_clicked_coord(event)
         return True
 
     def handle_button_release_event(self, widget, event):
@@ -187,11 +188,31 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         height = self.bounds["min_latitude"] - self.bounds["max_latitude"]
         gps_per_pix_width = width / (cols * 300)
         gps_per_pix_height = height / (rows * 160)
-      
+
         # Observera att kartans GPS-koordinatsystem börjar i vänstra nedre
         # hörnet, medan cairo börjar i vänstra övre hörnet! På grund av detta
         # inverterar vi värdet vi räknar fram så båda koordinatsystemen
         # överensstämmer.
         return [gps_per_pix_width * movement_x,
                 gps_per_pix_height * movement_y]
+        
+    def get_clicked_coord(self, event):
+        x, y, state = event.window.get_pointer()
+        rect = self.get_allocation()
+        dx = 1.0*x/rect.width
+        dy = 1.0*y/rect.height
+        
+        width = self.bounds["max_longitude"] - self.bounds["min_longitude"]
+        height = self.bounds["max_latitude"] - self.bounds["min_latitude"]
+        
+        gps_x = self.bounds["min_longitude"] + dx*width
+        gps_y = self.bounds["min_latitude"] + dy*height
+        
+#        totem_coordinate = (15.5726, 58.4035)
+#        totem_unit_data = shared.data.UnitData(totem_coordinate, "Totem", 0)
+#        totem_unit_data.type = shared.data.UnitType.commander
+#        totem = map.mapdata.Unit(totem_unit_data)
+#        self.mapdata.add_object("totem", totem)
+        #print dy, dx
+        print gps_x, gps_y
 
