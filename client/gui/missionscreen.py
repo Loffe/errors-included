@@ -33,6 +33,11 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
             hbox.add(entry)
             parent.add(hbox)
             return entry
+
+        def new_section(title, parent):
+            label = gtk.Label(title)
+            label.set_alignment(0, 0.5)
+            parent.add(label)
         
         # create layout boxes
         main_box = gtk.VBox(False,0)
@@ -50,12 +55,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         combo_box.set_size_request(300,50)
         hbox.pack_start(combo_box, True,True, 0)
         
-        new_mission_label = gtk.Label("Nytt uppdrag:")
-        new_mission_label.set_alignment(0, 0.5)
-        #invisible_label = gtk.Label("")
-        hbox1 = gtk.HBox(True,0)
-        main_box.add(hbox1)
-        hbox1.pack_start(new_mission_label,True,True,0)
+        new_section("Nytt uppdrag", main_box)
         
         # create entries
         self.event_entry = new_entry("     Händelse:", main_box)
@@ -64,17 +64,15 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
 
         self.hurted_entry = new_entry("     Antal skadade:", main_box)
 
-        contact = gtk.Label("Kontaktperson:")
-        contact.set_alignment(0, 0.5)
-        hbox5 = gtk.HBox(True,0)
-        main_box.add(hbox5)
-        hbox5.pack_start(contact,True,True,0)
+        new_section("Kontaktperson", main_box)
 
         self.name_entry = new_entry("     Namn:", main_box)
 
         self.number_entry = new_entry("     Nummer:", main_box)
 
-        self.random_entry = new_entry("Övrigt:", main_box)
+        new_section("Övrigt", main_box)
+        self.random_entry = new_entry("     Information:", main_box)
+        
 
         select_unit_button = SelectUnitButton(self.db)
         main_box.add(select_unit_button)
