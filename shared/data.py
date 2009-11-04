@@ -29,6 +29,12 @@ class Database(object):
         self.session.delete(object)
         self.session.commit()
 
+    def get_all_units(self):
+        list = []
+        for u in self.session.query(UnitData):
+            list.append(u)
+        return list
+
 class UnitType(object):
     ambulance, commander, other = range(3)
 
@@ -187,3 +193,17 @@ def create_database():
     db = Database()
     Base.metadata.create_all(db.engine)
     return db
+
+if __name__ == "__main__":
+    print "Testing db"
+    db = Database()
+    '''
+    for i in range(5):
+        u = UnitData((0, 15), "Enhet " + str(i), datetime.now(), UnitType.ambulance)
+        print u
+        db.add(u)
+    '''
+    units = db.get_all_units()
+    for u in units:
+        print u.id, u.name
+
