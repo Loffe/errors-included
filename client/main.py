@@ -14,9 +14,10 @@ from map.mapdata import *
 from gui.gui import Screen
 from gui.mapscreen import MapScreen
 from gui.alarmscreen import AlarmScreen
-from gui.messagescreen import MessageScreen
+from gui.inboxscreen import InboxScreen
 from gui.obstaclescreen import ObstacleScreen
 from gui.missionscreen import MissionScreen
+from gui.newmessagescreen import NewMessageScreen
 
 
 class ClientGui(hildon.Program):
@@ -100,9 +101,13 @@ class ClientGui(hildon.Program):
         self.screens["alarm"] = self.alarm_screen
 
         # adding messages screen
-        self.message_screen = MessageScreen()
+        self.message_screen = InboxScreen()
         vbox_right.pack_start(self.message_screen, True, True, 0)
         self.screens["message"] = self.message_screen
+        
+        self.new_message_screen = NewMessageScreen()
+        vbox_right.pack_start(self.new_message_screen, True, True, 0)
+        self.screens["new_message"] = self.new_message_screen
 
         # add the obstacle screen
         self.obstacle_screen = ObstacleScreen()
@@ -138,6 +143,7 @@ class ClientGui(hildon.Program):
         self.screens["message_menu"] = self.message_menu
         
         new_mess = gtk.Button("Nytt")
+        new_mess.connect("clicked", self.create_new_message)
         inbox = gtk.Button("Inkorg")
         outbox = gtk.Button("Utkorg")
         in_alarms = gtk.Button("Inkomna larm")
@@ -287,8 +293,8 @@ class ClientGui(hildon.Program):
     def create_mission(self, event):
         self.show(["make_mission", "buttons"])
 
-    def create_message(self, event):
-        self.show(["message", "buttons"])
+    def create_new_message(self, event):
+        self.show(["new_message", "buttons"])
         
     # contacts view event handlers
     def show_contacts(self,event):
