@@ -16,12 +16,18 @@ class Queue(dbus.service.Object):
     running = False
 
     def __init__(self, host, port):
+        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+        self.session_bus = dbus.SessionBus()
+        self.name = dbus.service.BusName("com.example.Queue", self.session_bus)
+        dbus.service.Object.__init__(self, self.session_bus,
+                                     '/Queue')
         self.server = (host, port)
 
     @dbus.service.method(dbus_interface='com.example.Queue',
                          in_signature='v', out_signature='s')
     def enqueue(self, msg):
         self.output.append(msg)
+        print "Queued: ", msg
         return "message queued :)"
 
     def connect_to_server(self):
@@ -82,12 +88,6 @@ class Queue(dbus.service.Object):
             gobject.idle_add(mainloop.quit)
         import signal
         signal.signal(signal.SIGTERM, _sigterm_cb)
-
-        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-
-        session_bus = dbus.SessionBus()
-        name = dbus.service.BusName("com.example.Queue", session_bus)
-        object = Queue(session_bus, '/Queue')
 
         mainloop = gobject.MainLoop()
         print "Running example queue service."
