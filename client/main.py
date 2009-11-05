@@ -8,6 +8,7 @@ import pango
 import datetime
 
 from shared.data import *
+import shared.queueinterface
 from map.mapdata import *
 
 from gui.gui import Screen
@@ -17,10 +18,9 @@ from gui.messagescreen import MessageScreen
 from gui.obstaclescreen import ObstacleScreen
 from gui.missionscreen import MissionScreen
 
-import queueinterface
 
 class ClientGui(hildon.Program):
-    queue = queueinterface.interface
+    queue = shared.queueinterface.interface
     db = None
     '''
     The main GUI-process of the client
