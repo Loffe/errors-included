@@ -4,6 +4,8 @@ import gtk
 import gui
 import shared.data
 import map.map_xml_reader
+import map
+from datetime import datetime
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
     bounds = {"min_latitude":0,
@@ -71,7 +73,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.origin_position = self.mapdata.focus
         self.last_movement_timestamp = time.time()
         self.allow_movement = True
-        self.get_clicked_coord(event)
+        self.draw_clicked_pos(event)
         return True
 
     def handle_button_release_event(self, widget, event):
@@ -143,8 +145,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         # Ritar ut eventuella objekt
         objects = self.mapdata.objects
         for item in objects:
-            x, y = self.gps_to_pixel(objects[item].map_object_data.coord[0],
-                                     objects[item].map_object_data.coord[1])
+            x, y = self.gps_to_pixel(objects[item].map_object_data.coords[0],
+                                     objects[item].map_object_data.coords[1])
 
             if x != 0 and y != 0:
                 objects[item].picture.draw(self.context, x, y)
@@ -198,21 +200,22 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         
     def get_clicked_coord(self, event):
         x, y, state = event.window.get_pointer()
-        rect = self.get_allocation()
-        dx = 1.0*x/rect.width
-        dy = 1.0*y/rect.height
+        (lon,lat) = self.pixel_to_gps(x,y)
+#        rect = self.get_allocation()
+#        dx = 1.0*x/rect.width
+#        dy = 1.0*y/rect.height
+#        
+#        width = self.bounds["max_longitude"] - self.bounds["min_longitude"]
+#        height = self.bounds["max_latitude"] - self.bounds["min_latitude"]
         
-        width = self.bounds["max_longitude"] - self.bounds["min_longitude"]
-        height = self.bounds["max_latitude"] - self.bounds["min_latitude"]
-        
-        gps_x = self.bounds["min_longitude"] + dx*width
-        gps_y = self.bounds["min_latitude"] + dy*height
-        
-#        totem_coordinate = (15.5726, 58.4035)
-#        totem_unit_data = shared.data.UnitData(totem_coordinate, "Totem", 0)
-#        totem_unit_data.type = shared.data.UnitType.commander
-#        totem = map.mapdata.Unit(totem_unit_data)
-#        self.mapdata.add_object("totem", totem)
-        #print dy, dx
-        print gps_x, gps_y
+        gps_x = self.bounds["min_longitude"] + lon#dx*width
+        gps_y = self.bounds["min_latitude"] - lat#dy*height
 
+        print gps_x, gps_y
+        return gps_x,gps_y
+        
+    def draw_clicked_pos(self,event):
+        (lon,lat) = self.get_clicked_coord(event)
+#        poi_data = shared.data.POIData((lon, lat), "goal", datetime.now(), shared.data.POIType.pasta_wagon)
+#        self.mapdata.add_object("Shape1", map.mapdata.MapObject(poi_data))
+#        self.draw()

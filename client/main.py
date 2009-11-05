@@ -64,7 +64,7 @@ class ClientGui(hildon.Program):
         add_object_button.connect("clicked", self.show_add_object)
         self.menu_buttons["add_object"] = add_object_button
 
-        contacts_button = gtk.ToggleButton("Kontakt")
+        contacts_button = gtk.ToggleButton("Kontakter")
         contacts_button.connect("clicked", self.show_contacts)
         self.menu_buttons["contacts"] = contacts_button
 
@@ -130,6 +130,21 @@ class ClientGui(hildon.Program):
         self.mission_menu.add(status_button)
         self.mission_menu.add(journal_button)
         self.mission_menu.add(faq_button)
+        
+        #Message buttons and their menu
+        self.message_menu = gtk.HBox(False, 0)
+        self.message_menu.set_size_request(0, 60)
+        vbox_right.pack_start(self.message_menu, False, False, 0)
+        self.screens["message_menu"] = self.message_menu
+        
+        new_mess = gtk.Button("Nytt")
+        inbox = gtk.Button("Inkorg")
+        outbox = gtk.Button("Utkorg")
+        in_alarms = gtk.Button("Inkomna larm")
+        self.message_menu.add(new_mess)
+        self.message_menu.add(inbox)
+        self.message_menu.add(outbox)
+        self.message_menu.add(in_alarms)
 
         # Add object buttons and their menu
         self.add_object_menu = gtk.HBox(False, 0)
@@ -272,15 +287,16 @@ class ClientGui(hildon.Program):
     def create_mission(self, event):
         self.show(["make_mission", "buttons"])
 
-
+    def create_message(self, event):
+        self.show(["message", "buttons"])
+        
     # contacts view event handlers
     def show_contacts(self,event):
         self.toggle_show("contacts", ["notifications"], "Här visas dina kontakter och du kan ringa till dem")
 
-
     # messages view event handlers
     def show_messages(self, event):
-        self.toggle_show("messages", ["notifications", "message"], "Här visas dina meddelanden")
+        self.toggle_show("messages", ["notifications", "message","message_menu"], "Här visas dina meddelanden")
 
 
     # show certain screen methods
