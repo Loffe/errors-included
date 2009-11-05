@@ -53,6 +53,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         # create and pack combobox
         combo_box = gtk.combo_box_new_text()
         combo_box.set_size_request(300,50)
+        combo_box.append_text("Välj ett larm här")
         hbox.pack_start(combo_box, True,True, 0)
         
         new_section("Nytt uppdrag", main_box)
@@ -86,7 +87,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         combo_box.connect('changed', self.select_alarm)
 
         # set the first item added as active
-#        combo_box.set_active(0)
+        combo_box.set_active(0)
 
         # show 'em all! (:
         main_box.show_all()
