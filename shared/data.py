@@ -12,6 +12,25 @@ class Packable(object):
     '''
     Extend this class to be able to pack/unpack a message containing it.
     '''
+#    __tablename__ = "Packables"
+#    id = Column(Integer, primary_key = True)
+#    var1 = Column(Integer)
+#    var2 = Column(Integer)
+#    var3 = Column(Integer)
+#    var4 = Column(Integer)
+#    var5 = Column(Integer)
+#    var6 = Column(Integer)
+#    var7 = Column(Integer)
+#    var8 = Column(Integer)
+#    __mapper_args__ = {"polymorphic_on": var1,
+#                       "polymorphic_on": var2,
+#                       "polymorphic_on": var3,
+#                       "polymorphic_on": var4,
+#                       "polymorphic_on": var5,
+#                       "polymorphic_on": var6,
+#                       "polymorphic_on": var7,
+#                       "polymorphic_on": var8} 
+    
     def to_dict(self):
         dict = {}
 #        dict["coords"] = self.coords
@@ -66,7 +85,7 @@ class MapObjectData(Base, Packable):
     __tablename__ = 'MapObjectData'
     id = Column(Integer, primary_key=True)
     data_type = Column(Integer)
-    __mapper_args__ = {"polymorphic_on": data_type} 
+    __mapper_args__ = {'polymorphic_identity': 'MapObjectData', "polymorphic_on": data_type} 
     
     coordx = Column(Float)
     coordy = Column(Float)
@@ -141,6 +160,35 @@ class POIData(MapObjectData):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp)
         self.type = type
 
+class Alarm(Base, Packable):
+    __tablename__ = 'Alarm'
+    id = Column(Integer, primary_key = True)
+    
+    event = Column(UnicodeText)
+    location_name = Column(UnicodeText)
+    poi_id = Column(Integer, ForeignKey('POIData.id'))
+    poi = relation(POIData)
+    timestamp = Column(DateTime)
+    contact_person = Column(UnicodeText)
+    contact_number = Column(UnicodeText)
+    other = Column(UnicodeText)
+
+    def __init__(self, event, location_name, poi, contact_person, contact_number,
+                 timestamp = datetime.now(), other = ""):
+        self.event = event
+        self.location_name = location_name
+        self.poi = poi
+        self.timestamp = timestamp
+        self.contact_person = contact_person
+        self.contact_number = contact_number
+        self.other = other
+        
+    def __repr__(self):
+        return "<%s: %s, %s, %s, %s, %s, %s, %s, %s>" % (self.__class__.__name__.encode("utf-8"), 
+                                     self.poi.coordx, self.poi.coordy, self.event, 
+                                     self.location_name.encode("utf-8"), self.timestamp,
+                                     self.contact_person.encode("utf-8"), self.contact_number.encode("utf-8"), self.other.encode("utf-8"))
+
 class MissionData(Base, Packable):
     '''
     All missions have data objects of this class. 
@@ -176,6 +224,9 @@ class EventType(object):
 
 # UNFINIISHED
 class Event(Packable):
+#    __tablename__ = "Events"
+    
+    
     def __init__(self, object, object_id = None, type = EventType.add, timestamp = datetime.now()):
         self.object = object
         self.object_id = object_id
@@ -227,9 +278,13 @@ class Message(object):
         dict = {}
         dict["type"] = self.type
         dict["prio"] = self.prio
-        dict["packed_data"] = self.unpacked_data.to_dict()
         dict["timestamp"] = self.timestamp.strftime("%s")
-        return json.dumps(dict)
+        try:
+            dict["packed_data"] = self.unpacked_data.to_dict()
+        except:
+            dict["packed_data"] = str(self.unpacked_data)
+        self.packed_data = json.dumps(dict)
+        return self.packed_data
 
     def unpack(self, raw_message):
         '''
@@ -242,36 +297,29 @@ class Message(object):
         self.timestamp = datetime.fromtimestamp(float(dict["timestamp"]))
         self.packed_data = dict["packed_data"]
         
-        def create(dict):
-            '''
-            Create a POIData object from a specified dictionary.
-            @param dict: the dictionary to use.
-            '''
-            # remove added class key (and value)
-            classname = dict["class"]
-            del dict["class"]
-            # replace timestamp string with a real datetime
-            dict["timestamp"] = datetime.fromtimestamp(float(dict["timestamp"]))
-            return globals()[classname](**dict)
-
-        def create_mission(dict):
-            # remove added class keys (and values)
-            del dict["class"]
-            # create the poi from its dict
-            dict["poi"] = create(dict["poi"])
+        if type(self.packed_data) == dict:
             
-            # create the mission data object
-            return MissionData(**dict)
-        
-        if self.type == MessageType.mission:
-            # create the event object from the event object dict
-            self.packed_data["object"] = create_mission(self.packed_data["object"])
-            # create the event from the data
-            event = create(self.packed_data)
-            # set and return the message event
-            self.unpacked_data = event
-            
-        elif self.type == MessageType.map:
+            def create(dict):
+                '''
+                Create a POIData object from a specified dictionary.
+                @param dict: the dictionary to use.
+                '''
+                # remove added class key (and value)
+                classname = dict["class"]
+                del dict["class"]
+                try:
+                    # replace timestamp string with a real datetime
+                    dict["timestamp"] = datetime.fromtimestamp(float(dict["timestamp"]))
+                except:
+                    pass
+                try:
+                    # create the poi from its dict
+                    dict["poi"] = create(dict["poi"])
+                except:
+                    pass
+                # create and return an instance of the object
+                return globals()[classname](**dict)
+    
             # create the event object from the event object dict
             self.packed_data["object"] = create(self.packed_data["object"])
             # create the event from the data
@@ -290,10 +338,14 @@ def create_database():
 if __name__ == '__main__':
     poi_data = POIData(12,113, "goal", datetime.now(), POIType.accident)
     mission_data = MissionData("accident", poi_data, 7, "Me Messon", "")
+
+    alarm = Alarm("hej hopp", "Linköping", poi_data, "Klasse", "11111")
+
+    event = Event(object = alarm)
     
-    event = Event(object = poi_data)
+#    m = Message(type = MessageType.alarm, unpacked_data = event)
+    m = Message(type = MessageType.text, unpacked_data = "hej")
     
-    m = Message(type = MessageType.map, unpacked_data = event)
     raw = m.pack()
     m = Message()
     m.unpack(raw)
