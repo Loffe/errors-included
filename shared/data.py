@@ -326,6 +326,8 @@ class Message(object):
             event = create(self.packed_data)
             # set and return the message event
             self.unpacked_data = event
+        else:
+            self.unpacked_data = dict["packed_data"]
 
 def create_database():
     '''
@@ -344,7 +346,7 @@ if __name__ == '__main__':
     event = Event(object = alarm)
     
 #    m = Message(type = MessageType.alarm, unpacked_data = event)
-    m = Message(type = MessageType.text, unpacked_data = "hej")
+    m = Message(type = MessageType.text, unpacked_data = 5)
     
     raw = m.pack()
     m = Message()
