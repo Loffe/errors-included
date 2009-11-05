@@ -27,6 +27,7 @@ class Queue(dbus.service.Object):
                          in_signature='v', out_signature='s')
     def enqueue(self, msg):
         self.output.append(msg)
+        print "Queued: ", msg
         return "message queued :)"
 
     def connect_to_server(self):
