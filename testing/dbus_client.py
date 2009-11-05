@@ -19,9 +19,10 @@ def main():
 
     print (hello_reply_list)
 
-    return
     # ... or create an Interface wrapper for the remote object
-    iface = dbus.Interface(remote_object, "com.example.SampleInterface")
+    iface = dbus.Interface(remote_object, "com.example.Queue")
+    print iface.enqueue("Hello")
+    return
 
     hello_reply_tuple = iface.GetTuple()
 
