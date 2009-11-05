@@ -9,7 +9,7 @@ from selectunit import SelectUnitDialog
 
 class MissionScreen(gtk.ScrolledWindow, gui.Screen):
     
-    selected_type = None
+    selected_alarm = None
     db = None
     
     def __init__(self, db):
@@ -78,15 +78,15 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         main_box.add(select_unit_button)
         
         # add selectable types
-        for type in shared.data.ObstacleType.__dict__.keys():
-            if type[0] != "_":
-                combo_box.append_text(type)
+        for alarm in self.db.get_all_alarms():
+                combo_box.append_text(alarm.event)
+                
 
         # add event handler
-        combo_box.connect('changed', self.select_type)
+        combo_box.connect('changed', self.select_alarm)
 
         # set the first item added as active
-        combo_box.set_active(0)
+#        combo_box.set_active(0)
 
         # show 'em all! (:
         main_box.show_all()
@@ -94,12 +94,26 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
     '''Handle events
     '''
 
-    def select_type(self, combobox):
+    def select_alarm(self, combobox):
         '''
         Call when combobox changes to switch obstacle type.
         @param combobox: the changed combobox
         '''
         # set the selected type
-        self.selected_type = combobox.get_active()
-        
-
+        self.selected_alarm = combobox.get_active_text()
+        for alarm in self.db.get_all_alarms():
+            if alarm.event == self.selected_alarm:
+                self.event_entry.set_text(alarm.event)
+                self.location_entry.set_text(alarm.location_name)
+                self.name_entry.set_text(alarm.contact_person)
+                self.hurted_entry.set_text(str(alarm.number_of_wounded))
+                self.number_entry.set_text(alarm.contact_number)
+                self.random_entry.set_text(alarm.other)
+                
+    def ok_button_function(self, event):
+        alarm = None
+        for a in self.db.get_all_alarms():
+            if a.event == self.selected_alarm:
+                alarm = a
+        mission = shared.data.MissionData(self.event_entry.get_text(), alarm.poi, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text())
+        self.db.add(mission)
