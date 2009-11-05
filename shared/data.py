@@ -4,7 +4,6 @@ from datetime import datetime
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker, relation
 from sqlalchemy.ext.declarative import declarative_base
-
 # Create a base class to extend in order to be able to save to the database. 
 Base = declarative_base()
 
@@ -83,7 +82,7 @@ class MapObjectData(Base, Packable):
     
     coords = property(get_coords, set_coords)
 
-    def __init__(self, coordx, coordy, name, timestamp):
+    def __init__(self, coordx, coordy, name, timestamp, id):
         '''
         Constructor. Creates a map object.
         @param coord: The coordinates of this object.
@@ -92,17 +91,18 @@ class MapObjectData(Base, Packable):
         '''
         self.coordx = coordx
         self.coordy = coordy
-        self.name = u""+name
+        self.name = name
         self.timestamp = timestamp
+        self.id = id
 
     def __repr__(self):
         repr = "<%s: x=%s, y=%s, %s, %s>" % (self.__class__.__name__,
                                      self.coordx, self.coordy, self.name,
                                      self.timestamp)
-        try:
-            return repr.encode('utf-8')
-        except:
-            return repr 
+#        try:
+#            return repr.encode('utf-8')
+#        except:
+        return repr 
 
 class UnitData(MapObjectData):
     '''
@@ -115,8 +115,8 @@ class UnitData(MapObjectData):
     type = Column(Integer)
 
     def __init__(self, coordx, coordy, name, timestamp, 
-                 type = UnitType.ambulance):
-        MapObjectData.__init__(self, coordx, coordy, name, timestamp)
+                 type = UnitType.ambulance, id = None):
+        MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
 
 class ObstacleData(MapObjectData):
@@ -130,8 +130,8 @@ class ObstacleData(MapObjectData):
     type = Column(Integer)
 
     def __init__(self, coordx, coordy, name, timestamp, 
-                 type = ObstacleType.tree):
-        MapObjectData.__init__(self, coordx, coordy, name, timestamp)
+                 type = ObstacleType.tree, id = None):
+        MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
 
 class POIData(MapObjectData):
@@ -145,8 +145,8 @@ class POIData(MapObjectData):
     type = Column(Integer)
 
     def __init__(self, coordx, coordy, name, timestamp, 
-                 type = POIType.pasta_wagon):
-        MapObjectData.__init__(self, coordx, coordy, name, timestamp)
+                 type = POIType.pasta_wagon, id = None):
+        MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
 
 class Alarm(Base, Packable):
@@ -163,7 +163,7 @@ class Alarm(Base, Packable):
     other = Column(UnicodeText)
 
     def __init__(self, event, location_name, poi, contact_person, 
-                 contact_number, timestamp = datetime.now(), other = ""):
+                 contact_number, timestamp = datetime.now(), other = u""):
         self.event = event
         self.location_name = location_name
         self.poi = poi
@@ -177,10 +177,10 @@ class Alarm(Base, Packable):
                 (self.__class__.__name__,self.poi.coordx, self.poi.coordy, 
                  self.event, self.location_name, self.timestamp, 
                  self.contact_person, self.contact_number, self.other))
-        try:
-            return repr.encode('utf-8')
-        except:
-            return repr
+#        try:
+#            return repr.encode('utf-8')
+#        except:
+        return repr
 
 class MissionData(Base, Packable):
     '''
@@ -197,12 +197,12 @@ class MissionData(Base, Packable):
     other = Column(UnicodeText)
 
     def __init__(self, event_type, poi, number_of_wounded, contact_person, 
-                 other = ""):
-        self.event_type = u""+event_type
+                 other = u""):
+        self.event_type = event_type
         self.poi = poi
         self.number_of_wounded = number_of_wounded
-        self.contact_person = u""+contact_person
-        self.other = u""+other
+        self.contact_person = contact_person
+        self.other = other
     
     def __repr__(self):
         repr = ("<%s: %s, %s, %s, %s, %s>" % 
@@ -219,35 +219,38 @@ class EventType(object):
     '''
     add, change, remove = range(3)
 
-class Event(Packable):
+class Event(Base, Packable):
     '''
     An Event declares what to be done with a specified object. It's possible to 
     pack/unpack. This makes it possible to send it as a message.
     '''
+    __tablename__ = "Events"
+    id = Column(Integer, primary_key = True)
+    object_id = Column(Integer)
+    type = Column(Integer)
+    timestamp = Column(DateTime)
     
-    def __init__(self, object, object_id = None, type = EventType.add, 
-                 timestamp = datetime.now()):
+    def __init__(self, object_id, type, timestamp = datetime.now()):
         '''
         Constructor. Creates an event.
-        @param object: the object to handle.
         @param object_id: the global unique id of the object.
         @param type: the event type (add, change or remove) specifies what to be
         done with the object.
         @param timestamp: the timestamp of this event.
         '''
-        self.object = object
         self.object_id = object_id
         self.type = type
         self.timestamp = timestamp
 
     def __repr__(self):
-        repr = ("<%s: type=%s, %s; obj_id=%s, obj=%s>" % 
+        repr = ("<%s: type=%s, %s; obj_id=%s>" % 
                 (self.__class__.__name__, self.type, self.timestamp, 
-                 self.object_id, self.object))
-        try:
-            return repr.encode('utf-8')
-        except:
-            return repr
+                 self.object_id))
+#        try:
+#            return repr.encode('utf-8')
+#        except:
+#            return repr
+        return repr
 
 class MessageType(object):
     (mission, map, text, alarm, control, low_battery, status_update, mission_response, 
@@ -302,7 +305,7 @@ class Message(object):
         try:
             dict["packed_data"] = self.unpacked_data.to_dict()
         except:
-            dict["packed_data"] = str(self.unpacked_data)
+            dict["packed_data"] = self.unpacked_data
         self.packed_data = json.dumps(dict)
         return self.packed_data
 
@@ -328,11 +331,11 @@ class Message(object):
                 # remove added class key (and value)
                 classname = dict["class"]
                 del dict["class"]
-                try:
-                    # create the event object from the event object dict
-                    self.packed_data["object"] = create(self.packed_data["object"])
-                except:
-                    pass
+#                try:
+#                    # create the event object from the event object dict
+#                    self.packed_data["object"] = create(self.packed_data["object"])
+#                except:
+#                    pass
                 try:
                     # replace timestamp string with a real datetime
                     dict["timestamp"] = datetime.fromtimestamp(float(dict["timestamp"]))
@@ -359,10 +362,11 @@ class Message(object):
         repr = ("<%s: prio=%s, type=%s, %s; packed=%s, unpacked=%s>" % 
                 (self.__class__.__name__, self.prio, self.type, self.timestamp, 
                  self.packed_data, self.unpacked_data))
-        try:
-            return repr.encode('utf-8')
-        except:
-            return repr
+#        try:
+#            return repr.encode('utf-8')
+#        except:
+#            return repr
+        return repr
 
 def create_database():
     '''
@@ -374,14 +378,17 @@ def create_database():
     return db
 
 if __name__ == '__main__':
-    poi_data = POIData(12,113, "goal", datetime.now(), POIType.accident)
-    mission_data = MissionData("accident", poi_data, 7, "Me Messon", "")
-
-    alarm = Alarm("hej hopp", "Linköping", poi_data, "Klasse", "11111")
-
-    event = Event(object = alarm)
-
-    m1 = Message(type = MessageType.alarm, unpacked_data = alarm)
-    print "packed:", m1
-    m2 = Message(packed_data = m1.packed_data)
-    print "unpacked:", m2
+    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident)
+    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå")
+    print mission_data
+#    alarm = Alarm("räv", "Linköping", poi_data, "Klasse", "11111")
+    db = create_database()
+    db.add(mission_data)
+#    event = Event(object = alarm)
+#    event = Event(poi_data.id, EventType.add)
+#    print "ALARM:", alarm
+#    print "POI:", poi_data.__dict__
+    print Message(type = MessageType.map, unpacked_data = mission_data)
+#    print "packed:", m1
+#    m2 = Message(packed_data = m1.packed_data)
+#    print "unpacked:", m2
