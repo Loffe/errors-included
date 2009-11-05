@@ -14,3 +14,4 @@ except ImportError:
     import settingsexample as settings
 
 server = settings.server
+queue = settings.queue

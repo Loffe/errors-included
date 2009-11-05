@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import simplejson as json
 from datetime import datetime
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker, relation
@@ -11,7 +12,7 @@ class Database(object):
     '''
     A sqlite3 database using sqlalchemy.
     '''
-    
+
     def __init__(self):
         '''
         Create database engine and session.
@@ -27,6 +28,19 @@ class Database(object):
     def delete(self, object):
         self.session.delete(object)
         self.session.commit()
+
+    def get_all_units(self):
+        list = []
+        for u in self.session.query(UnitData):
+            list.append(u)
+        return list
+
+    def get_units(self, unit_ids):
+        list = []
+        q = self.session.query(UnitData).filter(UnitData.id.in_(unit_ids))
+        for u in q:
+            list.append(u)
+        return list
 
 class UnitType(object):
     ambulance, commander, other = range(3)
@@ -71,6 +85,15 @@ class MapObjectData(Base):
         self.coords = coord
         self.name = u""+name
         self.timestamp = timestamp
+        
+    def to_dict(self):
+        dict = {}
+#        dict["coords"] = self.coords
+        for var in self.__dict__.keys():
+            if not var.startswith("_"):
+                dict[var] = self.__dict__[var]
+        dict["class"] = self.__class__
+        return dict
 
     def __repr__(self):
         return "<%s: %s, %s, %s, %s>" % (self.__class__.__name__.encode("utf-8"), 
@@ -79,7 +102,7 @@ class MapObjectData(Base):
 
 class UnitData(MapObjectData):
     '''
-    All units have data objects extending this class.
+    All units have data objects of this class.
     '''
     __tablename__ = 'UnitData'
     __mapper_args__ = {'polymorphic_identity': 'UnitData'}
@@ -92,6 +115,9 @@ class UnitData(MapObjectData):
         self.type = type
 
 class ObstacleData(MapObjectData):
+    '''
+    All obstacles have data objects of this class.
+    '''
     __tablename__ = 'ObstacleData'
     __mapper_args__ = {'polymorphic_identity': 'ObstacleData'}
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
@@ -103,6 +129,9 @@ class ObstacleData(MapObjectData):
         self.type = type
 
 class POIData(MapObjectData):
+    '''
+    All Points of Interest (POIs) have data objects of this class.
+    '''
     __tablename__ = 'POIData'
     __mapper_args__ = {'polymorphic_identity': 'POIData'}
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
@@ -114,6 +143,9 @@ class POIData(MapObjectData):
         self.type = type
 
 class MissionData(Base):
+    '''
+    All missions have data objects of this class. 
+    '''
     __tablename__ = 'MissionData'
     id = Column(Integer, primary_key=True)
 
@@ -131,25 +163,54 @@ class MissionData(Base):
         self.number_of_wounded = number_of_wounded
         self.contact_person = u""+contact_person
         self.other = u""+other
-        
+
+# UNSTABLE!
 class Message(object):
-    type = None
-    data = None    
+    '''
+    All messages must be instances of this class.
+    Enables packing and unpacking of raw messages.
+    '''
+    # The data to send (a dict containing all variables)
+    data = None
     
-    def __init__(self, raw_msg = None):
-        self.unpack(raw_msg)
+    def __init__(self, object = None, raw_message = None):
+        '''
+        Create a message.
+        @param object:
+        @param raw_message:
+        '''
+        if self.raw_message != None:
+            self.unpack(raw_message)
+        else:
+            self.data = object.to_dict()
     
-    """ till JSON tror vi
-    """
     def pack(self):
-        pass
+        return json.dumps(self.data)
     
-    def unpack(self, raw_msg):
-        if raw_msg != None:
-            #packa upp
-            pass
+    ## SHIIIIET!  PROLLY DOESN*T WOOOÖÖRK
+    def unpack(self, raw_message = None):
+        if raw_message != None:
+            self.data = json.loads(raw_message)
+            # convert temp to type and object
+            data_class = self.data["class"]
+            object = data_class.__new__(self.data.values.sort())
+        return object
 
 def create_database():
     db = Database()
     Base.metadata.create_all(db.engine)
     return db
+
+if __name__ == "__main__":
+    print "Testing db"
+    db = Database()
+    '''
+    for i in range(5):
+        u = UnitData((0, 15), "Enhet " + str(i), datetime.now(), UnitType.ambulance)
+        print u
+        db.add(u)
+    '''
+    units = db.get_all_units()
+    for u in units:
+        print u.id, u.name
+

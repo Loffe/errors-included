@@ -10,15 +10,18 @@ import datetime
 from shared.data import *
 from map.mapdata import *
 
+from gui.gui import Screen
 from gui.mapscreen import MapScreen
 from gui.alarmscreen import AlarmScreen
 from gui.messagescreen import MessageScreen
 from gui.obstaclescreen import ObstacleScreen
+from gui.missionscreen import MissionScreen
 
 import queueinterface
 
 class ClientGui(hildon.Program):
     queue = queueinterface.interface
+    db = None
     '''
     The main GUI-process of the client
     '''
@@ -106,6 +109,11 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.obstacle_screen, True, True, 0)
         self.screens["obstacle"] = self.obstacle_screen
         
+        # add the create_mission screen
+        self.mission_screen = MissionScreen(self.db)
+        vbox_right.pack_start(self.mission_screen, True, True, 0)
+        self.screens["make_mission"] = self.mission_screen
+        
         # Mission buttons and their menu
         self.mission_menu = gtk.HBox(False, 0)
         self.mission_menu.set_size_request(0, 60)
@@ -134,6 +142,7 @@ class ClientGui(hildon.Program):
         create_obstacle_button = gtk.Button("Hinder")
         create_obstacle_button.connect("clicked", self.create_obstacle)
         create_mission_button = gtk.Button("Uppdrag")
+        create_mission_button.connect("clicked", self.create_mission)
         self.add_object_menu.add(create_alarm_button)
         self.add_object_menu.add(create_obstacle_button)
         self.add_object_menu.add(create_mission_button)
@@ -175,18 +184,10 @@ class ClientGui(hildon.Program):
         self.show_add_object(event)
     
     def ok_button_function(self, event):
-#        self.show_add_object(event)
-        coord = (15.5724, 58.4050)
-        name = "hinder"
-        timestamp = datetime(2009,11,3,10,40)
-        type = self.obstacle_screen.selected_type
-        print type
-
-        data = ObstacleData(coord, name, timestamp, type)
-
-        obstacle = Obstacle(data)
-
-        self.db.add(data)
+        for screen in self.screens.values():
+            if screen.props.visible and isinstance(screen, Screen):
+                screen.ok_button_function(event)
+        #self.show_add_object(event)
     
     # mission view event handlers
     def show_mission(self, event):
@@ -259,7 +260,7 @@ class ClientGui(hildon.Program):
     def show_add_object(self, event):
         self.toggle_show("add_object", 
                          ["notifications", "map","add_object_menu"], 
-                         "Här kan du lägga till ett objekt")
+                         "Välj en koordinat och sedan typ av objekt")
     
     # add object buttons event handlers
     def create_alarm(self, event):
@@ -269,12 +270,12 @@ class ClientGui(hildon.Program):
         self.show(["obstacle", "buttons"])
     
     def create_mission(self, event):
-        pass
+        self.show(["make_mission", "buttons"])
 
 
     # contacts view event handlers
     def show_contacts(self,event):
-        self.toggle_show("contacts", [])
+        self.toggle_show("contacts", ["notifications"], "Här visas dina kontakter och du kan ringa till dem")
 
 
     # messages view event handlers

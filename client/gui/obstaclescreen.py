@@ -26,18 +26,19 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         # create layout boxes
         main_box = gtk.HBox(False,0)
         self.add_with_viewport(main_box)
-        left_box = gtk.VBox(True,0)
-        right_box = gtk.VBox(True,0)
+        left_box = gtk.VBox(False,0)
+        right_box = gtk.VBox(False,0)
         main_box.pack_start(left_box,False,False,0)
         main_box.add(right_box)
         
         # create type label
         type_label = gtk.Label("Typ:")
+        type_label.set_alignment(0, 0.5)
         left_box.pack_start(type_label, True, True, 0)
         
         # create and pack combobox
         combo_box = gtk.combo_box_new_text()
-        combo_box.set_size_request(300,50)
+        #combo_box.set_size_request(300,50)
         right_box.pack_start(combo_box, True, False, 0)
         
         label, self.location_entry = new_entry("Händelse:")
