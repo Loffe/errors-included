@@ -219,11 +219,22 @@ class EventType(object):
     '''
     add, change, remove = range(3)
 
-# UNFINIISHED
 class Event(Packable):
+    '''
+    An Event declares what to be done with a specified object. It's possible to 
+    pack/unpack. This makes it possible to send it as a message.
+    '''
     
     def __init__(self, object, object_id = None, type = EventType.add, 
                  timestamp = datetime.now()):
+        '''
+        Constructor. Creates an event.
+        @param object: the object to handle.
+        @param object_id: the global unique id of the object.
+        @param type: the event type (add, change or remove) specifies what to be
+        done with the object.
+        @param timestamp: the timestamp of this event.
+        '''
         self.object = object
         self.object_id = object_id
         self.type = type
@@ -254,22 +265,31 @@ class Message(object):
     prio = 0
     # The packed data (json dumps) to send (a dict containing all variables)
     packed_data = None
-    # The event
+    # The unpacked data
     unpacked_data = None
-    
+    # The timestamp of this message
     timestamp = None
     
-    def __init__(self, type = None, unpacked_data = None):
+    def __init__(self, type = None, unpacked_data = None, packed_data = None):
         '''
-        Create a message.
-        @param type:
-        @param unpacked_data:
+        Constructor. Creates a message.
+        @param type: the type of this message
+        @param unpacked_data: the unpacked data to pack
+        @param packed_data: the packed data to unpack
         '''
         self.type = type
         self.unpacked_data = unpacked_data
+        self.packed_data = packed_data
         self.timestamp = datetime.now()
-#        if unpacked_data != None:
-#            self.packed_data = unpacked_data.to_dict()
+        
+        # message created from unpacked data
+        if unpacked_data:
+            # pack the unpacked data
+            self.pack()
+        # message created from packed data
+        elif packed_data:
+            # unpack the packed data
+            self.unpack(packed_data)
     
     def pack(self):
         '''
@@ -297,8 +317,9 @@ class Message(object):
         self.timestamp = datetime.fromtimestamp(float(dict["timestamp"]))
         self.packed_data = dict["packed_data"]
         
+        # it's data packed to a dict
         if type(self.packed_data) == type({}):
-            
+
             def create(dict):
                 '''
                 Create an object from a specified dictionary.
@@ -324,19 +345,20 @@ class Message(object):
                     pass
                 # create and return an instance of the object
                 return globals()[classname](**dict)
-    
-            # create the event from the data
-            data = create(self.packed_data)
-            # set and return the message event
-            self.unpacked_data = data
+
+            # create and set data
+            self.unpacked_data = create(self.packed_data)
+
+        # it's a default type
         else:
+            # the packed data behave as the unpacked data (no need to convert)
             self.unpacked_data = dict["packed_data"]
-            
+        return self.unpacked_data
+
     def __repr__(self):
-        repr = "<%s: prio=%s, type=%s, %s; %s>" % (self.__class__.__name__, 
-                                                   self.prio, self.type, 
-                                                   self.timestamp, 
-                                                   self.unpacked_data)
+        repr = ("<%s: prio=%s, type=%s, %s; packed=%s, unpacked=%s>" % 
+                (self.__class__.__name__, self.prio, self.type, self.timestamp, 
+                 self.packed_data, self.unpacked_data))
         try:
             return repr.encode('utf-8')
         except:
@@ -347,6 +369,7 @@ def create_database():
     Create the database.
     '''
     db = Database()
+    # create tables and columns
     Base.metadata.create_all(db.engine)
     return db
 
@@ -358,9 +381,7 @@ if __name__ == '__main__':
 
     event = Event(object = alarm)
 
-    m = Message(type = MessageType.alarm, unpacked_data = alarm)
-    
-    raw = m.pack()
-    m = Message()
-    m.unpack(raw)
-    print m
+    m1 = Message(type = MessageType.alarm, unpacked_data = alarm)
+    print "packed:", m1
+    m2 = Message(packed_data = m1.packed_data)
+    print "unpacked:", m2
