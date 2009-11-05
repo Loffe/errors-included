@@ -21,7 +21,6 @@ from gui.newmessagescreen import NewMessageScreen
 from gui.outboxscreen import OutboxScreen
 from gui.alarminboxscreen import AlarmInboxScreen
 
-
 class ClientGui(hildon.Program):
     queue = shared.queueinterface.interface
     db = None
@@ -40,6 +39,8 @@ class ClientGui(hildon.Program):
         self.window.set_title("ClientGui")
         self.add_window(self.window)
         
+        # Creates a empty list that contains provius screens
+        self.prev_page = []
         # create the database
         self.db = shared.data.create_database()
 
@@ -215,13 +216,13 @@ class ClientGui(hildon.Program):
     ''' Handle events
     ''' 
     def back_button_function(self, event):
-        self.show_add_object(event)
+        self.show(self.prev_page[-2])
+        print "back to: ", self.prev_page[-2]
     
     def ok_button_function(self, event):
         for screen in self.screens.values():
             if screen.props.visible and isinstance(screen, Screen):
                 screen.ok_button_function(event)
-        #self.show_add_object(event)
     
     # mission view event handlers
     def show_mission(self, event):
@@ -233,8 +234,6 @@ class ClientGui(hildon.Program):
         pass
     
     def show_status(self, event):
-        
-
         
         dialog = gtk.Dialog("Samtal",
                  self.window,  #the toplevel wgt of your app
@@ -253,11 +252,7 @@ class ClientGui(hildon.Program):
         result = dialog.run()
         if result == 77:
            print "svara"
-           
-           
-           
-           
-           
+
            dia = gtk.Dialog("Samtal",
                  self.window,  #the toplevel wgt of your app
                  gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
@@ -265,8 +260,6 @@ class ClientGui(hildon.Program):
         
            dia.set_size_request(400,200)
 
-
-        
            qu = gtk.Label("Vill du lägga på?")
            qu.show()
            dia.vbox.pack_start(qu)
@@ -274,10 +267,6 @@ class ClientGui(hildon.Program):
            result = dia.run()
            
            dia.destroy()
-           
-           
-           
-           
            
         elif result == 666:
             print "upptaget"
@@ -288,7 +277,6 @@ class ClientGui(hildon.Program):
     
     def show_faq(self, event):
         pass
-
 
     # add object view event handlers
     def show_add_object(self, event):
@@ -326,7 +314,6 @@ class ClientGui(hildon.Program):
     def show_messages(self, event):
         self.toggle_show("messages", ["notifications", "message","message_menu"], "Här visas dina meddelanden")
 
-
     # show certain screen methods
     def toggle_show(self, button_key, screen_keys, notification_text = ""):
         '''
@@ -339,11 +326,8 @@ class ClientGui(hildon.Program):
             for menu_button in self.menu_buttons.keys():
                 if menu_button != button_key:
                     self.menu_buttons[menu_button].set_active(False)
-            for key in self.screens.keys():
-                self.screens[key].hide_all()
+            self.show(screen_keys)
             self.screens["notifications"].set_label(notification_text)
-            for key in screen_keys:
-                self.screens[key].show_all()
         else:
             self.show_default()
     
@@ -352,6 +336,9 @@ class ClientGui(hildon.Program):
         Show specified screens.
         @param keys: a list with keys to the screens to show. 
         '''
+        self.prev_page.append(keys)
+        print "showing: ", self.prev_page
+
         for key in self.screens.keys():
             self.screens[key].hide_all()
         for key in keys:
