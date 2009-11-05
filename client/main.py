@@ -18,6 +18,8 @@ from gui.inboxscreen import InboxScreen
 from gui.obstaclescreen import ObstacleScreen
 from gui.missionscreen import MissionScreen
 from gui.newmessagescreen import NewMessageScreen
+from gui.outboxscreen import OutboxScreen
+from gui.alarminboxscreen import AlarmInboxScreen
 
 
 class ClientGui(hildon.Program):
@@ -108,6 +110,14 @@ class ClientGui(hildon.Program):
         self.new_message_screen = NewMessageScreen()
         vbox_right.pack_start(self.new_message_screen, True, True, 0)
         self.screens["new_message"] = self.new_message_screen
+        
+        self.outbox_screen = OutboxScreen()
+        vbox_right.pack_start(self.outbox_screen, True, True, 0)
+        self.screens["output"] = self.outbox_screen
+        
+        self.alarm_inbox_screen = AlarmInboxScreen()
+        vbox_right.pack_start(self.alarm_inbox_screen, True, True, 0)
+        self.screens["alarms"] = self.alarm_inbox_screen
 
         # add the obstacle screen
         self.obstacle_screen = ObstacleScreen()
@@ -145,8 +155,11 @@ class ClientGui(hildon.Program):
         new_mess = gtk.Button("Nytt")
         new_mess.connect("clicked", self.create_new_message)
         inbox = gtk.Button("Inkorg")
+        inbox.connect("clicked", self.show_inbox)
         outbox = gtk.Button("Utkorg")
+        outbox.connect("clicked", self.show_outbox)
         in_alarms = gtk.Button("Inkomna larm")
+        in_alarms.connect("clicked", self.show_alarms)
         self.message_menu.add(new_mess)
         self.message_menu.add(inbox)
         self.message_menu.add(outbox)
@@ -295,6 +308,15 @@ class ClientGui(hildon.Program):
 
     def create_new_message(self, event):
         self.show(["new_message", "buttons"])
+        
+    def show_outbox(self, event):
+        self.show(["output", "message_menu"])
+        
+    def show_inbox(self, event):
+        self.show(["message", "message_menu"])
+        
+    def show_alarms(self, event):
+        self.show(["alarms", "message_menu"])
         
     # contacts view event handlers
     def show_contacts(self,event):
