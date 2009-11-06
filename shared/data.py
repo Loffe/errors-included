@@ -54,6 +54,12 @@ class Database(object):
     def delete(self, object):
         self.session.delete(object)
         self.session.commit()
+        
+    def get_all_alarms(self):
+        list = []
+        for a in self.session.query(Alarm):
+            list.append(a)
+        return list
 
     def get_all_units(self):
         list = []
@@ -180,9 +186,10 @@ class Alarm(Base, Packable):
     contact_person = Column(UnicodeText)
     contact_number = Column(UnicodeText)
     other = Column(UnicodeText)
+    number_of_wounded = Column(Integer)
 
     def __init__(self, event, location_name, poi, contact_person, 
-                 contact_number, timestamp = datetime.now(), other = u""):
+                 contact_number, number_of_wounded, timestamp = datetime.now(), other = u""):
         self.event = event
         self.location_name = location_name
         self.poi = poi
@@ -190,11 +197,12 @@ class Alarm(Base, Packable):
         self.contact_person = contact_person
         self.contact_number = contact_number
         self.other = other
+        self.number_of_wounded = number_of_wounded
         
     def __repr__(self):
-        repr = ("<%s: %s, %s, %s, %s, %s, %s, %s, %s>" % 
+        repr = ("<%s: %s, %s, %s, %s, %s, %s, %s, %s, %s>" % 
                 (self.__class__.__name__,self.poi.coordx, self.poi.coordy, 
-                 self.event, self.location_name, self.timestamp, 
+                 self.event, self.location_name, self.number_of_wounded, self.timestamp, 
                  self.contact_person, self.contact_number, self.other))
         try:
             return repr.encode('utf-8')
@@ -408,7 +416,9 @@ def create_database():
     Base.metadata.create_all(db.engine)
     return db
 
+
 if __name__ == '__main__':
+    print "Testing db"
     db = create_database()
     poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident)
 #    db.add(poi_data)
@@ -419,6 +429,32 @@ if __name__ == '__main__':
 #    alarm = Alarm("räv", "Linköping", poi_data, "Klasse", "11111")
     
     db.add(mission_data)
+    
+#    for i in range(5):
+#        u = UnitData((0, 15), "Enhet " + str(i), datetime.now(), UnitType.ambulance)
+#        print u
+#        db.add(u)
+#    
+#    units = db.get_all_units()
+#    for u in units:
+#        print u.id, u.name
+#
+    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident)
+#    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå")
+#    print mission_data
+    alarm = Alarm(u"Bilolycka", u"Linköping", poi_data, u"Laban Andersson", u"070-741337", 7)
+    alarm2 = Alarm(u"Hjärtattack", u"Norrköping", poi_data, u"Jakob johansson", u"070-741338", 1)
+    alarm3 = Alarm(u"Barnmisshandel", u"Motala", poi_data, u"Muhammad Alzhein", u"n/a", 4)
+    db.add(alarm)
+    db.add(alarm2)
+    db.add(alarm3)
+    
+    enhet = UnitData(12,121,u"Enhet1",datetime.now(), UnitType.ambulance)
+    enhet2 = UnitData(12,111,u"Enhet2",datetime.now(), UnitType.ambulance)
+    enhet3 = UnitData(12,141,u"Enhet3",datetime.now(), UnitType.ambulance)
+    db.add(enhet)
+    db.add(enhet2)
+    db.add(enhet3)
 #    event = Event(object = alarm)
 #    event = Event(poi_data.id, EventType.add)
 #    print "ALARM:", alarm
