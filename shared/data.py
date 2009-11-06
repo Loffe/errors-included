@@ -75,14 +75,18 @@ class Database(object):
         return list
 
 class UnitType(object):
-    ambulance, commander, other = range(3)
+    (ambulance, # Regular unit
+     army, # short for Swedish Armed Forces
+     commander, # Nana nana nana nana LEADER! leader..
+     srsa, # Swedish Rescue Services Agency (SRSA) 
+     other) = range(3)
 
 class ObstacleType(object):
     # always sort in alphabetic order!!!
     bridge, other, road, tree = range(4)
 
 class POIType(object):
-    accident, pasta_wagon = range(2)
+    accident, fire, pasta_wagon = range(2)
 
 class MapObjectData(Base, Packable):
     '''

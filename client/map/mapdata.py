@@ -267,7 +267,11 @@ class Unit(MapObject):
         if unit_data.type == shared.data.UnitType.ambulance:
             path = "map/data/icons/ambulance.png"
         elif unit_data.type == shared.data.UnitType.commander:
-            path = "map/data/icons/totempole.png"
+            path = "map/data/icons/commander.png"
+        elif unit_data.type == shared.data.UnitType.army:
+            path = "map/data/icons/tank.png"
+        elif unit_data.type == shared.data.UnitType.srsa:
+            path = "map/data/icons/firetruck.png"
         self.picture = Picture(path)    
 
 class Obstacle(MapObject):
@@ -288,6 +292,10 @@ class POI(MapObject):
         path = "map/data/icons/default.png"
         if poi_data.type == shared.data.POIType.pasta_wagon:
             path = "map/data/icons/pastawagon.png"
+        elif poi_data.type == shared.data.POIType.fire:
+            path = "map/data/icons/fire.png"
+        elif poi_data.type == shared.data.POIType.accident:
+            path = "map/data/icons/accident.png"
         self.picture = Picture(path)
 
 class Mission():
