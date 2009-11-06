@@ -142,6 +142,7 @@ class ClientGui(hildon.Program):
         status_button.connect("clicked", self.show_status)
         journal_button = gtk.Button("Patient\nJournal")
         faq_button = gtk.Button("FAQ")
+        faq_button.connect("clicked", self.show_faq)
         self.mission_menu.add(info_button)
         self.mission_menu.add(status_button)
         self.mission_menu.add(journal_button)
@@ -275,7 +276,22 @@ class ClientGui(hildon.Program):
         pass
     
     def show_faq(self, event):
-        pass
+        dialog = gtk.Dialog("Uppdrag",
+                 self.window,  #the toplevel wgt of your app
+                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
+                 ("     Acceptera     ", 77, "  Acceptera inte  ", 666))
+        
+        question = gtk.Label("Nu har fått ett uppdrag vill du acceptera det?")
+        question.show()
+        dialog.vbox.pack_start(question)
+        dialog.show()
+        result = dialog.run()
+        if result == 77:
+           print "Acceptera"
+           
+        elif result == 666:
+            print "Acceptera inte"
+        dialog.destroy()
 
     # add object view event handlers
     def show_add_object(self, event):
