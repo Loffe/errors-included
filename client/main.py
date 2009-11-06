@@ -14,10 +14,12 @@ from map.mapdata import *
 from gui.gui import Screen
 from gui.mapscreen import MapScreen
 from gui.alarmscreen import AlarmScreen
-from gui.messagescreen import MessageScreen
+from gui.inboxscreen import InboxScreen
 from gui.obstaclescreen import ObstacleScreen
 from gui.missionscreen import MissionScreen
-
+from gui.newmessagescreen import NewMessageScreen
+from gui.outboxscreen import OutboxScreen
+from gui.alarminboxscreen import AlarmInboxScreen
 
 class ClientGui(hildon.Program):
     queue = shared.queueinterface.interface
@@ -37,6 +39,8 @@ class ClientGui(hildon.Program):
         self.window.set_title("ClientGui")
         self.add_window(self.window)
         
+        # Creates a empty list that contains provius screens
+        self.prev_page = []
         # create the database
         self.db = shared.data.create_database()
 
@@ -64,7 +68,7 @@ class ClientGui(hildon.Program):
         add_object_button.connect("clicked", self.show_add_object)
         self.menu_buttons["add_object"] = add_object_button
 
-        contacts_button = gtk.ToggleButton("Kontakt")
+        contacts_button = gtk.ToggleButton("Kontakter")
         contacts_button.connect("clicked", self.show_contacts)
         self.menu_buttons["contacts"] = contacts_button
 
@@ -100,9 +104,21 @@ class ClientGui(hildon.Program):
         self.screens["alarm"] = self.alarm_screen
 
         # adding messages screen
-        self.message_screen = MessageScreen()
+        self.message_screen = InboxScreen()
         vbox_right.pack_start(self.message_screen, True, True, 0)
         self.screens["message"] = self.message_screen
+        
+        self.new_message_screen = NewMessageScreen()
+        vbox_right.pack_start(self.new_message_screen, True, True, 0)
+        self.screens["new_message"] = self.new_message_screen
+        
+        self.outbox_screen = OutboxScreen()
+        vbox_right.pack_start(self.outbox_screen, True, True, 0)
+        self.screens["output"] = self.outbox_screen
+        
+        self.alarm_inbox_screen = AlarmInboxScreen()
+        vbox_right.pack_start(self.alarm_inbox_screen, True, True, 0)
+        self.screens["alarms"] = self.alarm_inbox_screen
 
         # add the obstacle screen
         self.obstacle_screen = ObstacleScreen()
@@ -130,6 +146,25 @@ class ClientGui(hildon.Program):
         self.mission_menu.add(status_button)
         self.mission_menu.add(journal_button)
         self.mission_menu.add(faq_button)
+        
+        #Message buttons and their menu
+        self.message_menu = gtk.HBox(False, 0)
+        self.message_menu.set_size_request(0, 60)
+        vbox_right.pack_start(self.message_menu, False, False, 0)
+        self.screens["message_menu"] = self.message_menu
+        
+        new_mess = gtk.Button("Nytt")
+        new_mess.connect("clicked", self.create_new_message)
+        inbox = gtk.Button("Inkorg")
+        inbox.connect("clicked", self.show_inbox)
+        outbox = gtk.Button("Utkorg")
+        outbox.connect("clicked", self.show_outbox)
+        in_alarms = gtk.Button("Inkomna larm")
+        in_alarms.connect("clicked", self.show_alarms)
+        self.message_menu.add(new_mess)
+        self.message_menu.add(inbox)
+        self.message_menu.add(outbox)
+        self.message_menu.add(in_alarms)
 
         # Add object buttons and their menu
         self.add_object_menu = gtk.HBox(False, 0)
@@ -181,13 +216,12 @@ class ClientGui(hildon.Program):
     ''' Handle events
     ''' 
     def back_button_function(self, event):
-        self.show_add_object(event)
+        self.show(self.prev_page[-2])
     
     def ok_button_function(self, event):
         for screen in self.screens.values():
             if screen.props.visible and isinstance(screen, Screen):
                 screen.ok_button_function(event)
-        #self.show_add_object(event)
     
     # mission view event handlers
     def show_mission(self, event):
@@ -199,8 +233,6 @@ class ClientGui(hildon.Program):
         pass
     
     def show_status(self, event):
-        
-
         
         dialog = gtk.Dialog("Samtal",
                  self.window,  #the toplevel wgt of your app
@@ -219,11 +251,7 @@ class ClientGui(hildon.Program):
         result = dialog.run()
         if result == 77:
            print "svara"
-           
-           
-           
-           
-           
+
            dia = gtk.Dialog("Samtal",
                  self.window,  #the toplevel wgt of your app
                  gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
@@ -231,8 +259,6 @@ class ClientGui(hildon.Program):
         
            dia.set_size_request(400,200)
 
-
-        
            qu = gtk.Label("Vill du lägga på?")
            qu.show()
            dia.vbox.pack_start(qu)
@@ -240,10 +266,6 @@ class ClientGui(hildon.Program):
            result = dia.run()
            
            dia.destroy()
-           
-           
-           
-           
            
         elif result == 666:
             print "upptaget"
@@ -254,7 +276,6 @@ class ClientGui(hildon.Program):
     
     def show_faq(self, event):
         pass
-
 
     # add object view event handlers
     def show_add_object(self, event):
@@ -272,16 +293,25 @@ class ClientGui(hildon.Program):
     def create_mission(self, event):
         self.show(["make_mission", "buttons"])
 
-
+    def create_new_message(self, event):
+        self.show(["new_message", "buttons"])
+        
+    def show_outbox(self, event):
+        self.show(["output", "message_menu"])
+        
+    def show_inbox(self, event):
+        self.show(["message", "message_menu"])
+        
+    def show_alarms(self, event):
+        self.show(["alarms", "message_menu"])
+        
     # contacts view event handlers
     def show_contacts(self,event):
         self.toggle_show("contacts", ["notifications"], "Här visas dina kontakter och du kan ringa till dem")
 
-
     # messages view event handlers
     def show_messages(self, event):
-        self.toggle_show("messages", ["notifications", "message"], "Här visas dina meddelanden")
-
+        self.toggle_show("messages", ["notifications", "message","message_menu"], "Här visas dina meddelanden")
 
     # show certain screen methods
     def toggle_show(self, button_key, screen_keys, notification_text = ""):
@@ -295,11 +325,8 @@ class ClientGui(hildon.Program):
             for menu_button in self.menu_buttons.keys():
                 if menu_button != button_key:
                     self.menu_buttons[menu_button].set_active(False)
-            for key in self.screens.keys():
-                self.screens[key].hide_all()
+            self.show(screen_keys)
             self.screens["notifications"].set_label(notification_text)
-            for key in screen_keys:
-                self.screens[key].show_all()
         else:
             self.show_default()
     
@@ -308,6 +335,8 @@ class ClientGui(hildon.Program):
         Show specified screens.
         @param keys: a list with keys to the screens to show. 
         '''
+        self.prev_page.append(keys)
+
         for key in self.screens.keys():
             self.screens[key].hide_all()
         for key in keys:

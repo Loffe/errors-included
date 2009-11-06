@@ -6,7 +6,7 @@ import shared.data
 import gui
 import pango
 
-class MessageScreen(gtk.ScrolledWindow, gui.Screen):
+class AlarmInboxScreen(gtk.ScrolledWindow, gui.Screen):
     '''
     The screen wich shows your messages
     '''
@@ -19,5 +19,8 @@ class MessageScreen(gtk.ScrolledWindow, gui.Screen):
 
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        
+        meddelande = gtk.Label("Du har inget larm atm!")
+        self.add_with_viewport(meddelande)
 
  
