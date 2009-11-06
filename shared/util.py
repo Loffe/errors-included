@@ -6,5 +6,4 @@ logging.basicConfig(level=logging.DEBUG,
                     filename='log.txt',
                     filemode='aw')
 
-logger = logging.getLogger('errors-included')
-logger.info("hej")
+log = logging.getLogger('errors-included')

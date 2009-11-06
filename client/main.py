@@ -9,6 +9,8 @@ import datetime
 
 from shared.data import *
 import shared.queueinterface
+from shared.util import log as log
+log.debug("imported log")
 from map.mapdata import *
 
 from gui.gui import Screen
@@ -20,6 +22,8 @@ from gui.missionscreen import MissionScreen
 from gui.newmessagescreen import NewMessageScreen
 from gui.outboxscreen import OutboxScreen
 from gui.alarminboxscreen import AlarmInboxScreen
+
+log.debug("imports ready")
 
 class ClientGui(hildon.Program):
     queue = shared.queueinterface.interface
@@ -34,6 +38,7 @@ class ClientGui(hildon.Program):
         '''
         Constructor. Creates the GUI (window and containing components).
         '''
+        log.debug("ClientGui started")
         hildon.Program.__init__(self)
         self.window = hildon.Window()
         self.window.set_title("ClientGui")
@@ -204,6 +209,7 @@ class ClientGui(hildon.Program):
 
         # Change to default True?
         self.window_in_fullscreen = False
+        log.info("ClientGui created")
         
     def run(self):
         '''
@@ -375,5 +381,6 @@ class ClientGui(hildon.Program):
 
 # den här borde skapa nya vyer av mission och kartan
 if __name__ == "__main__":
+    log.debug("__main__")
     app = ClientGui()
     app.run()
