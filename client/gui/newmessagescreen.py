@@ -47,32 +47,16 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
 
         label, self.subject_entry = new_entry("Ämne",vbox)
 
-#        label, self.message_entry = new_entry("Meddelande",vbox)
-#        self.message_entry.set_size_request(200,200)
         msg_label = gtk.Label("Meddelande")
         msg_label.set_alignment(0, 0.5)
         textbox = gtk.TextView()
         textbox.set_editable(True)
         textbox.set_size_request(200,200)
-        #print textbox.get_style()["border"]
         buffer = textbox.get_buffer()
         buffer.set_text("Skriv ditt meddelande här")
-        #textbox.set_size_allocate(200,200)
         msgbox = gtk.HBox(True,0)
         msgbox.pack_start(msg_label)
         msgbox.pack_start(textbox)
-#        text = "Hejsan"
-#        tag=gtk.TextTag("default")
-#
-#
-#        self.buffer.set_text(text) #text is a string  
-#        start, end=self.buffer.get_bounds()
-#        self.buffer.apply_tag_by_name("default",start,end)
-        
-#        msgbox.pack_start()
-#        msgbox.pack_start(msg_label)
         vbox.add(msgbox)
-        
 
-        
         self.show_all()
