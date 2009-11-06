@@ -336,6 +336,8 @@ class ClientGui(hildon.Program):
         @param keys: a list with keys to the screens to show. 
         '''
         self.prev_page.append(keys)
+        self.prev_page = self.prev_page[-2:]
+        print self.prev_page
 
         for key in self.screens.keys():
             self.screens[key].hide_all()
