@@ -7,6 +7,7 @@ import threading
 import Queue
 import dbus
 import dbus.service
+from shared.util import log as log
 
 class Server(dbus.service.Object):
     input = [sys.stdin]
@@ -22,7 +23,7 @@ class Server(dbus.service.Object):
         self.backlog = 5
         self.size = 1024
         self.server = None
-        self.queue = Queue.Queue(10)
+        self.queue = Queue.Queue()
 
     @dbus.service.method(dbus_interface='included.error.Server',
                          in_signature='v', out_signature='s')
@@ -37,7 +38,7 @@ class Server(dbus.service.Object):
         return "Message Available!!"
 
     def open_socket(self):
-        print "opening socket"
+        log.info("Server is opening socket")
         try:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             if 'arm' not in sys.version.lower():
@@ -56,7 +57,7 @@ class Server(dbus.service.Object):
         self.input.append(self.server)
         threading.Thread(target=self.run).start()
         #gobject.idle_add(self.run)
-        self.dbusloop()
+        #self.dbusloop()
 
     def close(self):
         print "Shutting down server"
@@ -81,10 +82,15 @@ class Server(dbus.service.Object):
                         running = False
                 else:
                     data = s.recv(1024)
-                    print "data from client:", data
-                    self.queue.put(data, False)
-                    print self.queue
-                    sys.stdout.flush()
+                    if data:
+                        self.message_available("super message is here")
+                        log.debug("data from client:" + str(data))
+                        self.queue.put(data, False)
+                        print self.queue
+                        sys.stdout.flush()
+                    else:
+                        s.close()
+                        self.input.remove(s)
         
         print "Shutting down server"
 
