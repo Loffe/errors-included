@@ -319,13 +319,15 @@ class Message(object):
     # The timestamp of this message
     timestamp = None
     
-    def __init__(self, type = None, unpacked_data = None, packed_data = None):
+    def __init__(self, sender, reciever, type = None, unpacked_data = None, packed_data = None):
         '''
         Constructor. Creates a message.
         @param type: the type of this message
         @param unpacked_data: the unpacked data to pack
         @param packed_data: the packed data to unpack
         '''
+        self.sender = sender
+        self.reciever = reciever
         self.type = type
         self.unpacked_data = unpacked_data
         self.packed_data = packed_data
@@ -348,6 +350,8 @@ class Message(object):
         dict["type"] = self.type
         dict["prio"] = self.prio
         dict["timestamp"] = self.timestamp.strftime("%s")
+        dict["sender"] = self.sender
+        dict["reciever"] = self.reciever
         try:
             dict["packed_data"] = self.unpacked_data.to_dict()
         except:
@@ -363,6 +367,8 @@ class Message(object):
         dict = json.loads(raw_message)
         self.type = dict["type"]
         self.prio = dict["prio"]
+        self.sender = dict["sender"]
+        self.reciever = dict["reciever"]
         self.timestamp = datetime.fromtimestamp(float(dict["timestamp"]))
         self.packed_data = dict["packed_data"]
         
@@ -400,9 +406,9 @@ class Message(object):
         return self.unpacked_data
 
     def __repr__(self):
-        repr = ("<%s: prio=%s, type=%s, %s; packed=%s, unpacked=%s>" % 
-                (self.__class__.__name__, self.prio, self.type, self.timestamp, 
-                 self.packed_data, self.unpacked_data))
+        repr = ("<%s: sender=%s, receiver=%s, prio=%s, type=%s, %s; packed=%s, unpacked=%s>" % 
+                (self.__class__.__name__, self.sender, self.reciever, self.prio,
+                 self.type, self.timestamp, self.packed_data, self.unpacked_data))
         try:
             return repr.encode('utf-8')
         except:

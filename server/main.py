@@ -12,6 +12,7 @@ import shared.data
 
 class Server(dbus.service.Object):
     input = [sys.stdin]
+    output = []
 
     def __init__(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -91,6 +92,7 @@ class Server(dbus.service.Object):
                 if s == self.server:
                     (client, port) = self.server.accept()
                     self.input.append(client)
+                    self.output.append(client)
                 elif s == sys.stdin:
                     junk = sys.stdin.readline()
                     if junk.startswith("quit"):
@@ -104,17 +106,25 @@ class Server(dbus.service.Object):
                         self.inqueue.put(data, False)
                         m = None
                         try:
-                            m = shared.data.Message(packed_data=data)
+                            m = shared.data.Message(None, None, packed_data=data)
                         except ValueError:
                             log.debug("Crappy data = ! JSON")
                             continue
 
                         print m
-                        print self.inqueue
+                        if m.sender == "ragnar dahlberg":
+                            self.enqueue(m.sender, "hej pa mig")
                         sys.stdout.flush()
                     else:
                         s.close()
                         self.input.remove(s)
+                        self.output.remove(s)
+            for s in outputready:
+                for k in self.outqueues.keys():
+                    q = self.outqueues[k]
+                    data = q.pop()
+                    s.write(data)
+
         
         self.close()
 
