@@ -18,12 +18,20 @@ class Server(dbus.service.Object):
         self.name = dbus.service.BusName("included.errors.Server", self.session_bus)
         dbus.service.Object.__init__(self, self.session_bus,
                                      '/Queue')
-        self.host = ''
+        self.host = '127.0.0.1'
         self.port = 50000
         self.backlog = 5
         self.size = 1024
         self.server = None
-        self.queue = Queue.Queue()
+        self.inqueue = Queue.Queue()
+        self.outqueue = Queue.Queue()
+        self.mainloop = None
+
+    @dbus.service.enqueue(dbus_interface='included.error.Server',
+                         in_signature='v', out_signature='s')
+    def enqueue(self, variant):
+        print "Enqueue called"
+        return "Enqueue :)"
 
     @dbus.service.method(dbus_interface='included.error.Server',
                          in_signature='v', out_signature='s')
@@ -57,12 +65,14 @@ class Server(dbus.service.Object):
         self.input.append(self.server)
         threading.Thread(target=self.run).start()
         #gobject.idle_add(self.run)
-        #self.dbusloop()
+        self.dbusloop()
 
     def close(self):
         print "Shutting down server"
-        gobject.idle_add(mainloop.quit)
+        if self.mainloop:
+            gobject.idle_add(self.mainloop.quit)
         # Wait for clients to exit
+        self.server.close()
         for s in self.input:
             s.close()
 
@@ -85,26 +95,28 @@ class Server(dbus.service.Object):
                     if data:
                         self.message_available("super message is here")
                         log.debug("data from client:" + str(data))
-                        self.queue.put(data, False)
-                        print self.queue
+                        self.inqueue.put(data, False)
+                        print self.inqueue
                         sys.stdout.flush()
                     else:
                         s.close()
                         self.input.remove(s)
         
-        print "Shutting down server"
+        self.close()
 
     def dbusloop(self):
         #import signal
         #signal.signal(signal.SIGTERM, self.close)
 
-        mainloop = gobject.MainLoop()
+        self.mainloop = gobject.MainLoop()
+        gobject.threads_init()
+
         print "Running example queue service."
-        while mainloop.is_running():
+        while self.mainloop.is_running():
             try:
-                mainloop.run()
+                self.mainloop.run()
             except KeyboardInterrupt:
-                mainloop.quit()
+                self.mainloop.quit()
 
 
 if __name__ == "__main__":
