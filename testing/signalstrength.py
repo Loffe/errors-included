@@ -52,7 +52,7 @@ def start():
 
     connection.request_connection(conic.CONNECT_FLAG_NONE)
 
-#    request_statistics(connection)
+    request_statistics(connection)
     return False
 
     
