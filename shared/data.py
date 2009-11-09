@@ -79,14 +79,14 @@ class UnitType(object):
      army, # short for Swedish Armed Forces
      commander, # Nana nana nana nana LEADER! leader..
      srsa, # Swedish Rescue Services Agency (SRSA) 
-     other) = range(3)
+     other) = range(5)
 
 class ObstacleType(object):
     # always sort in alphabetic order!!!
     bridge, other, road, tree = range(4)
 
 class POIType(object):
-    accident, fire, pasta_wagon = range(2)
+    accident, fire, pasta_wagon = range(3)
 
 class MapObjectData(Base, Packable):
     '''
