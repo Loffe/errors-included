@@ -31,6 +31,7 @@ def request_statistics(connection):
 
 
 def statistics_cb(connection, event, data):
+    print "laban"
     print "statistics(%s, %s, %x)" % (connection, event, data)
     
     print "time active=%i" % event.get_time_active()
@@ -51,6 +52,7 @@ def start():
     print "stats"
     connection.request_connection(conic.CONNECT_FLAG_NONE)
     print "request stats"
+    request_statistics(connection)
     return False
 
     
