@@ -306,6 +306,8 @@ class Message(object):
     All messages must be instances of this class.
     Enables packing and unpacking of raw messages.
     '''
+    reciever = None
+    sender = None
     # The type of this message
     type = None
     # The priority of this message (lowest 0 - 9 highest)

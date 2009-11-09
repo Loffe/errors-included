@@ -8,6 +8,7 @@ import Queue
 import dbus
 import dbus.service
 from shared.util import log as log
+import shared.data
 
 class Server(dbus.service.Object):
     input = [sys.stdin]
@@ -24,12 +25,17 @@ class Server(dbus.service.Object):
         self.size = 1024
         self.server = None
         self.inqueue = Queue.Queue()
-        self.outqueue = Queue.Queue()
+        self.outqueues = {}
         self.mainloop = None
 
-    @dbus.service.enqueue(dbus_interface='included.error.Server',
-                         in_signature='v', out_signature='s')
-    def enqueue(self, variant):
+    @dbus.service.method(dbus_interface='included.error.Server',
+                         in_signature='sv', out_signature='s')
+    def enqueue(self, reciever, msg):
+        try:
+            queue = self.outqueues[reciever]
+        except KeyError:
+            queue = self.outqueues[reciever] = Queue.Queue()
+        queue.put(queue, msg)
         print "Enqueue called"
         return "Enqueue :)"
 
@@ -96,6 +102,14 @@ class Server(dbus.service.Object):
                         self.message_available("super message is here")
                         log.debug("data from client:" + str(data))
                         self.inqueue.put(data, False)
+                        m = None
+                        try:
+                            m = shared.data.Message(packed_data=data)
+                        except ValueError:
+                            log.debug("Crappy data = ! JSON")
+                            continue
+
+                        print m
                         print self.inqueue
                         sys.stdout.flush()
                     else:
