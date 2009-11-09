@@ -46,7 +46,7 @@ def start():
     print "start():"
     connection = conic.Connection()
 
-#    connection.connect("connection-event", connection_cb, 0xFFAA)
+    connection.connect("connection-event", connection_cb, 0xFFAA)
 
     connection.connect("statistics", statistics_cb, 0x55AA)
 
