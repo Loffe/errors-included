@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-import queue
+import shared.queue
 import config
 
 if __name__ == "__main__":
-    q = queue.Queue(config.server.ip,config.server.port)
+    q = shared.queue.Queue(config.server.ip,config.server.port)
 
     for i in range(10):
         q.enqueue("hejsan" + str(i))
