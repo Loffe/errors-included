@@ -52,7 +52,7 @@ def start():
 
     connection.request_connection(conic.CONNECT_FLAG_NONE)
 
-    request_statistics(connection)
+    connection.statistics(iap_id)
     return False
 
     
