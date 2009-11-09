@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 import dbus
-import gpsbt
+import dbus.mainloop.glib
+import dbus.service
 import time
+import threading
+import gobject
 
-class QoSManager(object):
+class QoSManager(dbus.service.Object):
     '''
     This class manages and updates the service level depending on battery level
     and signal strength.
@@ -13,6 +16,12 @@ class QoSManager(object):
         '''
         Constructor.
         '''
+        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+        self.session_bus = dbus.SessionBus()
+        self.name = dbus.service.BusName("included.errors.QoSManager", self.session_bus)
+        dbus.service.Object.__init__(self, self.session_bus,
+                                     '/QoSManager')
+        
         # the service level
         self.service_level = 0
 
@@ -27,19 +36,16 @@ class QoSManager(object):
         # lower service level if under those levels
         self.critical_battery_level = 20
         self.critical_signal_strength = 0
-        
-        # da buzz
-        self.bus = dbus.SystemBus()
 
     def check_battery_level(self):
         '''
         Update the battery level.
         '''
-        hal_obj = bus.get_object('org.freedesktop.Hal',
+        hal_obj = self.session_bus.get_object('org.freedesktop.Hal',
                                  '/org/freedesktop/Hal/Manager')
         hal = dbus.Interface(hal_obj, 'org.freedesktop.Hal.Manager')
         uids = hal.FindDeviceByCapability('battery')
-        dev_obj = bus.get_object('org.freedesktop.Hal', uids[0])
+        dev_obj = self.session_bus.get_object('org.freedesktop.Hal', uids[0])
         
         # Battery left (mAh)
         battery_left = dev_obj.GetProperty('battery.reporting.current')
@@ -80,6 +86,7 @@ class QoSManager(object):
         '''
         Update the gps coordinates (own position).
         '''
+        import gpsbt
         # start the GPS
         context = gpsbt.start()
         
@@ -100,13 +107,18 @@ class QoSManager(object):
         
         # set gps coordinates
         self.gps_coord = (x,y)
+        self.signal_new_gps_coord(self.gps_coord)
 
-
-    def mainloop(self):
-        while True:
+    def start(self):
+        threading.Thread(target=self.run).start()
+        self.dbusloop()
+    
+    def run(self):
+        running = True
+        while running:
             # get levels
-            battery = check_battery_level()
-            signal = check_signal_strength()
+            battery = self.check_battery_level()
+            signal = self.check_signal_strength()
             
             # temporary store the current service level
             current_level = self.service_level
@@ -127,15 +139,33 @@ class QoSManager(object):
             if self.service_level != current_level:
                 self.signal_changed_service_level()
 
-    '''
-    dbus Signals
-    '''
-    def signal_new_gps_coord(self):
-        pass
+        self.close()
+                
+    def close(self):
+        print "Shutting down QoS-Manager"
+        gobject.idle_add(mainloop.quit)
     
-    def signal_changed_service_level(self):
+    def dbusloop(self):
+        mainloop = gobject.MainLoop()
+        gobject.threads_init()
+        print "Running client QoS-Manager (errors-included)."
+        while mainloop.is_running():
+            try:
+                mainloop.run()
+            except KeyboardInterrupt:
+                mainloop.quit()
+
+    @dbus.service.signal(dbus_interface='included.errors.QosManager', signature='s')
+    def signal_new_gps_coord(self, coord):
+        print "coordinates updated"
+    
+    @dbus.service.signal(dbus_interface='included.errors.QosManager', signature='s')
+    def signal_changed_service_level(self, level):
         '''
         Signal to dbus; service level changed
         '''
-        # dbus signal!
-        pass
+        print "level changed"
+
+if __name__ == '__main__':
+    qos = QoSManager()
+    qos.start()
