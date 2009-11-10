@@ -140,14 +140,14 @@ class QoSManager(dbus.service.Object):
             time.sleep(self.service_level_update_interval)
             print "service_level_updater"
             # get levels
-            try:
-                battery = self.check_battery_level()
-                print "battery-level:", self.battery_level
-                signal = self.check_signal_strength()
-                print "signal-strength:", self.signal_strength
-            except:
-                # Not in N810, modules doesn't work; do nothing...
-                print "service level failure"
+#            try:
+            battery = self.check_battery_level()
+            print "battery-level:", self.battery_level
+            signal = self.check_signal_strength()
+            print "signal-strength:", self.signal_strength
+#            except:
+#                # Not in N810, modules doesn't work; do nothing...
+#                print "service level failure"
 
             # temporary store the current service level
             current_level = self.service_level
