@@ -28,7 +28,7 @@ class QoSManager(dbus.service.Object):
         self.bus = dbus.SystemBus()
         
         # the service level
-        self.service_level = 0
+        self.service_level = "None"
 
         # the variables updated by this class
         self.gps_coord = (0,0)
@@ -113,6 +113,7 @@ class QoSManager(dbus.service.Object):
             time.sleep(1)
 
         # TODO: LIMIT TRIES COUNT?!
+        print "tries:", str(tries)
 
         # Stop the GPS
         gpsbt.stop(self.gps_context)
@@ -193,7 +194,7 @@ class QoSManager(dbus.service.Object):
                 self.signal_changed_service_level(self.service_level)
                 
             print "service level:", self.service_level
-                
+
     def close(self):
         print "Shutting down QoS-Manager"
         self.running = False
@@ -213,13 +214,21 @@ class QoSManager(dbus.service.Object):
             except KeyboardInterrupt:
                 self.close()
 
-    @dbus.service.signal(dbus_interface='included.errors.QosManager', signature='v')
+    @dbus.service.method(dbus_interface='included.errors.QoSManager', in_signature='', out_signature='s')
+    def dbus_close(self):
+        self.close()
+
+    @dbus.service.signal(dbus_interface='included.errors.QoSManager', signature='v')
     def signal_new_gps_coord(self, coord):
         print "coordinates updated"
 
-    @dbus.service.signal(dbus_interface='included.errors.QosManager', signature='s')
+    @dbus.service.signal(dbus_interface='included.errors.QoSManager', signature='s')
     def signal_changed_service_level(self, level):
         print "service level changed"
+
+    @dbus.service.method(dbus_interface='included.errors.QoSManager', in_signature='', out_signature='v')
+    def get_service_level(self):
+        return self.service_level
 
 if __name__ == '__main__':
     qos = QoSManager()
