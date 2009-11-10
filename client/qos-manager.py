@@ -110,6 +110,8 @@ class QoSManager(dbus.service.Object):
         while (x,y) == (0,0):
             x, y = gpsdevice.get_position()
             tries += 1
+            if tries >= 50:
+                break
             time.sleep(1)
 
         # TODO: LIMIT TRIES COUNT?!
@@ -119,8 +121,9 @@ class QoSManager(dbus.service.Object):
         gpsbt.stop(self.gps_context)
 
         # set gps coordinates
-        self.gps_coord = (x,y)
-        self.signal_new_gps_coord(self.gps_coord)
+        if not (x,y) == (0,0):
+            self.gps_coord = (x,y)
+            self.signal_new_gps_coord(self.gps_coord)
 
     def start(self):
         '''
@@ -204,7 +207,7 @@ class QoSManager(dbus.service.Object):
         except:
             # No GPS-device loaded/started
             pass
-    
+
     def dbusloop(self):
         self.mainloop = gobject.MainLoop()
         gobject.threads_init()
