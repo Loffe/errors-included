@@ -8,7 +8,7 @@ import gst
 class GTK_Main:
     def __init__(self):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.set_title("Webcam-Viewer")
+        window.set_title("Videosamtal")
         window.set_default_size(500, 400)
         window.connect("destroy", gtk.main_quit, "WM destroy")
         vbox = gtk.VBox()
@@ -27,7 +27,8 @@ class GTK_Main:
         hbox.pack_start(self.button2, False)
         hbox.add(gtk.Label())
         window.show_all()
-        options = "v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink"
+        
+        options = "v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=20/1 ! autovideosink"
         self.player = gst.parse_launch ( options )
         bus = self.player.get_bus()
         bus.add_signal_watch()
@@ -65,7 +66,11 @@ class GTK_Main:
             imagesink = message.src
             imagesink.set_property("force-aspect-ratio", True)
             imagesink.set_xwindow_id(self.movie_window.window.xid)
-            
+    
+#    def play_moby(self):
+#        playbin = gst.element_factory_make("playbin", "my-playbin")
+        
+    
 GTK_Main()
 gtk.gdk.threads_init()
 gtk.main()
