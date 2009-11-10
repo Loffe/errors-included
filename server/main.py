@@ -7,9 +7,12 @@ import threading
 import Queue
 import dbus
 import dbus.service
+from shared.util import log as log
+import shared.data
 
 class Server(dbus.service.Object):
     input = [sys.stdin]
+    output = []
 
     def __init__(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -17,12 +20,25 @@ class Server(dbus.service.Object):
         self.name = dbus.service.BusName("included.errors.Server", self.session_bus)
         dbus.service.Object.__init__(self, self.session_bus,
                                      '/Queue')
-        self.host = ''
+        self.host = '127.0.0.1'
         self.port = 50000
         self.backlog = 5
         self.size = 1024
         self.server = None
-        self.queue = Queue.Queue(10)
+        self.inqueue = Queue.Queue()
+        self.outqueues = {}
+        self.mainloop = None
+
+    @dbus.service.method(dbus_interface='included.error.Server',
+                         in_signature='sv', out_signature='s')
+    def enqueue(self, reciever, msg):
+        try:
+            queue = self.outqueues[reciever]
+        except KeyError:
+            queue = self.outqueues[reciever] = Queue.Queue()
+        queue.put(queue, msg)
+        print "Enqueue called"
+        return "Enqueue :)"
 
     @dbus.service.method(dbus_interface='included.error.Server',
                          in_signature='v', out_signature='s')
@@ -37,7 +53,7 @@ class Server(dbus.service.Object):
         return "Message Available!!"
 
     def open_socket(self):
-        print "opening socket"
+        log.info("Server is opening socket")
         try:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             if 'arm' not in sys.version.lower():
@@ -60,8 +76,10 @@ class Server(dbus.service.Object):
 
     def close(self):
         print "Shutting down server"
-        gobject.idle_add(mainloop.quit)
+        if self.mainloop:
+            gobject.idle_add(self.mainloop.quit)
         # Wait for clients to exit
+        self.server.close()
         for s in self.input:
             s.close()
 
@@ -74,6 +92,7 @@ class Server(dbus.service.Object):
                 if s == self.server:
                     (client, port) = self.server.accept()
                     self.input.append(client)
+                    self.output.append(client)
                 elif s == sys.stdin:
                     junk = sys.stdin.readline()
                     if junk.startswith("quit"):
@@ -81,24 +100,47 @@ class Server(dbus.service.Object):
                         running = False
                 else:
                     data = s.recv(1024)
-                    print "data from client:", data
-                    self.queue.put(data, False)
-                    print self.queue
-                    sys.stdout.flush()
+                    if data:
+                        self.message_available("super message is here")
+                        log.debug("data from client:" + str(data))
+                        self.inqueue.put(data, False)
+                        m = None
+                        try:
+                            m = shared.data.Message(None, None, packed_data=data)
+                        except ValueError:
+                            log.debug("Crappy data = ! JSON")
+                            continue
+
+                        print m
+                        if m.sender == "ragnar dahlberg":
+                            self.enqueue(m.sender, "hej pa mig")
+                        sys.stdout.flush()
+                    else:
+                        s.close()
+                        self.input.remove(s)
+                        self.output.remove(s)
+            for s in outputready:
+                for k in self.outqueues.keys():
+                    q = self.outqueues[k]
+                    data = q.pop()
+                    s.write(data)
+
         
-        print "Shutting down server"
+        self.close()
 
     def dbusloop(self):
         #import signal
         #signal.signal(signal.SIGTERM, self.close)
 
-        mainloop = gobject.MainLoop()
+        self.mainloop = gobject.MainLoop()
+        gobject.threads_init()
+
         print "Running example queue service."
-        while mainloop.is_running():
+        while self.mainloop.is_running():
             try:
-                mainloop.run()
+                self.mainloop.run()
             except KeyboardInterrupt:
-                mainloop.quit()
+                self.mainloop.quit()
 
 
 if __name__ == "__main__":
