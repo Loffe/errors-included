@@ -25,7 +25,7 @@ def request_statistics(connection):
         return True
         
     counter += 1
-    #connection.statistics(iap_id)
+    connection.statistics(iap_id)
     
     return True    
 
@@ -68,7 +68,7 @@ def connection_cb(connection, event, data):
     
     if status == conic.STATUS_CONNECTED:
         print "1: (CONNECTED (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
-        gobject.timeout_add(100, request_statistics, connection)
+        gobject.timeout_add(10000, request_statistics, connection)
     elif status == conic.STATUS_DISCONNECTED:
         print "1: (DISCONNECTED (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
     elif status == conic.STATUS_DISCONNECTING:
