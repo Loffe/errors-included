@@ -63,7 +63,7 @@ def connection_cb(connection, event, data):
     status = event.get_status()
     error = event.get_error()
     iap_id = event.get_iap_id()
-    connection.statistics(iap_id)
+    #connection.statistics(iap_id)
     bearer = event.get_bearer_type()
     
     if status == conic.STATUS_CONNECTED:
