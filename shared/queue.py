@@ -7,6 +7,8 @@ import socket
 import subprocess
 import threading
 import time
+from shared.util import getLogger
+log = getLogger("queue.log")
 
 class Queue(dbus.service.Object):
     output = []
@@ -17,6 +19,7 @@ class Queue(dbus.service.Object):
     closing = False
 
     def __init__(self, host, port):
+        log.info("Queue startin up")
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         self.session_bus = dbus.SessionBus()
         self.name = dbus.service.BusName("com.example.Queue", self.session_bus)
@@ -32,10 +35,16 @@ class Queue(dbus.service.Object):
         #print self.output
         return "message queued :)"
 
+    @dbus.service.method(dbus_interface='com.example.Queue',
+                         in_signature='', out_signature='s')
+    def dbus_close(self):
+        self.close()
+        return "queue closing"
+
     def connect_to_server(self):
         if not self.server:
             raise Exception("No server is set. Cannot connect")
-        print "Connecting"
+        log.info("Connecting")
 
         if config.server.ssh == True:
             subprocess.call(["ssh",
@@ -49,7 +58,7 @@ class Queue(dbus.service.Object):
             self.socket.connect(self.server)
             self.running = True
             self.closing = False
-            print "Connected :D"
+            log.info("Connected :D")
             self.thread_listen = threading.Thread(target=self._recv)
             self.thread_send = threading.Thread(target=self._send)
             self.thread_listen.start()
@@ -62,12 +71,14 @@ class Queue(dbus.service.Object):
         self.close()
 
     def close(self):
-        print "Closing socket to server"
+        log.info("Closing socket to server")
+        if self.mainloop is not None:
+            self.mainloop.quit()
         self.closing = True
         self.socket.close()
 
     def _send(self):
-        print "starting send loop", self.output
+        log.info("starting send loop" + str(self.output))
         while self._check_connection():
             if len(self.output) > 0:
                 msg = self.output[0]
@@ -94,7 +105,7 @@ class Queue(dbus.service.Object):
         import signal
         signal.signal(signal.SIGTERM, _sigterm_cb)
 
-        mainloop = gobject.MainLoop()
+        self.mainloop = mainloop = gobject.MainLoop()
         print "Running example queue service."
         while mainloop.is_running():
             try:

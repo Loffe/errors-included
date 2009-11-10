@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
-from shared.util import log as log
+from shared.util import getLogger
+log = getLogger("client.log")
 log.debug("main imported log")
 import clientgui
 

@@ -9,7 +9,8 @@ import datetime
 
 from shared.data import *
 import shared.queueinterface
-from shared.util import log as log
+from shared.util import getLogger
+log = getLogger("client.log")
 log.debug("clientgui imported log")
 from map.mapdata import *
 

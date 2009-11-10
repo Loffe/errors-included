@@ -7,7 +7,8 @@ import threading
 import Queue
 import dbus
 import dbus.service
-from shared.util import log as log
+from shared.util import getLogger
+log = getLogger("server.log")
 import shared.data
 
 class Server(dbus.service.Object):
