@@ -6,6 +6,7 @@ import dbus.service
 import time
 import threading
 import gobject
+import gpsbt
 
 class QoSManager(dbus.service.Object):
     '''
@@ -20,6 +21,7 @@ class QoSManager(dbus.service.Object):
         self.session_bus = dbus.SessionBus()
         self.name = dbus.service.BusName("included.errors.QoSManager", self.session_bus)
         dbus.service.Object.__init__(self, self.session_bus, '/QoSManager')
+        self.bus = dbus.SystemBus()
         
         # the service level
         self.service_level = 0
@@ -45,10 +47,10 @@ class QoSManager(dbus.service.Object):
         '''
         Update the battery level.
         '''
-        hal_obj = self.session_bus.get_object('org.freedesktop.Hal', '/org/freedesktop/Hal/Manager')
+        hal_obj = self.bus.get_object('org.freedesktop.Hal', '/org/freedesktop/Hal/Manager')
         hal = dbus.Interface(hal_obj, 'org.freedesktop.Hal.Manager')
         uids = hal.FindDeviceByCapability('battery')
-        dev_obj = self.session_bus.get_object('org.freedesktop.Hal', uids[0])
+        dev_obj = self.bus.get_object('org.freedesktop.Hal', uids[0])
         
         # Battery left (mAh)
         battery_left = dev_obj.GetProperty('battery.reporting.current')
@@ -89,7 +91,6 @@ class QoSManager(dbus.service.Object):
         '''
         Update the gps coordinates (own position).
         '''
-        import gpsbt
         # start the GPS
         context = gpsbt.start()
         
@@ -131,23 +132,23 @@ class QoSManager(dbus.service.Object):
                 print "GPS-coordinate:", self.gps_coord
             except:
                 # Not in N810, got no GPS-device; do nothing...
-                pass
+                print "gps failure"
     
     def service_level_updater(self):
         battery = self.battery_level
         signal = self.signal_strength
         while self.running:
             time.sleep(self.service_level_update_interval)
-            print "signal_level_updater"
+            print "service_level_updater"
             # get levels
-            try:
-                battery = self.check_battery_level()
-                print "battery-level:", self.battery_level
-                signal = self.check_signal_strength()
-                print "signal-strength:", self.signal_strength
-            except:
-                # Not in N810, modules doesn't work; do nothing...
-                pass
+#            try:
+            battery = self.check_battery_level()
+            print "battery-level:", self.battery_level
+            signal = self.check_signal_strength()
+            print "signal-strength:", self.signal_strength
+#            except:
+#                # Not in N810, modules doesn't work; do nothing...
+#                print "service level failure"
 
             # temporary store the current service level
             current_level = self.service_level
