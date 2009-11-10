@@ -51,7 +51,7 @@ def start():
     connection.connect("statistics", statistics_cb, 0x55AA)
 
     connection.request_connection(conic.CONNECT_FLAG_NONE)
-    request_statistics(connection)
+#    request_statistics(connection)
     return False
 
     
