@@ -30,11 +30,16 @@ class QoSManager(dbus.service.Object):
         self.battery_level = 0
         
         # gps update interval (every X seconds)
-        self.gps_update_interval = 60
+        self.gps_update_interval = 30
+        
+        # service level update interval (every X seconds)
+        self.service_level_update_interval = 10
         
         # lower service level if under those levels
         self.critical_battery_level = 20
         self.critical_signal_strength = 0
+        
+        self.running = False
 
     def check_battery_level(self):
         '''
@@ -108,14 +113,31 @@ class QoSManager(dbus.service.Object):
         self.signal_new_gps_coord(self.gps_coord)
 
     def start(self):
-        threading.Thread(target=self.run).start()
+        '''
+        Start service level updater, gps updater and dbus loop.
+        '''
+        print "Running client QoS-Manager (errors-included)."
+        self.running = True
+        threading.Thread(target=self.service_level_updater).start()
+        threading.Thread(target=self.gps_updater).start()
         self.dbusloop()
+        
+    def gps_updater(self):
+        while self.running:
+            time.sleep(self.gps_update_interval)
+            print "gps_updater"
+            try:
+                self.update_gps_coord()
+            except:
+                # Not in N810, got no GPS-device; do nothing...
+                pass
     
-    def run(self):
-        running = True
+    def service_level_updater(self):
         battery = self.battery_level
         signal = self.signal_strength
-        while running:
+        while self.running:
+            time.sleep(self.service_level_update_interval)
+            print "signal_level_updater"
             # get levels
             try:
                 battery = self.check_battery_level()
@@ -138,26 +160,23 @@ class QoSManager(dbus.service.Object):
                 self.service_level = "send few"
             if (battery == "high" or battery == "charging") and signal == "high":
                 self.service_level = "max"
-                
+
             # signal if service level changed!
             if self.service_level != current_level:
-                self.signal_changed_service_level()
-
-        self.close()
+                self.signal_changed_service_level(self.service_level)
                 
     def close(self):
         print "Shutting down QoS-Manager"
-        gobject.idle_add(mainloop.quit)
+        self.running = False
     
     def dbusloop(self):
-        mainloop = gobject.MainLoop()
+        self.mainloop = gobject.MainLoop()
         gobject.threads_init()
-        print "Running client QoS-Manager (errors-included)."
-        while mainloop.is_running():
+        while self.mainloop.is_running():
             try:
-                mainloop.run()
+                self.mainloop.run()
             except KeyboardInterrupt:
-                mainloop.quit()
+                self.close()
 
     @dbus.service.signal(dbus_interface='included.errors.QosManager', signature='v')
     def signal_new_gps_coord(self, coord):
@@ -165,9 +184,6 @@ class QoSManager(dbus.service.Object):
 
     @dbus.service.signal(dbus_interface='included.errors.QosManager', signature='s')
     def signal_changed_service_level(self, level):
-        '''
-        Signal to dbus; service level changed
-        '''
         print "level changed"
 
 if __name__ == '__main__':
