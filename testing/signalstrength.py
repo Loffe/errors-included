@@ -13,17 +13,22 @@ import gobject
 
 
 loop = None
+iap_id = None
 
 def start():
     print "Start"
     connection = conic.Connection()
     connection.request_connection(conic.CONNECT_FLAG_NONE)
     connection.connect("connection-event", connection_cb, 0xFFAA)
+    connection.statistics(iap_id)
 
+    return False
 
 def connection_cb(connection, event, data):
+    global iap_id
 #        print "connection_cb(%s, %s, %x)" % (connection, event, data)
     status = event.get_status()
+    iap_id = event.get_iap_id()
     if status == conic.STATUS_CONNECTED:
         print "CONNECTED"
     elif status == conic.STATUS_DISCONNECTED:
