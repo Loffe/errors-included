@@ -14,6 +14,7 @@ class Queue(dbus.service.Object):
     server = ()
     socket = None
     running = False
+    closing = False
 
     def __init__(self, host, port):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -47,9 +48,12 @@ class Queue(dbus.service.Object):
         try:
             self.socket.connect(self.server)
             self.running = True
-            gobject.idle_add(self._send)
-            gobject.idle_add(self._recv)
+            self.closing = False
             print "Connected :D"
+            self.thread_listen = threading.Thread(target=self._recv)
+            self.thread_send = threading.Thread(target=self._send)
+            self.thread_listen.start()
+            self.thread_send.start()
         except socket.error, (errno, errmsg):
             self._handle_error(errno)
         return False
@@ -59,28 +63,26 @@ class Queue(dbus.service.Object):
 
     def close(self):
         print "Closing socket to server"
+        self.closing = True
         self.socket.close()
 
     def _send(self):
-        print "trying to send", self.output
-        if not self._check_connection():
-            return
-        if len(self.output) > 0:
-            msg = self.output[0]
-            self.socket.send(msg)
-            del self.output[0]
-        return True
+        print "starting send loop", self.output
+        while self._check_connection():
+            if len(self.output) > 0:
+                msg = self.output[0]
+                self.socket.send(msg)
+                del self.output[0]
 
     def _recv(self):
-        if not self._check_connection():
-            return
+        print "starting listen loop"
         self.socket.settimeout(1.0)
-        try:
-            data = self.socket.recv(1000)
-        except socket.timeout:
-            return True
-        self.input.append(data)
-        return True
+        while self._check_connection():
+            try:
+                data = self.socket.recv(1000)
+            except socket.timeout:
+                return True
+            self.input.append(data)
 
     def mainloop(self):
         if self._check_connection():
@@ -88,7 +90,7 @@ class Queue(dbus.service.Object):
             gobject.idle_add(self._recv)
 
         def _sigterm_cb(self):
-            gobject.idle_add(mainloop.quit)
+            gobject.idle_add(self.close)
         import signal
         signal.signal(signal.SIGTERM, _sigterm_cb)
 
@@ -98,9 +100,12 @@ class Queue(dbus.service.Object):
             try:
                 mainloop.run()
             except KeyboardInterrupt:
-                mainloop.quit()
+                self.close()
 
     def _check_connection(self):
+        print "_check_connection"
+        if self.closing == True:
+            return False
         if self.running == True:
             return True
         if not self.connect_to_server():
@@ -109,3 +114,5 @@ class Queue(dbus.service.Object):
     def _handle_error(self, errno, errmsg=None):
         if errno == 111:
             print "Connection refused"
+        else:
+            print errno, errmsg
