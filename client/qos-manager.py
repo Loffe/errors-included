@@ -6,6 +6,7 @@ import dbus.service
 import time
 import threading
 import gobject
+import gpsbt
 
 class QoSManager(dbus.service.Object):
     '''
@@ -89,7 +90,6 @@ class QoSManager(dbus.service.Object):
         '''
         Update the gps coordinates (own position).
         '''
-        import gpsbt
         # start the GPS
         context = gpsbt.start()
         
@@ -131,14 +131,14 @@ class QoSManager(dbus.service.Object):
                 print "GPS-coordinate:", self.gps_coord
             except:
                 # Not in N810, got no GPS-device; do nothing...
-                pass
+                print "gps failure"
     
     def service_level_updater(self):
         battery = self.battery_level
         signal = self.signal_strength
         while self.running:
             time.sleep(self.service_level_update_interval)
-            print "signal_level_updater"
+            print "service_level_updater"
             # get levels
             try:
                 battery = self.check_battery_level()
@@ -147,7 +147,7 @@ class QoSManager(dbus.service.Object):
                 print "signal-strength:", self.signal_strength
             except:
                 # Not in N810, modules doesn't work; do nothing...
-                pass
+                print "service level failure"
 
             # temporary store the current service level
             current_level = self.service_level
