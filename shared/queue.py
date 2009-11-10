@@ -81,6 +81,7 @@ class Queue(dbus.service.Object):
         log.info("starting send loop" + str(self.output))
         while self._check_connection():
             if len(self.output) > 0:
+                log.info("trying to send %s" % self.output[0])
                 msg = self.output[0]
                 self.socket.send(msg)
                 del self.output[0]

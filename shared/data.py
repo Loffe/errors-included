@@ -303,7 +303,7 @@ class Event(Base, Packable):
 class MessageType(object):
     (mission, map, text, alarm, control, low_battery, status_update, mission_response, 
     journal_request, journal_confirmationresponse, journal_confirmationrequest, 
-    journal_transfer, alarm_ack, vvoip_request, vvoip_response) = range(15)
+    journal_transfer, alarm_ack, vvoip_request, vvoip_response, login, login_ack, action) = range(18)
 
 class Message(object):
     '''

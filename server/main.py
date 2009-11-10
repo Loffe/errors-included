@@ -10,10 +10,12 @@ import dbus.service
 from shared.util import getLogger
 log = getLogger("server.log")
 import shared.data
+import handler
 
-class Server(dbus.service.Object):
+class ServerNetworkHandler(dbus.service.Object):
     input = [sys.stdin]
     output = []
+    message_handler = None
 
     def __init__(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -29,6 +31,7 @@ class Server(dbus.service.Object):
         self.inqueue = Queue.Queue()
         self.outqueues = {}
         self.mainloop = None
+        self.message_handler = handler.MessageHandler(self)
 
     @dbus.service.method(dbus_interface='included.error.Server',
                          in_signature='sv', out_signature='s')
@@ -112,10 +115,7 @@ class Server(dbus.service.Object):
                             log.debug("Crappy data = ! JSON")
                             continue
 
-                        print m
-                        if m.sender == "ragnar dahlberg":
-                            self.enqueue(m.sender, "hej pa mig")
-                        sys.stdout.flush()
+                        self.message_handler.handle(m)
                     else:
                         s.close()
                         self.input.remove(s)
@@ -145,5 +145,5 @@ class Server(dbus.service.Object):
 
 
 if __name__ == "__main__":
-    s = Server()
+    s = ServerNetworkHandler()
     s.start()
