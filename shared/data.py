@@ -461,9 +461,9 @@ if __name__ == '__main__':
     db.add(alarm2)
     db.add(alarm3)
     
-    enhet = UnitData(12,121,u"Enhet1",datetime.now(), UnitType.ambulance)
-    enhet2 = UnitData(12,111,u"Enhet2",datetime.now(), UnitType.ambulance)
-    enhet3 = UnitData(12,141,u"Enhet3",datetime.now(), UnitType.ambulance)
+    enhet = UnitData(15.56564, 58.4047 ,u"Enhet1",datetime.now(), UnitType.ambulance)
+    enhet2 = UnitData(15.552864, 58.405549000000001 ,u"Enhet2",datetime.now(), UnitType.ambulance)
+    enhet3 = UnitData(15.5656475, 58.4047164 ,u"Enhet3",datetime.now(), UnitType.ambulance)
     db.add(enhet)
     db.add(enhet2)
     db.add(enhet3)

@@ -5,15 +5,23 @@ import gui
 import shared.data
 import map.map_xml_reader
 import map
+from map.mapdata import Unit
 from datetime import datetime
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
+    db = None
+    
+#    self.db = db
+
+    
+    
     bounds = {"min_latitude":0,
                 "max_latitude":0,
                 "min_longitude":0,
                 "max_longitude":0}
 
-    def __init__(self):
+    def __init__(self, db):
+        self.db = db
         gui.Screen.__init__(self, "Map")
         gtk.DrawingArea.__init__(self)
 
@@ -143,7 +151,14 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
             tile.picture.draw(self.context, x, y)
 
         # Ritar ut eventuella objekt
+
         objects = self.mapdata.objects
+        
+        # add all units to dict with objects to draw
+        unitdata = self.db.get_all_units()
+        for data in unitdata:
+            objects[data.name] = Unit(data)                
+        
         for item in objects:
             x, y = self.gps_to_pixel(objects[item].map_object_data.coords[0],
                                      objects[item].map_object_data.coords[1])
@@ -151,7 +166,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
             if x != 0 and y != 0:
                 objects[item].picture.draw(self.context, x, y)
 
-   
+
     def gps_to_pixel(self, lon, lat):
         cols = self.cols
         rows = self.rows
@@ -216,6 +231,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         
     def draw_clicked_pos(self,event):
         (lon,lat) = self.get_clicked_coord(event)
+        print (lon,lat)
+        
 #        poi_data = shared.data.POIData((lon, lat), "goal", datetime.now(), shared.data.POIType.pasta_wagon)
 #        self.mapdata.add_object("Shape1", map.mapdata.MapObject(poi_data))
 #        self.draw()
