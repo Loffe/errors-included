@@ -10,10 +10,15 @@ import conic
 import dbus
 import dbus.glib
 import gobject
-        
-connection = conic.Connection()
-connection.request_connection(conic.CONNECT_FLAG_NONE)
-connection.connect("connection-event", connection_cb, 0xFFAA)
+
+
+loop = None
+
+def start():
+    print "Start"
+    connection = conic.Connection()
+    connection.request_connection(conic.CONNECT_FLAG_NONE)
+    connection.connect("connection-event", connection_cb, 0xFFAA)
 
 
 def connection_cb(connection, event, data):
@@ -29,4 +34,9 @@ def connection_cb(connection, event, data):
     print "signal_strength=%i" % event.get_signal_strength()
 
 
-  
+if __name__ == "__main__":
+    loop = gobject.MainLoop()
+    bus = dbus.SystemBus(private=True)
+    
+    gobject.idle_add(start)
+    loop.run()
