@@ -21,6 +21,7 @@ class QoSManager(dbus.service.Object):
         self.session_bus = dbus.SessionBus()
         self.name = dbus.service.BusName("included.errors.QoSManager", self.session_bus)
         dbus.service.Object.__init__(self, self.session_bus, '/QoSManager')
+        self.bus = dbus.SystemBus()
         
         # the service level
         self.service_level = 0
@@ -46,10 +47,10 @@ class QoSManager(dbus.service.Object):
         '''
         Update the battery level.
         '''
-        hal_obj = self.session_bus.get_object('org.freedesktop.Hal', '/org/freedesktop/Hal/Manager')
+        hal_obj = self.bus.get_object('org.freedesktop.Hal', '/org/freedesktop/Hal/Manager')
         hal = dbus.Interface(hal_obj, 'org.freedesktop.Hal.Manager')
         uids = hal.FindDeviceByCapability('battery')
-        dev_obj = self.session_bus.get_object('org.freedesktop.Hal', uids[0])
+        dev_obj = self.bus.get_object('org.freedesktop.Hal', uids[0])
         
         # Battery left (mAh)
         battery_left = dev_obj.GetProperty('battery.reporting.current')
