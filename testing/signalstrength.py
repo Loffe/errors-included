@@ -13,8 +13,6 @@ import gobject
 
 connection = conic.Connection()
 
-connection.connect("statistics", statistics_cb, 0x55AA)
-
 connection.request_connection(conic.CONNECT_FLAG_NONE)
 
 print "signal_strength=%i" % event.get_signal_strength()
