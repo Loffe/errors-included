@@ -128,6 +128,7 @@ class QoSManager(dbus.service.Object):
             print "gps_updater"
             try:
                 self.update_gps_coord()
+                print "GPS-coordinate:", self.gps_coord
             except:
                 # Not in N810, got no GPS-device; do nothing...
                 pass
@@ -141,7 +142,9 @@ class QoSManager(dbus.service.Object):
             # get levels
             try:
                 battery = self.check_battery_level()
+                print "battery-level:", self.battery_level
                 signal = self.check_signal_strength()
+                print "signal-strength:", self.signal_strength
             except:
                 # Not in N810, modules doesn't work; do nothing...
                 pass
