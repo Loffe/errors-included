@@ -398,7 +398,10 @@ class Message(object):
                 except:
                     pass
                 # create and return an instance of the object
-                return globals()[classname](**dict)
+                if classname == "dict":
+                    return dict
+                else:
+                    return globals()[classname](**dict)
 
             # create and set data
             self.unpacked_data = create(self.packed_data)
