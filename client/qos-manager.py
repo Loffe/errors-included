@@ -19,8 +19,7 @@ class QoSManager(dbus.service.Object):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         self.session_bus = dbus.SessionBus()
         self.name = dbus.service.BusName("included.errors.QoSManager", self.session_bus)
-        dbus.service.Object.__init__(self, self.session_bus,
-                                     '/QoSManager')
+        dbus.service.Object.__init__(self, self.session_bus, '/QoSManager')
         
         # the service level
         self.service_level = 0
@@ -41,8 +40,7 @@ class QoSManager(dbus.service.Object):
         '''
         Update the battery level.
         '''
-        hal_obj = self.session_bus.get_object('org.freedesktop.Hal',
-                                 '/org/freedesktop/Hal/Manager')
+        hal_obj = self.session_bus.get_object('org.freedesktop.Hal', '/org/freedesktop/Hal/Manager')
         hal = dbus.Interface(hal_obj, 'org.freedesktop.Hal.Manager')
         uids = hal.FindDeviceByCapability('battery')
         dev_obj = self.session_bus.get_object('org.freedesktop.Hal', uids[0])
@@ -115,11 +113,17 @@ class QoSManager(dbus.service.Object):
     
     def run(self):
         running = True
+        battery = self.battery_level
+        signal = self.signal_strength
         while running:
             # get levels
-            battery = self.check_battery_level()
-            signal = self.check_signal_strength()
-            
+            try:
+                battery = self.check_battery_level()
+                signal = self.check_signal_strength()
+            except:
+                # Not in N810, modules doesn't work; do nothing...
+                pass
+
             # temporary store the current service level
             current_level = self.service_level
 
@@ -155,10 +159,10 @@ class QoSManager(dbus.service.Object):
             except KeyboardInterrupt:
                 mainloop.quit()
 
-    @dbus.service.signal(dbus_interface='included.errors.QosManager', signature='s')
+    @dbus.service.signal(dbus_interface='included.errors.QosManager', signature='v')
     def signal_new_gps_coord(self, coord):
         print "coordinates updated"
-    
+
     @dbus.service.signal(dbus_interface='included.errors.QosManager', signature='s')
     def signal_changed_service_level(self, level):
         '''
