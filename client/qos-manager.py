@@ -92,7 +92,7 @@ class QoSManager(dbus.service.Object):
         Update the gps coordinates (own position).
         '''
         # start the GPS
-        context = gpsbt.start()
+        self.context = gpsbt.start()
         
         # wait for the gps to start (Needed?)
         time.sleep(2)
@@ -107,7 +107,7 @@ class QoSManager(dbus.service.Object):
             time.sleep(1)
 
         # Stop the GPS
-        gpsbt.stop(context)
+        gpsbt.stop(self.context)
         
         # set gps coordinates
         self.gps_coord = (x,y)
@@ -156,7 +156,7 @@ class QoSManager(dbus.service.Object):
             # temporary store the current service level
             current_level = self.service_level
 
-            # calculate and set the service level            
+            # calculate and set the service level
             if battery == "low" and signal == "offline":
                 self.service_level = "mega-low"
             if battery == "low" and (signal == "low" or signal == "high"):
@@ -177,6 +177,8 @@ class QoSManager(dbus.service.Object):
     def close(self):
         print "Shutting down QoS-Manager"
         self.running = False
+        # Stop the GPS
+        gpsbt.stop(self.context)
     
     def dbusloop(self):
         self.mainloop = gobject.MainLoop()
