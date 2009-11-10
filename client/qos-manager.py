@@ -37,6 +37,8 @@ class QoSManager(dbus.service.Object):
         
         # gps update interval (every X seconds)
         self.gps_update_interval = 30
+        # try this number of times every time ;P
+        self.try_limit = 29
         
         # service level update interval (every X seconds)
         self.service_level_update_interval = 10
@@ -55,7 +57,7 @@ class QoSManager(dbus.service.Object):
         hal = dbus.Interface(hal_obj, 'org.freedesktop.Hal.Manager')
         uids = hal.FindDeviceByCapability('battery')
         dev_obj = self.bus.get_object('org.freedesktop.Hal', uids[0])
-        
+
         # Battery left (mAh)
         battery_left = dev_obj.GetProperty('battery.reporting.current')
         # Battery lifetime (mAh)
@@ -110,7 +112,7 @@ class QoSManager(dbus.service.Object):
         while (x,y) == (0,0):
             x, y = gpsdevice.get_position()
             tries += 1
-            if tries >= 50:
+            if tries >= self.try_limit:
                 break
             time.sleep(1)
 
