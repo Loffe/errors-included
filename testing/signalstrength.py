@@ -12,17 +12,19 @@ import dbus.glib
 import gobject
 
 connection = conic.Connection()
-
 connection.request_connection(conic.CONNECT_FLAG_NONE)
+connection.connect("connection-event", connection_cb, 0xFFAA)
 
-print "signal_strength=%i" % event.get_signal_strength()
 
-status = event.get_status()
-if status == conic.STATUS_CONNECTED:
-    print "CONNECTED"
-elif status == conic.STATUS_DISCONNECTED:
-    print "DISCONNECTED"
-elif status == conic.STATUS_DISCONNECTING:
-    print "DISCONNECTING"
    
-
+def connection_cb(connection, event, data):
+#        print "connection_cb(%s, %s, %x)" % (connection, event, data)
+    status = event.get_status()
+    if status == conic.STATUS_CONNECTED:
+        print "CONNECTED"
+    elif status == conic.STATUS_DISCONNECTED:
+        print "DISCONNECTED"
+    elif status == conic.STATUS_DISCONNECTING:
+        print "DISCONNECTING"
+        
+    print "signal_strength=%i" % event.get_signal_strength()
