@@ -89,6 +89,9 @@ def record(device_id, capture_path):
     time.sleep(5)
 
 if __name__ == "__main__":
+    
+    print list_capture_devices()
+    
     oparser = OptionParser()
     oparser.add_option("-f", "--file", dest="path",
                        help="save to FILE", metavar="FILE")
