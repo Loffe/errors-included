@@ -33,7 +33,7 @@ class Queue(dbus.service.Object):
     def connect_to_server(self):
         if not self.server:
             raise Exception("No server is set. Cannot connect")
-        print "Connecting"
+#        print "Connecting"
 
         if config.server.ssh == True:
             subprocess.call(["ssh",
@@ -105,4 +105,4 @@ class Queue(dbus.service.Object):
 
     def _handle_error(self, errno, errmsg=None):
         if errno == 111:
-            print "Connection refused"
+#            print "Connection refused"

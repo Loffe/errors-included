@@ -94,7 +94,7 @@ class ClientGui(hildon.Program):
         self.screens["notifications"] = notifications
 
         # add the map screen
-        self.map = MapScreen()
+        self.map = MapScreen(self.db)
         vbox_right.pack_start(self.map, True, True, 0)
         self.screens["map"] = self.map
 
