@@ -53,8 +53,8 @@ class QoSManager(dbus.service.Object):
         self.signal_strength_update_interval = 10
         
         # lower service level if under those levels
-        self.critical_battery_level = 20
-        self.critical_signal_strength = 0
+        self.critical_battery_level = 20 # % of max charged
+        self.critical_signal_strength = -80 # dB damp
         
         self.running = False
         
@@ -126,7 +126,7 @@ class QoSManager(dbus.service.Object):
         # return signal strength as string
         if self.signal_strength == 0 or self.signal_strength == None:
             return "offline"
-        elif -self.signal_strength < -self.critical_signal_strength:
+        elif -self.critical_signal_strength < -self.signal_strength:
             return "low"
         else:
             return "high"
