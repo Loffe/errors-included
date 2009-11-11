@@ -104,16 +104,7 @@ class QoSManager(dbus.service.Object):
             print "Disconnected", self.signal_strength
     
     def request_statistics(connection):
-        global counter, loop
-    #    print "request_statistics():"
-        
-        if counter >= 10:
-            print "Max counter reached (%i), quitting", counter
-            loop.quit()
-            return True
-            
-        counter += 1
-        connection.statistics(iap_id)
+        connection.statistics(self.iap_id)
             
 
     # UNSTABLE! DOESN'T DO SHIT!
