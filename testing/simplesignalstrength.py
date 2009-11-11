@@ -10,6 +10,8 @@ import conic
 import dbus
 import dbus.glib
 import gobject
+import struct
+import binascii
 
 counter = 0
 loop = None
