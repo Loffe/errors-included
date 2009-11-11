@@ -43,7 +43,7 @@ def statistics_cb(connection, event, data):
         print "Signalstyrka", signal_strength
     elif status == conic.STATUS_DISCONNECTED:
         print "DISCONNECTED"
-    else
+    else:
         print "ERROR" 
 #    print "time active=%i" % event.get_time_active()
 #    print "rx_packets=%u" % event.get_rx_packets()
