@@ -16,6 +16,10 @@ import binascii
 iap_id = None
 loop = None
 
+
+def request_statistics():
+    connection.statistics(iap_id)
+    
 def start():
     print "Start"
     connection = conic.Connection()
@@ -27,8 +31,9 @@ def connection_cb(connection, event, data):
 #        print "connection_cb(%s, %s, %x)" % (connection, event, data)
     status = event.get_status()
     iap_id = event.get_iap_id()
-    connection.statistics(iap_id)
+    
     if status == conic.STATUS_CONNECTED:
+        gobject.timeout_add(1000, request_statistics, connection)
         print "CONNECTED"
     elif status == conic.STATUS_DISCONNECTED:
         print "DISCONNECTED"
