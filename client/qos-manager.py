@@ -105,10 +105,7 @@ class QoSManager(dbus.service.Object):
         '''
 
         # update the connection stats
-        try:
-            self.connection.statistics(self.iap_id)
-        except:
-            pass
+        self.connection.statistics(self.iap_id)
 
         # return signal strength
         if self.signal_strength == None:
@@ -158,6 +155,7 @@ class QoSManager(dbus.service.Object):
         '''
         print "Running client QoS-Manager (errors-included)"
         self.running = True
+        threading.Thread(target=self.connection_start).start()
         threading.Thread(target=self.service_level_updater).start()
         threading.Thread(target=self.gps_updater).start()
         self.dbusloop()
@@ -176,6 +174,13 @@ class QoSManager(dbus.service.Object):
             except:
                 # Not in N810, got no GPS-device; do nothing...
                 print "gps failure"
+                
+    def connection_start(self):
+        #main loop
+        self.connection = conic.Connection()
+        self.connection.connect("connection-event", self.connection_cb, 0xFFAA)
+        self.connection.connect("statistics", self.statistics_cb, 0x55AA)
+        self.connection.request_connection(conic.CONNECT_FLAG_NONE)
     
     def service_level_updater(self):
         '''
@@ -183,12 +188,6 @@ class QoSManager(dbus.service.Object):
         '''
         battery = self.battery_level
         signal = self.signal_strength
-        self.connection = conic.Connection()
-        self.connection.connect("connection-event", self.connection_cb, 0xFFAA)
-
-        self.connection.connect("statistics", self.statistics_cb, 0x55AA)
-
-        self.connection.request_connection(conic.CONNECT_FLAG_NONE)
         
         # main loop
         while self.running:
