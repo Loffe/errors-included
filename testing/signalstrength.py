@@ -11,8 +11,6 @@ import dbus
 import dbus.glib
 import gobject
 
-
-loop = None
 iap_id = None
 
 def start():
@@ -34,7 +32,13 @@ def connection_cb(connection, event, data):
     elif status == conic.STATUS_DISCONNECTING:
         print "DISCONNECTING"
         
-    print "signal_strength=%i" % event.get_signal_strength()
+    x = event.get_signal_strength()
+    hex = "%x"%x
+    try:
+        signal_strength = struct.unpack('!i', binascii.unhexlify(hex))[0]
+        print "Signalstyrka", signal_strength
+    except TypeError:
+        print "Disconnected"
 
 
 start()
