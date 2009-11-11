@@ -34,6 +34,11 @@ class QoSManager(dbus.service.Object):
         dbus.service.Object.__init__(self, self.session_bus, '/QoSManager')
         self.bus = dbus.SystemBus()
         
+        hal_obj = self.bus.get_object('org.freedesktop.Hal', '/org/freedesktop/Hal/Manager')
+        hal = dbus.Interface(hal_obj, 'org.freedesktop.Hal.Manager')
+        uids = hal.FindDeviceByCapability('battery')
+        self.dev_obj = self.bus.get_object('org.freedesktop.Hal', uids[0])
+        
         # the service level
         self.service_level = "None"
 
@@ -65,17 +70,12 @@ class QoSManager(dbus.service.Object):
         '''
         Update the battery level.
         '''
-        hal_obj = self.bus.get_object('org.freedesktop.Hal', '/org/freedesktop/Hal/Manager')
-        hal = dbus.Interface(hal_obj, 'org.freedesktop.Hal.Manager')
-        uids = hal.FindDeviceByCapability('battery')
-        dev_obj = self.bus.get_object('org.freedesktop.Hal', uids[0])
-
         # Battery left (mAh)
-        battery_left = dev_obj.GetProperty('battery.reporting.current')
+        battery_left = self.dev_obj.GetProperty('battery.reporting.current')
         # Battery lifetime (mAh)
-        battery_lifetime = dev_obj.GetProperty('battery.reporting.design')
+        battery_lifetime = self.dev_obj.GetProperty('battery.reporting.design')
         # True if charging
-        charging = dev_obj.GetProperty('battery.rechargeable.is_charging')
+        charging = self.dev_obj.GetProperty('battery.rechargeable.is_charging')
         # Battery left in %
         self.battery_level = battery_left*100/battery_lifetime
         
