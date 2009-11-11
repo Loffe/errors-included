@@ -96,11 +96,7 @@ class QoSManager(dbus.service.Object):
             print "Signalstyrka", self.signal_strength
         except TypeError:
             self.signal_strength = 0
-            print "Disconnected", self.signal_strength
-    
-    def request_statistics(connection):
-        connection.statistics(self.iap_id)
-            
+            print "Disconnected", self.signal_strength            
 
     # UNSTABLE! DOESN'T DO SHIT!
     def check_signal_strength(self):
@@ -117,7 +113,7 @@ class QoSManager(dbus.service.Object):
         connection.request_connection(conic.CONNECT_FLAG_NONE)
 
         # update the connection stats
-        self.request_statistics(connection)
+        connection.statistics(self.iap_id)
 
         # return signal strength
         if self.signal_strength == None:
