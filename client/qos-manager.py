@@ -8,11 +8,11 @@ import threading
 import gobject
 import struct
 import binascii
-#try:
-import conic
-#except:
+try:
+    import conic
+except:
     # Not in N810, no conic module; do nothing...
-#    pass
+    pass
 try:
     import gpsbt
 except:
@@ -56,8 +56,7 @@ class QoSManager(dbus.service.Object):
         
         self.running = False
         
-        self.iap_id = None
-        self.connection = conic.Connection()
+        self.iap_id = None    
 
     def check_battery_level(self):
         '''
@@ -184,6 +183,7 @@ class QoSManager(dbus.service.Object):
         '''
         battery = self.battery_level
         signal = self.signal_strength
+        self.connection = conic.Connection()
         self.connection.connect("connection-event", self.connection_cb, 0xFFAA)
 
         self.connection.connect("statistics", self.statistics_cb, 0x55AA)
