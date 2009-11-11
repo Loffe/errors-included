@@ -7,6 +7,7 @@ import threading
 import Queue
 import dbus
 import dbus.service
+import shared.networkqueue
 from shared.util import getLogger
 log = getLogger("server.log")
 import shared.data
@@ -68,7 +69,7 @@ class ServerNetworkHandler(dbus.service.Object):
         except socket.error, (value, message):
             if self.server:
                 self.server.close()
-            print "Could not open socket: " + message
+            log.info("Could not open socket: " + message)
             sys.exit()
 
     def start(self):
@@ -87,6 +88,11 @@ class ServerNetworkHandler(dbus.service.Object):
         for s in self.input:
             s.close()
 
+    def _accept_client(self, socket, port):
+        self.input.append(socket)
+        self.output.append(socket)
+        self.outqueues[socket] = shared.networkqueue.NetworkOutQueue(socket)
+
     def run(self):
         running = True
         while running:
@@ -96,8 +102,7 @@ class ServerNetworkHandler(dbus.service.Object):
                 if s == self.server:
                     (client, port) = self.server.accept()
                     print "client connected from ", port
-                    self.input.append(client)
-                    self.output.append(client)
+                    self._accept_client(client, port)
                 elif s == sys.stdin:
                     junk = sys.stdin.readline()
                     if junk.startswith("quit"):
@@ -121,12 +126,6 @@ class ServerNetworkHandler(dbus.service.Object):
                         s.close()
                         self.input.remove(s)
                         self.output.remove(s)
-            for s in outputready:
-                for k in self.outqueues.keys():
-                    q = self.outqueues[k]
-                    data = q.pop()
-                    s.write(data)
-
         
         self.close()
 
