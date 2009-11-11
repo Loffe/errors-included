@@ -20,7 +20,7 @@ class Signal(object):
     def request_statistics(self, connection):
         print "request_statistics():"
         
-        wlan.statistics(self.iap_id)
+        self.wlan.statistics(self.iap_id)
         
         return True    
 
