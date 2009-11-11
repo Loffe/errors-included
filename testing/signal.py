@@ -26,10 +26,16 @@ class Signal(object):
 
 
     def statistics_cb(self, connection, event, data):
-        print "statistics(%s, %s, %x)" % (connection, event, data)
+
+        hex = "%x"%event.get_signal_strength()
+        try:
+            signal_strength = struct.unpack('!i', binascii.unhexlify(hex))[0]
+        except TypeError:
+            print "Disconnected"
         
         print "time active=%i" % event.get_time_active()
         print "signal_strength=%i" % event.get_signal_strength()
+        print "signalstrength dB=", signal_strength
         print "rx_packets=%u" % event.get_rx_packets()
         print "tx_packets=%u" % event.get_tx_packets()
         print "rx_bytes=%u" % event.get_rx_bytes()
