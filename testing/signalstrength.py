@@ -19,12 +19,15 @@ loop = None
 
 def request_statistics():
     connection.statistics(iap_id)
+    return True
     
 def start():
     print "Start"
     connection = conic.Connection()
     connection.request_connection(conic.CONNECT_FLAG_NONE)
     connection.connect("connection-event", connection_cb, 0xFFAA)
+    
+    return False
     
 def connection_cb(connection, event, data):
     global iap_id
