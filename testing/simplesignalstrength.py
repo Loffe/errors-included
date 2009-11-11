@@ -78,9 +78,11 @@ def connection_cb(connection, event, data):
 #        print "1: (CONNECTED (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
         gobject.timeout_add(1000, request_statistics, connection)
     elif status == conic.STATUS_DISCONNECTED:
+        pass
 #        print "1: (DISCONNECTED (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
     elif status == conic.STATUS_DISCONNECTING:
-#        print "1: (DISCONNECTING (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
+        pass 
+        #print "1: (DISCONNECTING (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
    
 
 if __name__ == "__main__":
