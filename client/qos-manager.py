@@ -220,12 +220,12 @@ class QoSManager(dbus.service.Object):
                 print "battery level: failure"
 
             # get signal strength
-            try:
-                signal = self.check_signal_strength()
-                print "signal strength:", self.signal_strength, signal
-            except:
+#            try:
+            signal = self.check_signal_strength()
+            print "signal strength:", self.signal_strength, signal
+#            except:
                 # Not in N810, modules doesn't work; do nothing...
-                print "signal strength: failure"
+#                print "signal strength: failure"
 
             # temporary store the current service level
             current_level = self.service_level
