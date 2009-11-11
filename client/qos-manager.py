@@ -8,11 +8,11 @@ import threading
 import gobject
 import struct
 import binascii
-try:
-    import conic
-except:
+#try:
+import conic
+#except:
     # Not in N810, no conic module; do nothing...
-    pass
+#    pass
 try:
     import gpsbt
 except:
