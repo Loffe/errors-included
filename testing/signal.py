@@ -39,8 +39,8 @@ class Signal(object):
     def start(self):
         print "start():"
         self.wlan = conic.Connection()
-        self.wlan.connect("connection-event", connection_cb, 0xFFAA)
-        self.wlan.connect("statistics", statistics_cb, 0x55AA)
+        self.wlan.connect("connection-event", self.connection_cb, 0xFFAA)
+        self.wlan.connect("statistics", self.statistics_cb, 0x55AA)
         self.wlan.request_connection(conic.CONNECT_FLAG_NONE)
         
         return False
@@ -57,7 +57,7 @@ class Signal(object):
         
         if status == conic.STATUS_CONNECTED:
             print "1: (CONNECTED (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
-            gobject.timeout_add(10000, request_statistics, connection)
+            gobject.timeout_add(10000, self.request_statistics, connection)
         elif status == conic.STATUS_DISCONNECTED:
             print "1: (DISCONNECTED (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
         elif status == conic.STATUS_DISCONNECTING:
