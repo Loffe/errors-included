@@ -84,8 +84,22 @@ class QoSManager(dbus.service.Object):
         else:
             return "high"
 
+    def request_statistics(connection):
+        self.wlanconnection.statistics(self.iap_id)
+
     def connection_cb(connection, event, data):
+
+        status = event.get_status()
+        error = event.get_error()
         self.iap_id = event.get_iap_id()
+        bearer = event.get_bearer_type()
+        
+        if status == conic.STATUS_CONNECTED:
+            gobject.timeout_add(1000, request_statistics, connection)
+        elif status == conic.STATUS_DISCONNECTED:
+            pass
+        elif status == conic.STATUS_DISCONNECTING:
+            pass 
         
     def statistics_cb(connection, event, data):
         
@@ -103,9 +117,8 @@ class QoSManager(dbus.service.Object):
         '''
         Update the signal strength.
         '''
-
-        # update the connection stats
-        self.wlanconnection.statistics(self.iap_id)
+#        # update the connection stats
+#        self.wlanconnection.statistics(self.iap_id)
 
         # return signal strength
         if self.signal_strength == None:
@@ -155,7 +168,10 @@ class QoSManager(dbus.service.Object):
         '''
         print "Running client QoS-Manager (errors-included)"
         self.running = True
-        gobject.idle_add(self.connection_start)
+        self.wlanconnection = conic.Connection()
+        self.wlanconnection.connect("connection-event", self.connection_cb, 0xFFAA)
+        self.wlanconnection.connect("statistics", self.statistics_cb, 0x55AA)
+        self.wlanconnection.request_connection(conic.CONNECT_FLAG_NONE)
         threading.Thread(target=self.service_level_updater).start()
         threading.Thread(target=self.gps_updater).start()
         self.dbusloop()
@@ -174,13 +190,6 @@ class QoSManager(dbus.service.Object):
             except:
                 # Not in N810, got no GPS-device; do nothing...
                 print "gps failure"
-                
-    def connection_start(self):
-        #main loop
-        self.wlanconnection = conic.Connection()
-        self.wlanconnection.connect("connection-event", self.connection_cb, 0xFFAA)
-        self.wlanconnection.connect("statistics", self.statistics_cb, 0x55AA)
-        self.wlanconnection.request_connection(conic.CONNECT_FLAG_NONE)
     
     def service_level_updater(self):
         '''
