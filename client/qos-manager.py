@@ -124,14 +124,14 @@ class QoSManager(dbus.service.Object):
         
         connection = conic.Connection()
 
-        connection.connect("connection-event", connection_cb, 0xFFAA)
+        connection.connect("connection-event", self.connection_cb, 0xFFAA)
 
-        connection.connect("statistics", statistics_cb, 0x55AA)
+        connection.connect("statistics", self.statistics_cb, 0x55AA)
 
         connection.request_connection(conic.CONNECT_FLAG_NONE)
 
         # update the connection stats
-        request_statistics(connection)
+        self.request_statistics(connection)
 
         # return signal strength
         if self.signal_strength == None:
