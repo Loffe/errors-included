@@ -56,12 +56,12 @@ class Signal(object):
         bearer = event.get_bearer_type()
         
         if status == conic.STATUS_CONNECTED:
-            print "1: (CONNECTED (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
+            print "1: (CONNECTED (%s, %s, %i, %i)" % (self.iap_id, bearer, status, error)
             gobject.timeout_add(10000, self.request_statistics, connection)
         elif status == conic.STATUS_DISCONNECTED:
-            print "1: (DISCONNECTED (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
+            print "1: (DISCONNECTED (%s, %s, %i, %i)" % (self.iap_id, bearer, status, error)
         elif status == conic.STATUS_DISCONNECTING:
-            print "1: (DISCONNECTING (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
+            print "1: (DISCONNECTING (%s, %s, %i, %i)" % (self.iap_id, bearer, status, error)
    
 if __name__ == "__main__":
     
