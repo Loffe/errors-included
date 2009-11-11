@@ -20,7 +20,7 @@ def start():
     connection = conic.Connection()
     connection.request_connection(conic.CONNECT_FLAG_NONE)
     connection.connect("connection-event", connection_cb, 0xFFAA)
-
+    connection_cb(connection,event,data)
 def connection_cb(connection, event, data):
     global iap_id
 #        print "connection_cb(%s, %s, %x)" % (connection, event, data)
