@@ -19,7 +19,7 @@ iap_id = None
 
 def request_statistics(connection):
     global counter, loop
-    print "request_statistics():"
+#    print "request_statistics():"
     
     if counter >= 10:
         print "Max counter reached (%i), quitting", counter
@@ -35,19 +35,24 @@ def request_statistics(connection):
 def statistics_cb(connection, event, data):
 #    print "laban"
 #    print "statistics(%s, %s, %x)" % (connection, event, data)
-    
+    status = event.get_status()
+    if status == conic.STATUS_CONNECTED:
+        x = event.get_signal_strength()
+        hex = "%x"%x
+        signal_strength = struct.unpack('!i', binascii.unhexlify(hex))[0]
+        print "Signalstyrka", signal_strength
+    elif status == conic.STATUS_DISCONNECTED:
+        print "DISCONNECTED"
+    else
+        print "ERROR" 
 #    print "time active=%i" % event.get_time_active()
-    x = event.get_signal_strength()
-    hex = "%x"%x
-    signal_strength = struct.unpack('!i', binascii.unhexlify(hex))[0]
-    print "Signalstyrka", signal_strength
 #    print "rx_packets=%u" % event.get_rx_packets()
 #    print "tx_packets=%u" % event.get_tx_packets()
 #    print "rx_bytes=%u" % event.get_rx_bytes()
 #    print "tx_bytes=%u" % event.get_tx_bytes()
 
 def start():
-    print "start():"
+#    print "start():"
     connection = conic.Connection()
 
     connection.connect("connection-event", connection_cb, 0xFFAA)
@@ -70,12 +75,12 @@ def connection_cb(connection, event, data):
     bearer = event.get_bearer_type()
     
     if status == conic.STATUS_CONNECTED:
-        print "1: (CONNECTED (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
+#        print "1: (CONNECTED (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
         gobject.timeout_add(1000, request_statistics, connection)
     elif status == conic.STATUS_DISCONNECTED:
-        print "1: (DISCONNECTED (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
+#        print "1: (DISCONNECTED (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
     elif status == conic.STATUS_DISCONNECTING:
-        print "1: (DISCONNECTING (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
+#        print "1: (DISCONNECTING (%s, %s, %i, %i)" % (iap_id, bearer, status, error)
    
 
 if __name__ == "__main__":
