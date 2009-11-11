@@ -270,6 +270,7 @@ class QoSManager(dbus.service.Object):
                 self.mainloop.run()
             except KeyboardInterrupt:
                 self.close()
+        print "what happened?"
 
     @dbus.service.method(dbus_interface='included.errors.QoSManager', in_signature='', out_signature='s')
     def dbus_close(self):
@@ -290,3 +291,4 @@ class QoSManager(dbus.service.Object):
 if __name__ == '__main__':
     qos = QoSManager()
     qos.start()
+    print "qos closed"
