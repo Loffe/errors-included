@@ -7,7 +7,7 @@ Lauro Moura <lauro.neto@indt.org.br>, 2007
 """
 
 import dbus
-from dbus.mainloop.glib import DBusGMainLoop
+#from dbus.mainloop.glib import DBusGMainLoop
 import gobject
 import conic
 import struct
@@ -15,7 +15,7 @@ import binascii
 
 class Signal(object):
     def __init__(self):
-        DBusGMainLoop(set_as_default=True)
+#        DBusGMainLoop(set_as_default=True)
         self.iap_id = None
         self.wlan = None
 
@@ -30,6 +30,7 @@ class Signal(object):
     def statistics_cb(self, connection, event, data):
 
         hex = "%x"%event.get_signal_strength()
+        signal_strength = 0
         try:
             signal_strength = struct.unpack('!i', binascii.unhexlify(hex))[0]
         except TypeError:
@@ -75,7 +76,7 @@ if __name__ == "__main__":
     
     loop = gobject.MainLoop()
     
-    bus = dbus.SystemBus(private=True)
+#    bus = dbus.SystemBus(private=True)
     s = Signal()
     gobject.idle_add(s.start)
     loop.run()
