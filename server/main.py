@@ -80,7 +80,7 @@ class ServerNetworkHandler(dbus.service.Object):
         self.dbusloop()
 
     def close(self):
-        print "Shutting down server"
+        log.info("Shutting down server")
         if self.mainloop:
             gobject.idle_add(self.mainloop.quit)
         # Wait for clients to exit
