@@ -35,16 +35,12 @@ def request_statistics(connection):
 def statistics_cb(connection, event, data):
 #    print "laban"
 #    print "statistics(%s, %s, %x)" % (connection, event, data)
-    status = event.get_status()
-    if status == conic.STATUS_CONNECTED:
-        x = event.get_signal_strength()
-        hex = "%x"%x
-        signal_strength = struct.unpack('!i', binascii.unhexlify(hex))[0]
-        print "Signalstyrka", signal_strength
-    elif status == conic.STATUS_DISCONNECTED:
-        print "DISCONNECTED"
-    else:
-        print "ERROR" 
+    
+    x = event.get_signal_strength()
+    hex = "%x"%x
+    signal_strength = struct.unpack('!i', binascii.unhexlify(hex))[0]
+    print "Signalstyrka", signal_strength
+   
 #    print "time active=%i" % event.get_time_active()
 #    print "rx_packets=%u" % event.get_rx_packets()
 #    print "tx_packets=%u" % event.get_tx_packets()
