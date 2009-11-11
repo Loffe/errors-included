@@ -57,6 +57,7 @@ class QoSManager(dbus.service.Object):
         self.running = False
         
         self.iap_id = None
+        self.connection = conic.Connection()
 
     def check_battery_level(self):
         '''
@@ -103,17 +104,12 @@ class QoSManager(dbus.service.Object):
         '''
         Update the signal strength.
         '''
-        
-        connection = conic.Connection()
-
-        connection.connect("connection-event", self.connection_cb, 0xFFAA)
-
-        connection.connect("statistics", self.statistics_cb, 0x55AA)
-
-        connection.request_connection(conic.CONNECT_FLAG_NONE)
 
         # update the connection stats
-        connection.statistics(self.iap_id)
+        try:
+            self.connection.statistics(self.iap_id)
+        except:
+            pass
 
         # return signal strength
         if self.signal_strength == None:
@@ -188,6 +184,11 @@ class QoSManager(dbus.service.Object):
         '''
         battery = self.battery_level
         signal = self.signal_strength
+        self.connection.connect("connection-event", self.connection_cb, 0xFFAA)
+
+        self.connection.connect("statistics", self.statistics_cb, 0x55AA)
+
+        self.connection.request_connection(conic.CONNECT_FLAG_NONE)
         
         # main loop
         while self.running:
