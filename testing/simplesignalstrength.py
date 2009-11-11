@@ -38,8 +38,11 @@ def statistics_cb(connection, event, data):
     
     x = event.get_signal_strength()
     hex = "%x"%x
-    signal_strength = struct.unpack('!i', binascii.unhexlify(hex))[0]
-    print "Signalstyrka", signal_strength
+    try:
+        signal_strength = struct.unpack('!i', binascii.unhexlify(hex))[0]
+        print "Signalstyrka", signal_strength
+    except TypeError:
+        print "Disconnected"
    
 #    print "time active=%i" % event.get_time_active()
 #    print "rx_packets=%u" % event.get_rx_packets()
