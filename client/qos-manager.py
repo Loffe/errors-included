@@ -126,7 +126,7 @@ class QoSManager(dbus.service.Object):
         # return signal strength as string
         if self.signal_strength == 0 or self.signal_strength == None:
             return "offline"
-        elif self.signal_strength < self.critical_signal_strength:
+        elif -self.signal_strength < -self.critical_signal_strength:
             return "low"
         else:
             return "high"
