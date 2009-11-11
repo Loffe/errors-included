@@ -86,7 +86,7 @@ def connection_cb(connection, event, data):
 
 if __name__ == "__main__":
     loop = gobject.MainLoop()
-    bus = dbus.SystemBus(private=True)
+#    bus = dbus.SystemBus(private=True)
     
     gobject.idle_add(start)
     loop.run()
