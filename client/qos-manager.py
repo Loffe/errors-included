@@ -6,11 +6,25 @@ import dbus.service
 import time
 import threading
 import gobject
+import struct
+import binascii
+try:
+    import conic
+except:
+    # Not in N810, no conic module; do nothing...
+    pass
 try:
     import gpsbt
 except:
     # Not in N810, got no GPS-device; do nothing...
     pass
+counter = 0
+loop = None
+iap_id = None
+
+ 
+
+
 
 class QoSManager(dbus.service.Object):
     '''
@@ -75,15 +89,49 @@ class QoSManager(dbus.service.Object):
         else:
             return "high"
 
+    def connection_cb(connection, event, data):
+        self.iap_id = event.get_iap_id()
+        
+    def statistics_cb(connection, event, data):
+        
+        x = event.get_signal_strength()
+        hex = "%x"%x
+        try:
+            self.signal_strength = struct.unpack('!i', binascii.unhexlify(hex))[0]
+            print "Signalstyrka", self.signal_strength
+        except TypeError:
+            self.signal_strength = 0
+            print "Disconnected", self.signal_strength
+    
+    def request_statistics(connection):
+        global counter, loop
+    #    print "request_statistics():"
+        
+        if counter >= 10:
+            print "Max counter reached (%i), quitting", counter
+            loop.quit()
+            return True
+            
+        counter += 1
+        connection.statistics(iap_id)
+            
+
     # UNSTABLE! DOESN'T DO SHIT!
     def check_signal_strength(self):
         '''
         Update the signal strength.
         '''
-        # dbus getters?
-        signal_strength = None
+        
+        connection = conic.Connection()
 
-        self.signal_strength = signal_strength
+        connection.connect("connection-event", connection_cb, 0xFFAA)
+
+        connection.connect("statistics", statistics_cb, 0x55AA)
+
+        connection.request_connection(conic.CONNECT_FLAG_NONE)
+
+        # update the connection stats
+        request_statistics(connection)
 
         # return signal strength
         if self.signal_strength == None:
