@@ -64,7 +64,7 @@ class GTK_Main:
         message_name = message.structure.get_name()
         if message_name == "prepare-xwindow-id":
             imagesink = message.src
-            imagesink.set_property("force-aspect-ratio", True)
+            imagesink.set_property("force-aspect-ratio", False)
             imagesink.set_xwindow_id(self.movie_window.window.xid)
     
 #    def play_moby(self):
