@@ -95,6 +95,7 @@ class ServerNetworkHandler(dbus.service.Object):
             for s in inputready:
                 if s == self.server:
                     (client, port) = self.server.accept()
+                    print "client connected from ", port
                     self.input.append(client)
                     self.output.append(client)
                 elif s == sys.stdin:

@@ -12,10 +12,10 @@ if __name__ == "__main__":
         remote_object.dbus_close()
         sys.exit(0)
 
-    q = shared.queue.Queue(config.server.ip,config.server.port)
+    q = shared.queue.ClientNetworkHandler(config.server.ip,config.server.port)
 
     for i in range(3):
-        q.enqueue("hejsan" + str(i))
+        q.enqueue("howdy " + str(i))
 
     try:
         q.mainloop()
