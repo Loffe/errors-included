@@ -10,6 +10,8 @@ import dbus
 from dbus.mainloop.glib import DBusGMainLoop
 import gobject
 import conic
+import struct
+import binascii
 
 class Signal(object):
     def __init__(self):
