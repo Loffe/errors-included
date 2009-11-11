@@ -123,6 +123,7 @@ class ServerNetworkHandler(dbus.service.Object):
 
                         self.message_handler.handle(m)
                     else:
+                        print "client disconnected"
                         s.close()
                         self.input.remove(s)
                         self.output.remove(s)

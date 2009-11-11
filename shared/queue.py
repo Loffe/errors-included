@@ -31,6 +31,8 @@ class ClientNetworkHandler(dbus.service.Object):
         self.output = NetworkOutQueue(self.socket)
         self.input = NetworkInQueue(self.socket, self.message_received)
 
+        self.output.connect("socket-broken", self._socket_broken)
+
     @dbus.service.method(dbus_interface='com.example.Queue',
                          in_signature='v', out_signature='s')
     def enqueue(self, msg):
@@ -115,6 +117,11 @@ class ClientNetworkHandler(dbus.service.Object):
                 gobject.timeout_add(config.queue.reconnect_interval,
                                     self._check_connection)
             return False
+
+    def _socket_broken(self, event):
+        self.connected = False
+        self._check_connection()
+
 
     def _handle_error(self, errno, errmsg=None):
         if errno == 111:

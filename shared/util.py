@@ -6,6 +6,8 @@ def getLogger(filename="log.txt"):
     formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
     fh.setFormatter(formatter)
     logger.addHandler(fh)
+    ch = logging.StreamHandler()
+    logger.addHandler(ch)
     logger.setLevel(logging.DEBUG)
 
     return logger

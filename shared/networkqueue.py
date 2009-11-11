@@ -7,22 +7,30 @@ import shared.data
 from shared.util import getLogger
 log = getLogger("nw-queue.log")
 
-class NetworkQueue(object):
+class NetworkQueue(gobject.GObject):
     queue = Queue.Queue()
     socket = None
 
     def __init__(self, socket):
+        self.__gobject_init__()
         self.socket = socket
 
     def replace_socket(self, socket):
         print self.__class__.__name__, "got a new socket"
         self.socket = socket
 
+gobject.type_register(NetworkQueue)
+gobject.signal_new("socket-broken", NetworkQueue, gobject.SIGNAL_RUN_FIRST,
+                   gobject.TYPE_NONE, ())
+
 class NetworkOutQueue(NetworkQueue):
     sending = False
+    need_connection = True
 
     def __init__(self, socket):
         NetworkQueue.__init__(self, socket)
+        if self.socket:
+            self.need_connection = False
 
     def enqueue(self, packed_data):
         print "enqueued"
@@ -34,12 +42,15 @@ class NetworkOutQueue(NetworkQueue):
         '''
         Starts a send burst in a new thread
         '''
+        if self.need_connection:
+            return
         print "starting send burst"
         self.sending = True
         threading.Thread(target=self.send_loop).start()
 
     def replace_socket(self, socket):
         NetworkQueue.replace_socket(self, socket)
+        self.need_connection = False
         self.start_sending()
 
 
@@ -51,15 +62,20 @@ class NetworkOutQueue(NetworkQueue):
         while self.sending:
             try:
                 item = self.queue.get(block=False)
-                log.info("sending" + item)
+                log.debug("trying to send: " + item)
             except Queue.Empty, e:
                 self.sending = False
+                log.info("send burst complete")
                 return
             try:
                 self.socket.send(item)
+                log.debug("item sent")
             except:
-                self.need_connection = False
+                self.need_connection = True
+                self.sending = False
                 self.queue.put(item)
+                log.info("socket broken")
+                self.emit("socket-broken")
 
 
 class NetworkInQueue(NetworkQueue):
