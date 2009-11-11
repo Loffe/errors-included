@@ -17,7 +17,7 @@ class Signal(object):
         self.iap_id = None
         self.wlan = None
 
-    def request_statistics(connection):
+    def request_statistics(self, connection):
         print "request_statistics():"
         
         wlan.statistics(self.iap_id)
@@ -25,7 +25,7 @@ class Signal(object):
         return True    
 
 
-    def statistics_cb(connection, event, data):
+    def statistics_cb(self, connection, event, data):
         print "statistics(%s, %s, %x)" % (connection, event, data)
         
         print "time active=%i" % event.get_time_active()
@@ -36,7 +36,7 @@ class Signal(object):
         print "tx_bytes=%u" % event.get_tx_bytes()
 
 
-    def start():
+    def start(self):
         print "start():"
         self.wlan = conic.Connection()
         self.wlan.connect("connection-event", connection_cb, 0xFFAA)
@@ -46,7 +46,7 @@ class Signal(object):
         return False
 
     
-    def connection_cb(connection, event, data):
+    def connection_cb(self, connection, event, data):
         
         print "connection_cb(%s, %s, %x)" % (connection, event, data)
     
