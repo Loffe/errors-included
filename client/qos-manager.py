@@ -105,7 +105,7 @@ class QoSManager(dbus.service.Object):
         '''
 
         # update the connection stats
-        self.connection.statistics(self.iap_id)
+        self.wlanconnection.statistics(self.iap_id)
 
         # return signal strength
         if self.signal_strength == None:
@@ -155,7 +155,7 @@ class QoSManager(dbus.service.Object):
         '''
         print "Running client QoS-Manager (errors-included)"
         self.running = True
-        threading.Thread(target=self.connection_start).start()
+        gobject.idle_add(self.connection_start)
         threading.Thread(target=self.service_level_updater).start()
         threading.Thread(target=self.gps_updater).start()
         self.dbusloop()
@@ -177,10 +177,10 @@ class QoSManager(dbus.service.Object):
                 
     def connection_start(self):
         #main loop
-        self.connection = conic.Connection()
-        self.connection.connect("connection-event", self.connection_cb, 0xFFAA)
-        self.connection.connect("statistics", self.statistics_cb, 0x55AA)
-        self.connection.request_connection(conic.CONNECT_FLAG_NONE)
+        self.wlanconnection = conic.Connection()
+        self.wlanconnection.connect("connection-event", self.connection_cb, 0xFFAA)
+        self.wlanconnection.connect("statistics", self.statistics_cb, 0x55AA)
+        self.wlanconnection.request_connection(conic.CONNECT_FLAG_NONE)
     
     def service_level_updater(self):
         '''
