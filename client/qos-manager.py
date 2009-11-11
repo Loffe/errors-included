@@ -18,13 +18,6 @@ try:
 except:
     # Not in N810, got no GPS-device; do nothing...
     pass
-counter = 0
-loop = None
-iap_id = None
-
- 
-
-
 
 class QoSManager(dbus.service.Object):
     '''
@@ -62,6 +55,8 @@ class QoSManager(dbus.service.Object):
         self.critical_signal_strength = 0
         
         self.running = False
+        
+        self.iap_id = None
 
     def check_battery_level(self):
         '''
