@@ -37,11 +37,8 @@ class ServerNetworkHandler(dbus.service.Object):
     @dbus.service.method(dbus_interface='included.error.Server',
                          in_signature='sv', out_signature='s')
     def enqueue(self, reciever, msg):
-        try:
-            queue = self.outqueues[reciever]
-        except KeyError:
-            queue = self.outqueues[reciever] = Queue.Queue()
-        queue.put(queue, msg)
+        queue = self.outqueues[reciever]
+        queue.enqueue(msg)
         print "Enqueue called"
         return "Enqueue :)"
 
@@ -93,6 +90,24 @@ class ServerNetworkHandler(dbus.service.Object):
         self.output.append(socket)
         self.outqueues[socket] = shared.networkqueue.NetworkOutQueue(socket)
 
+    def _disconnect_client(self, socket):
+        print "client disconnected"
+        s.close()
+        self.input.remove(s)
+        self.output.remove(s)
+
+    def _login_client(self, socket, message):
+        m = message
+        if self.outqueues.has_key(socket):
+            id = m.sender
+            self.outqueues[id] = self.outqueues[socket]
+            del self.outqueues[socket]
+            log.debug("logged in and now has a named queue")
+            self.enqueue(m.sender, "login_ack")
+        else:
+            log.debug("no such socket or user already logged in")
+
+
     def run(self):
         running = True
         while running:
@@ -102,6 +117,7 @@ class ServerNetworkHandler(dbus.service.Object):
                 if s == self.server:
                     (client, port) = self.server.accept()
                     print "client connected from ", port
+                    # put client in temp list based on socket
                     self._accept_client(client, port)
                 elif s == sys.stdin:
                     junk = sys.stdin.readline()
@@ -116,9 +132,11 @@ class ServerNetworkHandler(dbus.service.Object):
                         length = int(hex_length, 16)
                     except ValueError:
                         pass
+                    except socket.error:
+                        self._disconnect_client(socket)
 
                     if length == 0:
-                        log.info("Invalid content length: ", hex_length)
+                        log.info("Invalid content length: " + hex_length)
                         continue
                     data = s.recv(length)
                     if data:
@@ -133,12 +151,12 @@ class ServerNetworkHandler(dbus.service.Object):
                             log.debug(ve)
                             continue
 
-                        self.message_handler.handle(m)
+                        if m.type == "login":
+                            self._login_client(s, m)
+                        else:
+                            self.message_handler.handle(m)
                     else:
-                        print "client disconnected"
-                        s.close()
-                        self.input.remove(s)
-                        self.output.remove(s)
+                        self._disconnect_client(socket)
         
         self.close()
 
