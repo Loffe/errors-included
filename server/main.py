@@ -128,8 +128,9 @@ class ServerNetworkHandler(dbus.service.Object):
                         m = None
                         try:
                             m = shared.data.Message(None, None, packed_data=data)
-                        except ValueError:
+                        except ValueError, ve:
                             log.debug("Crappy data = ! JSON")
+                            log.debug(ve)
                             continue
 
                         self.message_handler.handle(m)
