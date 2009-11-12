@@ -11,10 +11,10 @@ from datetime import datetime
 class MapScreen(gtk.DrawingArea, gui.Screen):
     db = None
     
+    db.connect('mapobject-adde', self.queue_draw)
+    
 #    self.db = db
 
-    
-    
     bounds = {"min_latitude":0,
                 "max_latitude":0,
                 "min_longitude":0,
@@ -129,6 +129,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
     def set_gps_data(self, gps_data):
         self.gps_data = gps_data
         self.queue_draw()
+
+
 
     def draw(self):
         # Hämtar alla tiles för en nivå
