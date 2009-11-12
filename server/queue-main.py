@@ -34,7 +34,7 @@ class ServerNetworkHandler(dbus.service.Object):
         self.mainloop = None
         self.message_handler = handler.MessageHandler(self)
 
-    @dbus.service.method(dbus_interface='included.error.Server',
+    @dbus.service.method(dbus_interface='included.errors.Server',
                          in_signature='sv', out_signature='s')
     def enqueue(self, reciever, msg):
         queue = self.outqueues[reciever]
@@ -42,14 +42,14 @@ class ServerNetworkHandler(dbus.service.Object):
         print "Enqueue called"
         return "Enqueue :)"
 
-    @dbus.service.method(dbus_interface='included.error.Server',
+    @dbus.service.method(dbus_interface='included.errors.Server',
                          in_signature='v', out_signature='s')
     def dequeue(self, variant):
         print "Popped called"
         return "Popped :)"
 
-    @dbus.service.signal(dbus_interface='included.error.Server',
-                         signature='s')
+    @dbus.service.signal(dbus_interface='included.errors.Server',
+                         signature='v')
     def message_available(self, string):
         print "Message Available!!"
         return "Message Available!!"
