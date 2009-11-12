@@ -2,6 +2,7 @@
 import sys, os
 import pygtk, gtk, gobject
 import pygst
+from easy import audio
 pygst.require("0.10")
 import gst
 
@@ -25,9 +26,12 @@ class GTK_Main:
         self.button2 = gtk.Button("Quit")
         self.button2.connect("clicked", self.exit)
         hbox.pack_start(self.button2, False)
+        self.button3 = gtk.Button("Audio")
+        self.button3.connect("clicked", self.audio)
+        hbox.pack_start(self.button3, False)
         hbox.add(gtk.Label())
         window.show_all()
-        
+        print "Button 3"
         options = "v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=20/1 ! autovideosink"
         self.player = gst.parse_launch ( options )
         bus = self.player.get_bus()
@@ -70,7 +74,11 @@ class GTK_Main:
 #    def play_moby(self):
 #        playbin = gst.element_factory_make("playbin", "my-playbin")
         
-    
+    def audio(self, message):
+        audio.record("hello_world.wav", 3)
+        audio.set_volume(5)
+        audio.play("hello_world.wav")
+        
 GTK_Main()
 gtk.gdk.threads_init()
 gtk.main()
