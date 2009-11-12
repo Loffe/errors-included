@@ -34,10 +34,13 @@ class QoSManager(dbus.service.Object):
         dbus.service.Object.__init__(self, self.session_bus, '/QoSManager')
         self.bus = dbus.SystemBus()
         
-        hal_obj = self.bus.get_object('org.freedesktop.Hal', '/org/freedesktop/Hal/Manager')
-        hal = dbus.Interface(hal_obj, 'org.freedesktop.Hal.Manager')
-        uids = hal.FindDeviceByCapability('battery')
-        self.dev_obj = self.bus.get_object('org.freedesktop.Hal', uids[0])
+        try:
+            hal_obj = self.bus.get_object('org.freedesktop.Hal', '/org/freedesktop/Hal/Manager')
+            hal = dbus.Interface(hal_obj, 'org.freedesktop.Hal.Manager')
+            uids = hal.FindDeviceByCapability('battery')
+            self.dev_obj = self.bus.get_object('org.freedesktop.Hal', uids[0])
+        except:
+            pass
         
         # the service level
         self.service_level = "None"
@@ -171,7 +174,10 @@ class QoSManager(dbus.service.Object):
         '''
         print "Running client QoS-Manager (errors-included)"
         self.running = True
-        self.wlan_start()
+        try:
+            self.wlan_start()
+        except:
+            pass
         threading.Thread(target=self.service_level_updater).start()
         threading.Thread(target=self.gps_updater).start()
         self.dbusloop()
@@ -219,12 +225,12 @@ class QoSManager(dbus.service.Object):
                 print "battery level: failure"
 
             # get signal strength
-#            try:
-            signal = self.check_signal_strength()
-            print "signal strength:", self.signal_strength, signal
-#            except:
+            try:
+                signal = self.check_signal_strength()
+                print "signal strength:", self.signal_strength, signal
+            except:
                 # Not in N810, modules doesn't work; do nothing...
-#                print "signal strength: failure"
+                pass
 
             # temporary store the current service level
             current_level = self.service_level
@@ -270,7 +276,6 @@ class QoSManager(dbus.service.Object):
                 self.mainloop.run()
             except KeyboardInterrupt:
                 self.close()
-        print "what happened?"
 
     @dbus.service.method(dbus_interface='included.errors.QoSManager', in_signature='', out_signature='s')
     def dbus_close(self):
@@ -291,4 +296,3 @@ class QoSManager(dbus.service.Object):
 if __name__ == '__main__':
     qos = QoSManager()
     qos.start()
-    print "qos closed"
