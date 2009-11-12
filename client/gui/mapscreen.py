@@ -5,7 +5,7 @@ import gui
 import shared.data
 import map.map_xml_reader
 import map
-from map.mapdata import Unit
+from map.mapdata import *
 from datetime import datetime
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
@@ -50,8 +50,17 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                         gtk.gdk.POINTER_MOTION_MASK |
                         gtk.gdk.POINTER_MOTION_HINT_MASK)
                          #|                        gtk.gdk.KEY_PRESS_MASK)
+        # add all current objects in db to map
+        self.update_map()
     
-    def update_map(self, w):
+    def update_map(self, w = None):
+        # add all units to dict with objects to draw
+        mapobjectdata = self.db.get_all_mapobjects()
+        for data in mapobjectdata:
+            if data.__class__ == shared.data.UnitData:
+                self.mapdata.objects[data.name] = Unit(data)
+            elif data.__class__ == shared.data.POIData:
+                self.mapdata.objects[data.name] = POI(data)
         self.queue_draw()
 
     def zoom(self, change):
@@ -153,12 +162,6 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         # Ritar ut eventuella objekt
 
         objects = self.mapdata.objects
-        
-        # add all units to dict with objects to draw
-        unitdata = self.db.get_all_units()
-        if len(unitdata) > len(objects):
-            for data in unitdata:
-                objects[data.name] = Unit(data)                
             
         for item in objects:
             x, y = self.gps_to_pixel(objects[item].map_object_data.coords[0],

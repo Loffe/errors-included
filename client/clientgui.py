@@ -284,10 +284,10 @@ class ClientGui(hildon.Program):
     
     def show_faq(self, event):
         print "faq the system!"
-#        poi_data = shared.data.POIData(12,113, u"goal", datetime.now(), shared.data.POIType.accident)
-        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
+        poi_data = shared.data.POIData(15.5769069,58.4088884, u"goal", datetime.now(), shared.data.POIType.accident)
+#        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
 #        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
-        self.db.add(unit_data)
+        self.db.add(poi_data)
 
     # add object view event handlers
     def show_add_object(self, event):
