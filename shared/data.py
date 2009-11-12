@@ -44,6 +44,7 @@ class Database(gobject.GObject):
         '''
         Create database engine and session.
         '''
+        gobject.GObject.__init__(self)
         self.engine = create_engine('sqlite:///database.db', echo=False)
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
@@ -51,6 +52,7 @@ class Database(gobject.GObject):
     def add(self, object):
         self.session.add(object)
         self.session.commit()
+        self.emit("mapobject-added")
         
     def delete(self, object):
         self.session.delete(object)
@@ -438,6 +440,7 @@ def create_database():
     Create the database.
     '''
     db = Database()
+
     # create tables and columns
     Base.metadata.create_all(db.engine)
     return db

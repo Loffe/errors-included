@@ -148,6 +148,7 @@ class ClientGui(hildon.Program):
         status_button.connect("clicked", self.show_status)
         journal_button = gtk.Button("Patient\nJournal")
         faq_button = gtk.Button("FAQ")
+        faq_button.connect("clicked", self.show_faq)
         self.mission_menu.add(info_button)
         self.mission_menu.add(status_button)
         self.mission_menu.add(journal_button)
@@ -282,7 +283,11 @@ class ClientGui(hildon.Program):
         pass
     
     def show_faq(self, event):
-        pass
+        print "faq the system!"
+#        poi_data = shared.data.POIData(12,113, u"goal", datetime.now(), shared.data.POIType.accident)
+        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
+#        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
+        self.db.add(unit_data)
 
     # add object view event handlers
     def show_add_object(self, event):

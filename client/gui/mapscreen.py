@@ -10,10 +10,6 @@ from datetime import datetime
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
     db = None
-    
-    db.connect('mapobject-adde', self.queue_draw)
-    
-#    self.db = db
 
     bounds = {"min_latitude":0,
                 "max_latitude":0,
@@ -21,10 +17,10 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                 "max_longitude":0}
 
     def __init__(self, db):
-        self.db = db
         gui.Screen.__init__(self, "Map")
         gtk.DrawingArea.__init__(self)
-
+        self.db = db
+        self.db.connect('mapobject-added', self.update_map)
         mapxml = map.map_xml_reader.MapXML("map/data/map.xml")
         self.mapdata = map.mapdata.MapData(mapxml.name, mapxml.levels)
         # queue_draw() ärvs från klassen gtk.DrawingArea
@@ -55,6 +51,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                         gtk.gdk.POINTER_MOTION_HINT_MASK)
                          #|                        gtk.gdk.KEY_PRESS_MASK)
     
+    def update_map(self, w):
+        self.queue_draw()
 
     def zoom(self, change):
         # Frigör minnet genom att ladda ur alla tiles för föregående nivå
@@ -158,9 +156,10 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         
         # add all units to dict with objects to draw
         unitdata = self.db.get_all_units()
-        for data in unitdata:
-            objects[data.name] = Unit(data)                
-        
+        if len(unitdata) > len(objects):
+            for data in unitdata:
+                objects[data.name] = Unit(data)                
+            
         for item in objects:
             x, y = self.gps_to_pixel(objects[item].map_object_data.coords[0],
                                      objects[item].map_object_data.coords[1])
