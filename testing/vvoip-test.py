@@ -25,13 +25,13 @@ class GTK_Main:
         hbox.pack_start(self.button, False)
         self.button2 = gtk.Button("Quit")
         self.button2.connect("clicked", self.exit)
+        hbox.pack_start(self.button2, False)
         self.button3 = gtk.Button("Audio")
         self.button3.connect("clicked", self.audio)
         hbox.pack_start(self.button3, False)
-        hbox.pack_start(self.button2, False)
         hbox.add(gtk.Label())
         window.show_all()
-        
+        print "Button 3"
         options = "v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=20/1 ! autovideosink"
         self.player = gst.parse_launch ( options )
         bus = self.player.get_bus()
