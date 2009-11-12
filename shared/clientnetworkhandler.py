@@ -7,6 +7,7 @@ import socket
 import subprocess
 import threading
 import time
+import shared.data
 from networkqueue import NetworkOutQueue, NetworkInQueue
 from shared.util import getLogger
 log = getLogger("queue.log")
@@ -28,15 +29,16 @@ class ClientNetworkHandler(dbus.service.Object):
         dbus.service.Object.__init__(self, self.session_bus,
                                      '/Queue')
         self.server = (host, port)
-        self.output = NetworkOutQueue(self.socket)
-        self.input = NetworkInQueue(self.socket, self.message_received)
+        self.db = shared.data.create_database()
+        self.output = NetworkOutQueue(self.socket, self.db)
+        self.input = NetworkInQueue(self.socket, self.db)
 
         self.output.connect("socket-broken", self._socket_broken)
 
     @dbus.service.method(dbus_interface='com.example.Queue',
-                         in_signature='v', out_signature='s')
-    def enqueue(self, msg):
-        self.output.enqueue(msg)
+                         in_signature='vi', out_signature='s')
+    def enqueue(self, msg, prio):
+        self.output.enqueue(msg, prio)
         #print "Queued: ", msg
         #print self.output
         return "Message queued :)"
@@ -96,6 +98,7 @@ class ClientNetworkHandler(dbus.service.Object):
         gobject.threads_init()
         self.mainloop = mainloop = gobject.MainLoop()
         print "Running example queue service."
+        mainloop.run()
         while mainloop.is_running():
             try:
                 mainloop.run()

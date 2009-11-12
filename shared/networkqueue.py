@@ -3,17 +3,19 @@ import threading
 import Queue
 
 import shared.data
+from shared.dbqueue import DatabaseQueue
 
 from shared.util import getLogger
 log = getLogger("nw-queue.log")
 
 class NetworkQueue(gobject.GObject):
-    queue = Queue.Queue()
+    queue = None
     socket = None
 
-    def __init__(self, socket):
+    def __init__(self, socket, db, direction):
         self.__gobject_init__()
         self.socket = socket
+        self.queue = DatabaseQueue(db, direction)
 
     def replace_socket(self, socket):
         print self.__class__.__name__, "got a new socket"
@@ -27,14 +29,14 @@ class NetworkOutQueue(NetworkQueue):
     sending = False
     need_connection = True
 
-    def __init__(self, socket):
-        NetworkQueue.__init__(self, socket)
+    def __init__(self, socket, db):
+        NetworkQueue.__init__(self, socket, db, DatabaseQueue.direction_out)
         if self.socket:
             self.need_connection = False
 
-    def enqueue(self, packed_data):
+    def enqueue(self, packed_data, prio):
         print "enqueued"
-        self.queue.put(packed_data)
+        self.queue.put(packed_data, prio)
         if not self.sending:
             self.start_sending()
 
@@ -82,14 +84,12 @@ class NetworkOutQueue(NetworkQueue):
 
 
 class NetworkInQueue(NetworkQueue):
-    def __init__(self, socket, callback):
-        NetworkQueue.__init__(self, socket)
-        self.callback = callback
+    def __init__(self, socket, db):
+        NetworkQueue.__init__(self, socket, db, DatabaseQueue.direction_in)
 
     def receive(self):
         data = self.socket.recv(1024)
         self.queue.put(data)
-        self.callback()
 
 
     def dequeue(self):

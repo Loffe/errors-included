@@ -24,6 +24,7 @@ class ServerNetworkHandler(dbus.service.Object):
         self.name = dbus.service.BusName("included.errors.Server", self.session_bus)
         dbus.service.Object.__init__(self, self.session_bus,
                                      '/Queue')
+        self.db = shared.data.create_database()
         self.host = '127.0.0.1'
         self.port = 50000
         self.backlog = 5
@@ -88,7 +89,7 @@ class ServerNetworkHandler(dbus.service.Object):
     def _accept_client(self, socket, port):
         self.input.append(socket)
         self.output.append(socket)
-        self.outqueues[socket] = shared.networkqueue.NetworkOutQueue(socket)
+        self.outqueues[socket] = shared.networkqueue.NetworkOutQueue(socket, self.db)
 
     def _disconnect_client(self, socket):
         print "client disconnected"

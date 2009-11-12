@@ -105,6 +105,29 @@ class ObstacleType(object):
 class POIType(object):
     accident, fire, pasta_wagon = range(3)
 
+class NetworkInQueueItem(Base):
+    __tablename__ = 'InQueue'
+    id = Column(Integer, primary_key=True)
+    processed = Column(Boolean)
+    data = Column(UnicodeText)
+    def __init__(self, data):
+        self.data = data
+        self.processed = False
+
+class NetworkOutQueueItem(Base):
+    __tablename__ = 'OutQueue'
+    id = Column(Integer, primary_key=True)
+    sent = Column(Boolean)
+    acked = Column(Boolean)
+    prio = Column(Integer)
+    data = Column(UnicodeText)
+
+    def __init__(self, data, prio):
+        self.sent = False
+        self.acked = False
+        self.data = data
+        self.prio = prio
+
 class MapObjectData(Base, Packable):
     '''
     All objects visible on map have data objects extending this class.

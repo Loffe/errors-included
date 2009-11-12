@@ -15,7 +15,7 @@ if __name__ == "__main__":
     q = shared.clientnetworkhandler.ClientNetworkHandler(config.server.ip,config.server.port)
 
     for i in range(3):
-        q.enqueue("{\"howdy\": %d}" % i)
+        q.enqueue("{\"howdy\": %d}" % i, i)
 
     try:
         q.mainloop()
