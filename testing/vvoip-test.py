@@ -27,6 +27,7 @@ class GTK_Main:
         self.button2.connect("clicked", self.exit)
         self.button3 = gtk.Button("Audio")
         self.button3.connect("clicked", self.audio)
+        hbox.pack_start(self.button3, False)
         hbox.pack_start(self.button2, False)
         hbox.add(gtk.Label())
         window.show_all()
@@ -73,7 +74,7 @@ class GTK_Main:
 #    def play_moby(self):
 #        playbin = gst.element_factory_make("playbin", "my-playbin")
         
-    def audio
+    def audio(self):
         audio.record("hello_world.wav", 3)
         audio.set_volume(5)
         audio.play("hello_world.wav")
