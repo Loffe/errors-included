@@ -25,7 +25,8 @@ class VideoWidget(gtk.DrawingArea):
         assert self.window.xid
         self.imagesink = sink
         self.imagesink.set_xwindow_id(self.window.xid)
-
+        
+        
 class MaemoGstView:
 
     def __init__(self):
