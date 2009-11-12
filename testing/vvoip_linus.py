@@ -31,8 +31,11 @@ class GTK_Main:
         hbox.add(gtk.Label())
         window.show_all()
 
-        # Set up the gstreamer pipeline
-        self.player = gst.parse_launch ("v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink")
+        #Stream from another device
+        self.player = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host=130.236.219.107 port=5434") 
+
+        # Show my webcam
+        #self.player = gst.parse_launch ("v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink")
 
         bus = self.player.get_bus()
         bus.add_signal_watch()
