@@ -18,12 +18,13 @@ class RagnarDahlberg(object):
         self.status = status
         self.coords = (0,0)
         
+        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         bus = dbus.SessionBus()
         remote_object = bus.get_object("included.errors.QoSManager", "/QoSManager")
         interface = dbus.Interface(remote_object, "included.errors.QoSManager")
         
         # TODO: Connect to dbus signals, to update gps-pos when QoSManager signals
-        interface.connect_to_signal("included.errors.QoSManager", self.update_coords, sender_keyword='included.errors.QoSManager')
+        interface.connect_to_signal("signal_new_gps_coord", self.update_coords, sender_keyword='included.errors.QoSManager')
         
     def update_coords(self, coords):
         self.coords = coords
