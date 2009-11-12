@@ -103,7 +103,7 @@ class ClientNetworkHandler(dbus.service.Object):
                 self.close()
 
     def _check_connection(self):
-        print "_check_connection"
+#        print "_check_connection"
         if self.closing == True:
             return False
         if self.connected == True:
@@ -125,6 +125,7 @@ class ClientNetworkHandler(dbus.service.Object):
 
     def _handle_error(self, errno, errmsg=None):
         if errno == 111:
-            print "Connection refused"
+            pass
+#            print "Connection refused"
         else:
             print errno, errmsg
