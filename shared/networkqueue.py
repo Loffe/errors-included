@@ -68,6 +68,9 @@ class NetworkOutQueue(NetworkQueue):
                 log.info("send burst complete")
                 return
             try:
+                # send 6 bytes containing content length
+                self.socket.send('0x%04x' % len(item))
+                # send json data
                 self.socket.send(item)
                 log.debug("item sent")
             except:

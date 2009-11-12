@@ -109,7 +109,18 @@ class ServerNetworkHandler(dbus.service.Object):
                         print "got quit"
                         running = False
                 else:
-                    data = s.recv(1024)
+                    # read and parse content length
+                    length = 0
+                    try:
+                        hex_length = s.recv(6)
+                        length = int(hex_length, 16)
+                    except ValueError:
+                        pass
+
+                    if length == 0:
+                        log.info("Invalid content length: ", hex_length)
+                        continue
+                    data = s.recv(length)
                     if data:
                         self.message_available("super message is here")
                         log.debug("data from client:" + str(data))
