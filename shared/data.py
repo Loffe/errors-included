@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import simplejson as json
 from datetime import datetime
+import gobject
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker, relation
 from sqlalchemy.ext.declarative import declarative_base
@@ -34,7 +35,7 @@ class Packable(object):
         dict["class"] = self.__class__.__name__
         return dict
 
-class Database(object):
+class Database(gobject.GObject):
     '''
     A sqlite3 database using sqlalchemy.
     '''
@@ -43,6 +44,7 @@ class Database(object):
         '''
         Create database engine and session.
         '''
+        gobject.GObject.__init__(self)
         self.engine = create_engine('sqlite:///database.db', echo=False)
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
@@ -50,6 +52,7 @@ class Database(object):
     def add(self, object):
         self.session.add(object)
         self.session.commit()
+        self.emit("mapobject-added")
         
     def delete(self, object):
         self.session.delete(object)
@@ -73,6 +76,10 @@ class Database(object):
         for u in q:
             list.append(u)
         return list
+    
+gobject.type_register(Database)
+gobject.signal_new("mapobject-added", Database, gobject.SIGNAL_RUN_FIRST,
+                   gobject.TYPE_NONE, ())
 
 class UnitType(object):
     (ambulance, # Regular unit
@@ -303,7 +310,7 @@ class Event(Base, Packable):
 class MessageType(object):
     (mission, map, text, alarm, control, low_battery, status_update, mission_response, 
     journal_request, journal_confirmationresponse, journal_confirmationrequest, 
-    journal_transfer, alarm_ack, vvoip_request, vvoip_response) = range(15)
+    journal_transfer, alarm_ack, vvoip_request, vvoip_response, login, login_ack, action) = range(18)
 
 class Message(object):
     '''
@@ -368,49 +375,55 @@ class Message(object):
         Unpack a simplejson string to an object.
         @param raw_message: the simplejson string
         '''
-        dict = json.loads(raw_message)
-        self.type = dict["type"]
-        self.prio = dict["prio"]
-        self.sender = dict["sender"]
-        self.reciever = dict["reciever"]
-        self.timestamp = datetime.fromtimestamp(float(dict["timestamp"]))
-        self.packed_data = dict["packed_data"]
-        
-        # it's data packed to a dict
-        if type(self.packed_data) == type({}):
+        try:
+            dict = json.loads(raw_message)
+            self.type = dict["type"]
+            self.prio = dict["prio"]
+            self.sender = dict["sender"]
+            self.reciever = dict["reciever"]
+            self.timestamp = datetime.fromtimestamp(float(dict["timestamp"]))
+            self.packed_data = dict["packed_data"]
 
-            def create(dict):
-                '''
-                Create an object from a specified dictionary.
-                @param dict: the dictionary to use.
-                '''
-                # remove added class key (and value)
-                classname = dict["class"]
-                del dict["class"]
-                try:
-                    # replace timestamp string with a real datetime
-                    dict["timestamp"] = datetime.fromtimestamp(float(dict["timestamp"]))
-                except:
-                    pass
-                try:
-                    # create the poi from its dict
-                    dict["poi"] = create(dict["poi"])
-                except:
-                    pass
-                # create and return an instance of the object
-                if classname == "dict":
-                    return dict
-                else:
-                    return globals()[classname](**dict)
+            # it's data packed to a dict
+            if type(self.packed_data) == type({}):
 
-            # create and set data
-            self.unpacked_data = create(self.packed_data)
+                def create(dict):
+                    '''
+                    Create an object from a specified dictionary.
+                    @param dict: the dictionary to use.
+                    '''
+                    # remove added class key (and value)
+                    classname = dict["class"]
+                    del dict["class"]
+                    try:
+                        # replace timestamp string with a real datetime
+                        dict["timestamp"] = datetime.fromtimestamp(float(dict["timestamp"]))
+                    except:
+                        pass
+                    try:
+                        # create the poi from its dict
+                        dict["poi"] = create(dict["poi"])
+                    except:
+                        pass
+                    # create and return an instance of the object
+                    if classname == "dict":
+                        return dict
+                    else:
+                        try:
+                            return globals()[classname](**dict)
+                        except:
+                            print "Failed with class:", classname, ", dict:", dict
 
-        # it's a default type
-        else:
-            # the packed data behave as the unpacked data (no need to convert)
-            self.unpacked_data = dict["packed_data"]
-        return self.unpacked_data
+                # create and set data
+                self.unpacked_data = create(self.packed_data)
+
+            # it's a default type
+            else:
+                # the packed data behave as the unpacked data (no need to convert)
+                self.unpacked_data = dict["packed_data"]
+            return self.unpacked_data
+        except KeyError, ke:
+            raise ValueError("Not a valid Message. Missing any keys maybe?")
 
     def __repr__(self):
         repr = ("<%s: sender=%s, receiver=%s, prio=%s, type=%s, %s; packed=%s, unpacked=%s>" % 
@@ -427,6 +440,7 @@ def create_database():
     Create the database.
     '''
     db = Database()
+
     # create tables and columns
     Base.metadata.create_all(db.engine)
     return db
@@ -454,22 +468,22 @@ if __name__ == '__main__':
 #    for u in units:
 #        print u.id, u.name
 #
-    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident)
+#    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident)
 #    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå")
 #    print mission_data
-    alarm = Alarm(u"Bilolycka", u"Linköping", poi_data, u"Laban Andersson", u"070-741337", 7)
-    alarm2 = Alarm(u"Hjärtattack", u"Norrköping", poi_data, u"Jakob johansson", u"070-741338", 1)
-    alarm3 = Alarm(u"Barnmisshandel", u"Motala", poi_data, u"Muhammad Alzhein", u"n/a", 4)
-    db.add(alarm)
-    db.add(alarm2)
-    db.add(alarm3)
-    
-    enhet = UnitData(15.56564, 58.4047 ,u"Enhet1",datetime.now(), UnitType.ambulance)
-    enhet2 = UnitData(15.552864, 58.405549000000001 ,u"Enhet2",datetime.now(), UnitType.ambulance)
-    enhet3 = UnitData(15.5656475, 58.4047164 ,u"Enhet3",datetime.now(), UnitType.ambulance)
-    db.add(enhet)
-    db.add(enhet2)
-    db.add(enhet3)
+#    alarm = Alarm(u"Bilolycka", u"Linköping", poi_data, u"Laban Andersson", u"070-741337", 7)
+#    alarm2 = Alarm(u"Hjärtattack", u"Norrköping", poi_data, u"Jakob johansson", u"070-741338", 1)
+#    alarm3 = Alarm(u"Barnmisshandel", u"Motala", poi_data, u"Muhammad Alzhein", u"n/a", 4)
+#    db.add(alarm)
+#    db.add(alarm2)
+#    db.add(alarm3)
+#    
+#    enhet = UnitData(15.56564, 58.4047 ,u"Enhet1",datetime.now(), UnitType.ambulance)
+#    enhet2 = UnitData(15.552864, 58.405549000000001 ,u"Enhet2",datetime.now(), UnitType.ambulance)
+#    enhet3 = UnitData(15.5656475, 58.4047164 ,u"Enhet3",datetime.now(), UnitType.ambulance)
+#    db.add(enhet)
+#    db.add(enhet2)
+#    db.add(enhet3)
 #    event = Event(object = alarm)
 #    event = Event(poi_data.id, EventType.add)
 #    print "ALARM:", alarm
