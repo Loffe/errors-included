@@ -74,7 +74,7 @@ class GTK_Main:
 #    def play_moby(self):
 #        playbin = gst.element_factory_make("playbin", "my-playbin")
         
-    def audio(self):
+    def audio(self, message):
         audio.record("hello_world.wav", 3)
         audio.set_volume(5)
         audio.play("hello_world.wav")
