@@ -49,8 +49,8 @@ class ServerNetworkHandler(dbus.service.Object):
         return "Popped :)"
 
     @dbus.service.signal(dbus_interface='included.errors.Server',
-                         signature='v')
-    def message_available(self, string):
+                         signature='s')
+    def message_available(self, message):
         print "Message Available!!"
         return "Message Available!!"
 
@@ -140,7 +140,6 @@ class ServerNetworkHandler(dbus.service.Object):
                         continue
                     data = s.recv(length)
                     if data:
-                        self.message_available("super message is here")
                         log.debug("data from client:" + str(data))
                         self.inqueue.put(data, False)
                         m = None
@@ -151,10 +150,11 @@ class ServerNetworkHandler(dbus.service.Object):
                             log.debug(ve)
                             continue
 
-                        if m.type == "login":
+                        if m.type == shared.data.MessageType.login:
                             self._login_client(s, m)
                         else:
                             self.message_handler.handle(m)
+                            self.message_available(data)
                     else:
                         self._disconnect_client(socket)
         

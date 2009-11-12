@@ -402,7 +402,10 @@ class Message(object):
                     if classname == "dict":
                         return dict
                     else:
-                        return globals()[classname](**dict)
+                        try:
+                            return globals()[classname](**dict)
+                        except:
+                            print "Failed with class:", classname, ", dict:", dict
 
                 # create and set data
                 self.unpacked_data = create(self.packed_data)
