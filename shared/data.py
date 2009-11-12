@@ -303,7 +303,7 @@ class Event(Base, Packable):
 class MessageType(object):
     (mission, map, text, alarm, control, low_battery, status_update, mission_response, 
     journal_request, journal_confirmationresponse, journal_confirmationrequest, 
-    journal_transfer, alarm_ack, vvoip_request, vvoip_response) = range(15)
+    journal_transfer, alarm_ack, vvoip_request, vvoip_response, login, login_ack, action) = range(18)
 
 class Message(object):
     '''
@@ -368,49 +368,55 @@ class Message(object):
         Unpack a simplejson string to an object.
         @param raw_message: the simplejson string
         '''
-        dict = json.loads(raw_message)
-        self.type = dict["type"]
-        self.prio = dict["prio"]
-        self.sender = dict["sender"]
-        self.reciever = dict["reciever"]
-        self.timestamp = datetime.fromtimestamp(float(dict["timestamp"]))
-        self.packed_data = dict["packed_data"]
-        
-        # it's data packed to a dict
-        if type(self.packed_data) == type({}):
+        try:
+            dict = json.loads(raw_message)
+            self.type = dict["type"]
+            self.prio = dict["prio"]
+            self.sender = dict["sender"]
+            self.reciever = dict["reciever"]
+            self.timestamp = datetime.fromtimestamp(float(dict["timestamp"]))
+            self.packed_data = dict["packed_data"]
 
-            def create(dict):
-                '''
-                Create an object from a specified dictionary.
-                @param dict: the dictionary to use.
-                '''
-                # remove added class key (and value)
-                classname = dict["class"]
-                del dict["class"]
-                try:
-                    # replace timestamp string with a real datetime
-                    dict["timestamp"] = datetime.fromtimestamp(float(dict["timestamp"]))
-                except:
-                    pass
-                try:
-                    # create the poi from its dict
-                    dict["poi"] = create(dict["poi"])
-                except:
-                    pass
-                # create and return an instance of the object
-                if classname == "dict":
-                    return dict
-                else:
-                    return globals()[classname](**dict)
+            # it's data packed to a dict
+            if type(self.packed_data) == type({}):
 
-            # create and set data
-            self.unpacked_data = create(self.packed_data)
+                def create(dict):
+                    '''
+                    Create an object from a specified dictionary.
+                    @param dict: the dictionary to use.
+                    '''
+                    # remove added class key (and value)
+                    classname = dict["class"]
+                    del dict["class"]
+                    try:
+                        # replace timestamp string with a real datetime
+                        dict["timestamp"] = datetime.fromtimestamp(float(dict["timestamp"]))
+                    except:
+                        pass
+                    try:
+                        # create the poi from its dict
+                        dict["poi"] = create(dict["poi"])
+                    except:
+                        pass
+                    # create and return an instance of the object
+                    if classname == "dict":
+                        return dict
+                    else:
+                        try:
+                            return globals()[classname](**dict)
+                        except:
+                            print "Failed with class:", classname, ", dict:", dict
 
-        # it's a default type
-        else:
-            # the packed data behave as the unpacked data (no need to convert)
-            self.unpacked_data = dict["packed_data"]
-        return self.unpacked_data
+                # create and set data
+                self.unpacked_data = create(self.packed_data)
+
+            # it's a default type
+            else:
+                # the packed data behave as the unpacked data (no need to convert)
+                self.unpacked_data = dict["packed_data"]
+            return self.unpacked_data
+        except KeyError, ke:
+            raise ValueError("Not a valid Message. Missing any keys maybe?")
 
     def __repr__(self):
         repr = ("<%s: sender=%s, receiver=%s, prio=%s, type=%s, %s; packed=%s, unpacked=%s>" % 
