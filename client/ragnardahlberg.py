@@ -23,6 +23,11 @@ class RagnarDahlberg(object):
         interface = dbus.Interface(remote_object, "included.errors.QoSManager")
         
         # TODO: Connect to dbus signals, to update gps-pos when QoSManager signals
+        interface.connect_to_signal("included.errors.QoSManager", self.update_coords, sender_keyword='included.errors.QoSManager')
+        
+    def update_coords(self, coords):
+        self.coords = coords
+        print "Got coords update"
     
     def run(self):
         while True:
