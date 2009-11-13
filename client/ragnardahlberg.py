@@ -3,6 +3,8 @@
 
 import shared.data
 import dbus
+import dbus.mainloop.glib
+import gobject
 
 class RagnarDahlberg(object):
     '''
@@ -14,10 +16,6 @@ class RagnarDahlberg(object):
         @param unit_type: my unit type.
         @param status: my status.
         '''
-        self.unit_type = unit_type
-        self.mission = None
-        self.status = status
-        self.coords = (0,0)
         
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         bus = dbus.SessionBus()
@@ -26,6 +24,11 @@ class RagnarDahlberg(object):
         
         # TODO: Connect to dbus signals, to update gps-pos when QoSManager signals
         interface.connect_to_signal("signal_new_gps_coord", self.update_coords, sender_keyword='included.errors.QoSManager')
+        
+        self.unit_type = unit_type
+        self.mission = None
+        self.status = status
+        self.coords = (0,0)
         
     def update_coords(self, coords):
         self.coords = coords
@@ -43,6 +46,10 @@ class RagnarDahlberg(object):
                 self.mainloop.run()
             except KeyboardInterrupt:
                 self.mainloop.quit()
+                self.close()
+    
+    def close(self):
+        print "Selfness aborted"
 
 if __name__ == "__main__":
     unit_type = shared.data.UnitType.commander
