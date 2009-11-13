@@ -36,7 +36,7 @@ class ClientNetworkHandler(dbus.service.Object):
         self.output.connect("socket-broken", self._socket_broken)
 
     @dbus.service.method(dbus_interface='com.example.Queue',
-                         in_signature='vi', out_signature='s')
+                         in_signature='si', out_signature='s')
     def enqueue(self, msg, prio):
         self.output.enqueue(msg, prio)
         #print "Queued: ", msg
