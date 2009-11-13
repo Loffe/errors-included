@@ -40,8 +40,12 @@ class GTK_Main:
         #Stream to another device
         self.player = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host=130.236.219.107 port=5434")
         
-#        self.player = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=176,height=144,framerate=15/1 ! hantro4200enc stream-type=1 profile-and-level=1001 !video/x-h263,framerate=15/1 ! rtph263ppay mtu=1438 ! udpsink host=130.236.219.107 port=5434 dsppcmsrc ! queue ! audio/x-raw-int,channels=1,rate=8000 ! mulawenc ! rtppcmupay mtu=1438 ! udpsink host=130.236.219.107 port=5432")
-
+        #Show the incoming video
+        self.player = gst.parse_launch("udpsrc port=5432 caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink")
+        
+        #Stream both audio and video
+#        self.player = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=15/1 ! hantro4200enc stream-type=1 profile-and-level=1001 !video/x-h263,framerate=15/1 ! rtph263ppay mtu=1438 ! udpsink host=130.236.219.107 port=5434 dsppcmsrc ! queue ! audio/x-raw-int,channels=1,rate=8000 ! mulawenc ! rtppcmupay mtu=1438 ! udpsink host=130.236.219.107 port=5432")
+            #Even try rate=48000
         
         # Show my webcam
 #        self.player = gst.parse_launch ("v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink")
