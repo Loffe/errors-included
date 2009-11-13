@@ -74,6 +74,7 @@ class NetworkOutQueue(NetworkQueue):
                 self.socket.send('0x%04x' % len(item))
                 # send json data
                 self.socket.send(item)
+                self.queue.mark_as_sent(item)
                 log.debug("item sent")
             except:
                 self.need_connection = True

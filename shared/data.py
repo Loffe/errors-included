@@ -46,8 +46,8 @@ class Database(gobject.GObject):
         '''
         gobject.GObject.__init__(self)
         self.engine = create_engine('sqlite:///database.db', echo=False)
-        Session = sessionmaker(bind=self.engine)
-        self.session = Session()
+        self._Session = sessionmaker(bind=self.engine)
+        self.session = self._Session()
         
     def add(self, object):
         self.session.add(object)
