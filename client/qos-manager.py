@@ -166,7 +166,7 @@ class QoSManager(dbus.service.Object):
         # set gps coordinates
         if not (x,y) == (0,0):
             self.gps_coord = (x,y)
-            self.signal_new_gps_coord(self.gps_coord)
+            self.signal_new_gps_coord(x, y)
 
     def start(self):
         '''
@@ -281,8 +281,8 @@ class QoSManager(dbus.service.Object):
     def dbus_close(self):
         self.close()
 
-    @dbus.service.signal(dbus_interface='included.errors.QoSManager', signature='v')
-    def signal_new_gps_coord(self, coord):
+    @dbus.service.signal(dbus_interface='included.errors.QoSManager', signature='dd')
+    def signal_new_gps_coord(self, coordx, coordy):
         print "coordinates updated"
 
     @dbus.service.signal(dbus_interface='included.errors.QoSManager', signature='s')
