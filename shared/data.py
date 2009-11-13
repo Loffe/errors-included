@@ -110,7 +110,11 @@ class NetworkInQueueItem(Base):
     id = Column(Integer, primary_key=True)
     processed = Column(Boolean)
     data = Column(UnicodeText)
-    def __init__(self, data):
+    def __init__(self, data, prio=0):
+        ''' Construct a new queue item.
+        
+        prio is not used, it's only to have same __init__ interface as NetworkOutQueueItem
+        '''
         self.data = data
         self.processed = False
 

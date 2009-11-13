@@ -3,11 +3,13 @@ import dbus
 import dbus.mainloop.glib
 import dbus.service
 import gobject
+import select
+import shared.data
 import socket
 import subprocess
+import sys
 import threading
 import time
-import shared.data
 from networkqueue import NetworkOutQueue, NetworkInQueue
 from shared.util import getLogger
 log = getLogger("queue.log")
@@ -88,12 +90,32 @@ class ClientNetworkHandler(dbus.service.Object):
         #msg = self.input.dequeue()
         return
 
+    def run(self):
+        running = True
+        while running:
+            inputready, outputready, exceptready = select.select(
+                    [self.socket, sys.stdin], [], [])
+            print "got input"
+            for s in inputready:
+                if s == sys.stdin:
+                    junk = sys.stdin.readline()
+                    if junk.startswith("quit"):
+                        print "got quit"
+                        running = False
+                elif s == self.socket:
+                    print "gettin' msg"
+                    self.input.receive()
+                    print "Just putted a message in a queue :D"
+        self.close()
+
     def mainloop(self):
         self._check_connection()
         def _sigterm_cb(self):
             gobject.idle_add(self.close)
         import signal
         signal.signal(signal.SIGTERM, _sigterm_cb)
+
+        threading.Thread(target=self.run).start()
 
         gobject.threads_init()
         self.mainloop = mainloop = gobject.MainLoop()

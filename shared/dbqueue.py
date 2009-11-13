@@ -19,6 +19,8 @@ class DatabaseQueue(Queue.Queue):
         session = self.db._Session()
         if self.item_type == data.NetworkOutQueueItem:
             return session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.sent == 0).count() == 0
+        if self.item_type == data.NetworkInQueueItem:
+            return session.query(data.NetworkInQueueItem).filter(data.NetworkInQueueItem.sent == 0).count() == 0
         session.close()
 
     # Check whether the queue is full
@@ -49,6 +51,7 @@ class DatabaseQueue(Queue.Queue):
     # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
     def put(self, data, priority=0, block=True, timeout=None):
         item = data, priority
+        print "putting:", data
         Queue.Queue.put(self, item, block, timeout)
 
     # shadow and wrap Queue.Queue's own `get' to strip auxiliary aspects

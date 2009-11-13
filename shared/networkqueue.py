@@ -91,8 +91,42 @@ class NetworkInQueue(NetworkQueue):
         NetworkQueue.__init__(self, socket, db, DatabaseQueue.direction_in)
 
     def receive(self):
-        data = self.socket.recv(1024)
-        self.queue.put(data)
+        ''' Receives data from network and puts it in a DatabaseQueue.
+
+        This method blocks so using select before calling is good practice.
+        '''
+
+        length = 0
+        try:
+            hex_length = self.socket.recv(6)
+            length = int(hex_length, 16)
+        except ValueError:
+            pass
+        except socket.error:
+            self.emit("socket-broken")
+
+        if length == 0:
+            log.info("Invalid content length: " + hex_length)
+            return
+        data = self.socket.recv(length)
+        if data:
+            log.debug("data from server:" + str(data))
+            self.queue.put(data, 37)
+            m = None
+            try:
+                m = shared.data.Message(None, None, packed_data=data)
+            except ValueError, ve:
+                log.debug("Crappy data = ! JSON")
+                log.debug(ve)
+                return
+
+            if m.type == shared.data.MessageType.login:
+                self._login_client(s, m)
+            else:
+                self.message_handler.handle(m)
+                self.message_available(data)
+        else:
+            self.emit("socket-broken")
 
 
     def dequeue(self):
