@@ -15,6 +15,7 @@ class RagnarDahlberg(object):
         @param status: my status.
         '''
         self.unit_type = unit_type
+        self.mission = None
         self.status = status
         self.coords = (0,0)
         
@@ -31,8 +32,17 @@ class RagnarDahlberg(object):
         print "Got coords update"
     
     def run(self):
-        while True:
-            pass
+        self.dbusloop()
+        
+    def dbusloop(self):
+        self.mainloop = gobject.MainLoop()
+        gobject.threads_init()
+        print "Running selfness loop listening to da buzz."
+        while self.mainloop.is_running():
+            try:
+                self.mainloop.run()
+            except KeyboardInterrupt:
+                self.mainloop.quit()
 
 if __name__ == "__main__":
     unit_type = shared.data.UnitType.commander
