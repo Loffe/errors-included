@@ -46,8 +46,8 @@ class Database(gobject.GObject):
         '''
         gobject.GObject.__init__(self)
         self.engine = create_engine('sqlite:///database.db', echo=False)
-        Session = sessionmaker(bind=self.engine)
-        self.session = Session()
+        self._Session = sessionmaker(bind=self.engine)
+        self.session = self._Session()
         
     def add(self, object):
         self.session.add(object)
@@ -97,6 +97,33 @@ class ObstacleType(object):
 
 class POIType(object):
     accident, fire, pasta_wagon = range(3)
+
+class NetworkInQueueItem(Base):
+    __tablename__ = 'InQueue'
+    id = Column(Integer, primary_key=True)
+    processed = Column(Boolean)
+    data = Column(UnicodeText)
+    def __init__(self, data, prio=0):
+        ''' Construct a new queue item.
+        
+        prio is not used, it's only to have same __init__ interface as NetworkOutQueueItem
+        '''
+        self.data = data
+        self.processed = False
+
+class NetworkOutQueueItem(Base):
+    __tablename__ = 'OutQueue'
+    id = Column(Integer, primary_key=True)
+    sent = Column(Boolean)
+    acked = Column(Boolean)
+    prio = Column(Integer)
+    data = Column(UnicodeText)
+
+    def __init__(self, data, prio):
+        self.sent = False
+        self.acked = False
+        self.data = data
+        self.prio = prio
 
 class MapObjectData(Base, Packable):
     '''

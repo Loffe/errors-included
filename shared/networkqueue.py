@@ -3,17 +3,19 @@ import threading
 import Queue
 
 import shared.data
+from shared.dbqueue import DatabaseQueue
 
 from shared.util import getLogger
 log = getLogger("nw-queue.log")
 
 class NetworkQueue(gobject.GObject):
-    queue = Queue.Queue()
+    queue = None
     socket = None
 
-    def __init__(self, socket):
+    def __init__(self, socket, db, direction):
         self.__gobject_init__()
         self.socket = socket
+        self.queue = DatabaseQueue(db, direction)
 
     def replace_socket(self, socket):
         print self.__class__.__name__, "got a new socket"
@@ -27,14 +29,14 @@ class NetworkOutQueue(NetworkQueue):
     sending = False
     need_connection = True
 
-    def __init__(self, socket):
-        NetworkQueue.__init__(self, socket)
+    def __init__(self, socket, db):
+        NetworkQueue.__init__(self, socket, db, DatabaseQueue.direction_out)
         if self.socket:
             self.need_connection = False
 
-    def enqueue(self, packed_data):
+    def enqueue(self, packed_data, prio):
         print "enqueued"
-        self.queue.put(packed_data)
+        self.queue.put(packed_data, prio)
         if not self.sending:
             self.start_sending()
 
@@ -61,17 +63,20 @@ class NetworkOutQueue(NetworkQueue):
         '''
         while self.sending:
             try:
-                item = self.queue.get(block=False)
-                log.debug("trying to send: " + item)
+                item, id = self.queue.get(block=False)
+                log.debug("trying to send: " + str(item))
             except Queue.Empty, e:
                 self.sending = False
                 log.info("send burst complete")
                 return
             try:
                 # send 6 bytes containing content length
-                self.socket.send('0x%04x' % len(item))
+                content_length = '0x%04x' % len(item)
+                log.info(content_length)
+                self.socket.send(content_length)
                 # send json data
                 self.socket.send(item)
+                self.queue.mark_as_sent(id)
                 log.debug("item sent")
             except:
                 self.need_connection = True
@@ -82,14 +87,46 @@ class NetworkOutQueue(NetworkQueue):
 
 
 class NetworkInQueue(NetworkQueue):
-    def __init__(self, socket, callback):
-        NetworkQueue.__init__(self, socket)
-        self.callback = callback
+    def __init__(self, socket, db):
+        NetworkQueue.__init__(self, socket, db, DatabaseQueue.direction_in)
 
     def receive(self):
-        data = self.socket.recv(1024)
-        self.queue.put(data)
-        self.callback()
+        ''' Receives data from network and puts it in a DatabaseQueue.
+
+        This method blocks so using select before calling is good practice.
+        '''
+
+        length = 0
+        try:
+            hex_length = self.socket.recv(6)
+            length = int(hex_length, 16)
+        except ValueError:
+            pass
+        except socket.error:
+            self.emit("socket-broken")
+
+        if length == 0:
+            log.info("Invalid content length: " + hex_length)
+            return
+        data = self.socket.recv(length)
+        if data:
+            log.debug("data from server:" + str(data))
+            self.queue.put(data, 37)
+            m = None
+            try:
+                m = shared.data.Message(None, None, packed_data=data)
+            except ValueError, ve:
+                log.debug("Crappy data = ! JSON")
+                log.debug(ve)
+                return
+
+            if m.type == shared.data.MessageType.login:
+                self._login_client(s, m)
+            else:
+                self.message_handler.handle(m)
+                self.message_available(data)
+        else:
+            self.emit("socket-broken")
 
 
     def dequeue(self):
