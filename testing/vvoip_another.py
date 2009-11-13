@@ -51,20 +51,20 @@ class GTK_Main:
         bus.connect("message", self.on_message)
         bus.connect("sync-message::element", self.on_sync_message)
         
-        bus2 = self.sender.get_bus()
-        bus2.add_signal_watch()
-        bus2.enable_sync_message_emission()
-        bus2.connect("message", self.on_message)
-        bus2.connect("sync-message::element", self.on_sync_message)
+#        bus2 = self.sender.get_bus()
+#        bus2.add_signal_watch()
+#        bus2.enable_sync_message_emission()
+#        bus2.connect("message", self.on_message)
+#        bus2.connect("sync-message::element", self.on_sync_message)
 
     def start_stop(self, w):
         if self.button.get_label() == "Start":
             self.button.set_label("Stop")
             self.player.set_state(gst.STATE_PLAYING)
-            self.sender.set_state(gst.STATE_PLAYING)
+#            self.sender.set_state(gst.STATE_PLAYING)
         else:
             self.player.set_state(gst.STATE_NULL)
-            self.sender.set_state(gst.STATE_NULL)
+#            self.sender.set_state(gst.STATE_NULL)
             self.button.set_label("Start")
 
     def exit(self, widget, data=None):
@@ -74,13 +74,13 @@ class GTK_Main:
         t = message.type
         if t == gst.MESSAGE_EOS:
             self.player.set_state(gst.STATE_NULL)
-            self.sender.set_state(gst.STATE_NULL)
+#            self.sender.set_state(gst.STATE_NULL)
             self.button.set_label("Start")
         elif t == gst.MESSAGE_ERROR:
             err, debug = message.parse_error()
             print "Error: %s" % err, debug
             self.player.set_state(gst.STATE_NULL)
-            self.sender.set_state(gst.STATE_NULL)
+#            self.sender.set_state(gst.STATE_NULL)
             self.button.set_label("Start")
 
     def on_sync_message(self, bus, message):
