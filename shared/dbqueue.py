@@ -1,5 +1,5 @@
 import Queue
-import shared.data as data
+import data as data
 
 class DatabaseQueue(Queue.Queue):
     direction_in, direction_out = range(2)
@@ -9,6 +9,7 @@ class DatabaseQueue(Queue.Queue):
         self.item_type = [data.NetworkInQueueItem, data.NetworkOutQueueItem][direction]
         self.db = database
         self.session = database._Session()
+        self.read_session = database._Session()
 
     # Return the number of items that are currently enqueued
     def _qsize(self):
@@ -17,8 +18,9 @@ class DatabaseQueue(Queue.Queue):
 
     # Check whether the queue is empty
     def _empty(self):
+        session = self.db._Session()
         if self.item_type == data.NetworkOutQueueItem:
-            return self.session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.sent == 0).count()
+            return session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.sent == 0).count() == 0
 
     # Check whether the queue is full
     def _full(self):
@@ -26,17 +28,18 @@ class DatabaseQueue(Queue.Queue):
 
     # Put a new item in the queue
     def _put(self, (data, prio)):
+        session = self.db._Session()
         item = self.item_type(data, prio)
-        self.session.add(item)
-        self.session.commit()
+        session.add(item)
+        session.commit()
 
     # Get an item from the queue
     def _get(self):
         # @TODO
         print "_get"
         if self.item_type == data.NetworkOutQueueItem:
-            q = self.session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.sent == False)
-            return q.first()
+            q = self.read_session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.sent == False)
+            return q.first().data
         print "nope, don't think so"
         return None
 
@@ -51,5 +54,20 @@ class DatabaseQueue(Queue.Queue):
         #return item
 
     def mark_as_sent(self, item):
+        session = self.db._Session()
         item.sent = True
-        self.session.commit()
+        session.commit()
+
+
+if __name__ == "__main__":
+    import data
+    db = data.create_database()
+    queue = DatabaseQueue(db, DatabaseQueue.direction_out)
+    _data = "{\"data\": 123}"
+    queue.put(_data, 4)
+    while True:
+        data2 = queue.get(block=False)
+        print data2
+        queue.mark_as_sent(data2)
+        print data2
+    print "Finished"

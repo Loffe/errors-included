@@ -64,7 +64,7 @@ class NetworkOutQueue(NetworkQueue):
         while self.sending:
             try:
                 item = self.queue.get(block=False)
-                log.debug("trying to send: " + item)
+                log.debug("trying to send: " + str(item))
             except Queue.Empty, e:
                 self.sending = False
                 log.info("send burst complete")
