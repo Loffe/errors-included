@@ -63,7 +63,7 @@ class NetworkOutQueue(NetworkQueue):
         '''
         while self.sending:
             try:
-                item = self.queue.get(block=False)
+                item, id = self.queue.get(block=False)
                 log.debug("trying to send: " + str(item))
             except Queue.Empty, e:
                 self.sending = False
@@ -74,7 +74,7 @@ class NetworkOutQueue(NetworkQueue):
                 self.socket.send('0x%04x' % len(item))
                 # send json data
                 self.socket.send(item)
-                self.queue.mark_as_sent(item)
+                self.queue.mark_as_sent(id)
                 log.debug("item sent")
             except:
                 self.need_connection = True

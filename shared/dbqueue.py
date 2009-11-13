@@ -40,7 +40,8 @@ class DatabaseQueue(Queue.Queue):
         print "_get"
         if self.item_type == data.NetworkOutQueueItem:
             q = session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.sent == False)
-            return q.first().data
+            item = q.first()
+            return item.data, item.id
         print "nope, don't think so"
         session.close()
         return None
@@ -51,12 +52,15 @@ class DatabaseQueue(Queue.Queue):
         Queue.Queue.put(self, item, block, timeout)
 
     # shadow and wrap Queue.Queue's own `get' to strip auxiliary aspects
-    #def get(self, block=True, timeout=None):
-        #priority, time_posted, item = Queue.Queue.get(self, block, timeout)
-        #return item
+    def get(self, block=True, timeout=None):
+        item, id = Queue.Queue.get(self, block, timeout)
+        return item, id
 
-    def mark_as_sent(self, item):
+    def mark_as_sent(self, id):
+        # @TODO: acuire lock maybe?
         session = self.db._Session()
+        q = session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.id == id)
+        item = q.first()
         item.sent = True
         session.commit()
         session.close()
