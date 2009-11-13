@@ -8,8 +8,6 @@ class DatabaseQueue(Queue.Queue):
         Queue.Queue.__init__(self)
         self.item_type = [data.NetworkInQueueItem, data.NetworkOutQueueItem][direction]
         self.db = database
-        self.session = database._Session()
-        self.read_session = database._Session()
 
     # Return the number of items that are currently enqueued
     def _qsize(self):
@@ -21,6 +19,7 @@ class DatabaseQueue(Queue.Queue):
         session = self.db._Session()
         if self.item_type == data.NetworkOutQueueItem:
             return session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.sent == 0).count() == 0
+        session.close()
 
     # Check whether the queue is full
     def _full(self):
@@ -32,15 +31,18 @@ class DatabaseQueue(Queue.Queue):
         item = self.item_type(data, prio)
         session.add(item)
         session.commit()
+        session.close()
 
     # Get an item from the queue
     def _get(self):
         # @TODO
+        session = self.db._Session()
         print "_get"
         if self.item_type == data.NetworkOutQueueItem:
-            q = self.read_session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.sent == False)
+            q = session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.sent == False)
             return q.first().data
         print "nope, don't think so"
+        session.close()
         return None
 
     # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
@@ -57,6 +59,7 @@ class DatabaseQueue(Queue.Queue):
         session = self.db._Session()
         item.sent = True
         session.commit()
+        session.close()
 
 
 if __name__ == "__main__":
