@@ -71,7 +71,9 @@ class NetworkOutQueue(NetworkQueue):
                 return
             try:
                 # send 6 bytes containing content length
-                self.socket.send('0x%04x' % len(item))
+                content_length = '0x%04x' % len(item)
+                log.info(content_length)
+                self.socket.send(content_length)
                 # send json data
                 self.socket.send(item)
                 self.queue.mark_as_sent(id)

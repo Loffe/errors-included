@@ -93,9 +93,14 @@ class ServerNetworkHandler(dbus.service.Object):
 
     def _disconnect_client(self, socket):
         print "client disconnected"
-        s.close()
-        self.input.remove(s)
-        self.output.remove(s)
+        socket.close()
+        try:
+            self.input.remove(socket)
+        except ValueError:
+            print "Client not in input list. Why?"
+        for id in self.outqueues.keys():
+            if self.outqueues[id].socket == socket:
+                del self.outqueues[id]
 
     def _login_client(self, socket, message):
         m = message
@@ -134,10 +139,11 @@ class ServerNetworkHandler(dbus.service.Object):
                     except ValueError:
                         pass
                     except socket.error:
-                        self._disconnect_client(socket)
+                        self._disconnect_client(s)
 
                     if length == 0:
                         log.info("Invalid content length: " + hex_length)
+                        self._disconnect_client(s)
                         continue
                     data = s.recv(length)
                     if data:
@@ -157,7 +163,7 @@ class ServerNetworkHandler(dbus.service.Object):
                             self.message_handler.handle(m)
                             self.message_available(data)
                     else:
-                        self._disconnect_client(socket)
+                        self._disconnect_client(s)
         
         self.close()
 
@@ -177,5 +183,5 @@ class ServerNetworkHandler(dbus.service.Object):
 
 
 if __name__ == "__main__":
-    s = ServerNetworkHandler()
-    s.start()
+    serverhandler = ServerNetworkHandler()
+    serverhandler.start()
