@@ -36,10 +36,10 @@ class ServerNetworkHandler(dbus.service.Object):
         self.message_handler = handler.MessageHandler(self)
 
     @dbus.service.method(dbus_interface='included.errors.Server',
-                         in_signature='sv', out_signature='s')
-    def enqueue(self, reciever, msg):
+                         in_signature='ssi', out_signature='s')
+    def enqueue(self, reciever, msg, prio):
         queue = self.outqueues[reciever]
-        queue.enqueue(msg)
+        queue.enqueue(msg, prio)
         print "Enqueue called"
         return "Enqueue :)"
 
@@ -109,7 +109,7 @@ class ServerNetworkHandler(dbus.service.Object):
             self.outqueues[id] = self.outqueues[socket]
             del self.outqueues[socket]
             log.debug("logged in and now has a named queue")
-            self.enqueue(m.sender, "login_ack")
+            self.enqueue(m.sender, "login_ack", 5)
         else:
             log.debug("no such socket or user already logged in")
 
