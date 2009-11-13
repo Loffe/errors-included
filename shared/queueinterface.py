@@ -10,7 +10,7 @@ if __name__ == '__main__':
     from datetime import datetime
     login_msg = data.Message("ragnar dahlberg", "server", type=data.MessageType.login,
                              unpacked_data={"class": "dict", "password": "prydlig frisyr"})
-    interface.enqueue(login_msg.packed_data)
+    interface.enqueue(login_msg.packed_data, 5)
 
     poi_data = data.POIData(12,113, u"goal", datetime.now(), data.POIType.accident)
     alarm = data.Alarm(u"Bilolycka", u"Linköping", poi_data,
@@ -18,4 +18,4 @@ if __name__ == '__main__':
     msg = data.Message("ragnar dahlberg", "server", type=data.MessageType.alarm, unpacked_data=alarm)
     data = msg.packed_data
     print "Sent:", data
-    print interface.enqueue(data)
+    print interface.enqueue(data, msg.prio)

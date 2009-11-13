@@ -3,8 +3,11 @@ import dbus
 import dbus.mainloop.glib
 import dbus.service
 import gobject
+import select
+import shared.data
 import socket
 import subprocess
+import sys
 import threading
 import time
 from networkqueue import NetworkOutQueue, NetworkInQueue
@@ -28,15 +31,16 @@ class ClientNetworkHandler(dbus.service.Object):
         dbus.service.Object.__init__(self, self.session_bus,
                                      '/Queue')
         self.server = (host, port)
-        self.output = NetworkOutQueue(self.socket)
-        self.input = NetworkInQueue(self.socket, self.message_received)
+        self.db = shared.data.create_database()
+        self.output = NetworkOutQueue(self.socket, self.db)
+        self.input = NetworkInQueue(self.socket, self.db)
 
         self.output.connect("socket-broken", self._socket_broken)
 
     @dbus.service.method(dbus_interface='com.example.Queue',
-                         in_signature='v', out_signature='s')
-    def enqueue(self, msg):
-        self.output.enqueue(msg)
+                         in_signature='si', out_signature='s')
+    def enqueue(self, msg, prio):
+        self.output.enqueue(msg, prio)
         #print "Queued: ", msg
         #print self.output
         return "Message queued :)"
@@ -86,6 +90,24 @@ class ClientNetworkHandler(dbus.service.Object):
         #msg = self.input.dequeue()
         return
 
+    def run(self):
+        running = True
+        while running:
+            inputready, outputready, exceptready = select.select(
+                    [self.socket, sys.stdin], [], [])
+            print "got input"
+            for s in inputready:
+                if s == sys.stdin:
+                    junk = sys.stdin.readline()
+                    if junk.startswith("quit"):
+                        print "got quit"
+                        running = False
+                elif s == self.socket:
+                    print "gettin' msg"
+                    self.input.receive()
+                    print "Just putted a message in a queue :D"
+        self.close()
+
     def mainloop(self):
         self._check_connection()
         def _sigterm_cb(self):
@@ -93,9 +115,12 @@ class ClientNetworkHandler(dbus.service.Object):
         import signal
         signal.signal(signal.SIGTERM, _sigterm_cb)
 
+        threading.Thread(target=self.run).start()
+
         gobject.threads_init()
         self.mainloop = mainloop = gobject.MainLoop()
         print "Running example queue service."
+        mainloop.run()
         while mainloop.is_running():
             try:
                 mainloop.run()

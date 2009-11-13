@@ -24,6 +24,7 @@ class ServerNetworkHandler(dbus.service.Object):
         self.name = dbus.service.BusName("included.errors.Server", self.session_bus)
         dbus.service.Object.__init__(self, self.session_bus,
                                      '/Queue')
+        self.db = shared.data.create_database()
         self.host = '127.0.0.1'
         self.port = 50000
         self.backlog = 5
@@ -35,10 +36,10 @@ class ServerNetworkHandler(dbus.service.Object):
         self.message_handler = handler.MessageHandler(self)
 
     @dbus.service.method(dbus_interface='included.errors.Server',
-                         in_signature='sv', out_signature='s')
-    def enqueue(self, reciever, msg):
+                         in_signature='ssi', out_signature='s')
+    def enqueue(self, reciever, msg, prio):
         queue = self.outqueues[reciever]
-        queue.enqueue(msg)
+        queue.enqueue(msg, prio)
         print "Enqueue called"
         return "Enqueue :)"
 
@@ -88,13 +89,18 @@ class ServerNetworkHandler(dbus.service.Object):
     def _accept_client(self, socket, port):
         self.input.append(socket)
         self.output.append(socket)
-        self.outqueues[socket] = shared.networkqueue.NetworkOutQueue(socket)
+        self.outqueues[socket] = shared.networkqueue.NetworkOutQueue(socket, self.db)
 
     def _disconnect_client(self, socket):
         print "client disconnected"
-        s.close()
-        self.input.remove(s)
-        self.output.remove(s)
+        socket.close()
+        try:
+            self.input.remove(socket)
+        except ValueError:
+            print "Client not in input list. Why?"
+        for id in self.outqueues.keys():
+            if self.outqueues[id].socket == socket:
+                del self.outqueues[id]
 
     def _login_client(self, socket, message):
         m = message
@@ -103,7 +109,10 @@ class ServerNetworkHandler(dbus.service.Object):
             self.outqueues[id] = self.outqueues[socket]
             del self.outqueues[socket]
             log.debug("logged in and now has a named queue")
-            self.enqueue(m.sender, "login_ack")
+            ack = shared.data.Message("server", id,
+                                      type=shared.data.MessageType.login_ack,
+                                      unpacked_data={"result": "ok"})
+            self.enqueue(m.sender, ack.packed_data, 5)
         else:
             log.debug("no such socket or user already logged in")
 
@@ -133,10 +142,11 @@ class ServerNetworkHandler(dbus.service.Object):
                     except ValueError:
                         pass
                     except socket.error:
-                        self._disconnect_client(socket)
+                        self._disconnect_client(s)
 
                     if length == 0:
                         log.info("Invalid content length: " + hex_length)
+                        self._disconnect_client(s)
                         continue
                     data = s.recv(length)
                     if data:
@@ -156,7 +166,7 @@ class ServerNetworkHandler(dbus.service.Object):
                             self.message_handler.handle(m)
                             self.message_available(data)
                     else:
-                        self._disconnect_client(socket)
+                        self._disconnect_client(s)
         
         self.close()
 
@@ -176,5 +186,5 @@ class ServerNetworkHandler(dbus.service.Object):
 
 
 if __name__ == "__main__":
-    s = ServerNetworkHandler()
-    s.start()
+    serverhandler = ServerNetworkHandler()
+    serverhandler.start()
