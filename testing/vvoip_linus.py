@@ -38,7 +38,7 @@ class GTK_Main:
 #        gst-launch v4l2src ! video/x-raw-yuv,width=352,height=288,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host=<other N800's ip> port=5434 
 
         #Stream to another device
-        self.player = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host=130.236.219.107 port=5434")
+        self.sender = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host=130.236.219.107 port=5434")
         
         #Show the incoming video
         self.player = gst.parse_launch("udpsrc port=5432 caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink")
@@ -55,14 +55,22 @@ class GTK_Main:
         bus.enable_sync_message_emission()
         bus.connect("message", self.on_message)
         bus.connect("sync-message::element", self.on_sync_message)
+        
+        bus2 = self.sender.get_bus()
+        bus2.add_signal_watch()
+        bus2.enable_sync_message_emission()
+        bus2.connect("message", self.on_message)
+        bus2.connect("sync-message::element", self.on_sync_message)
 
     def start_stop(self, w):
-        if self.button.get_label() == "Start":
-            self.button.set_label("Stop")
-            self.player.set_state(gst.STATE_PLAYING)
-        else:
-            self.player.set_state(gst.STATE_NULL)
-            self.button.set_label("Start")
+       if self.button.get_label() == "Start":
+           self.button.set_label("Stop")
+           self.player.set_state(gst.STATE_PLAYING)
+           self.sender.set_state(gst.STATE_PLAYING)
+       else:
+           self.player.set_state(gst.STATE_NULL)
+           self.sender.set_state(gst.STATE_NULL)
+           self.button.set_label("Start")
 
     def exit(self, widget, data=None):
         gtk.main_quit()
@@ -71,11 +79,13 @@ class GTK_Main:
         t = message.type
         if t == gst.MESSAGE_EOS:
             self.player.set_state(gst.STATE_NULL)
+            self.sender.set_state(gst.STATE_NULL)
             self.button.set_label("Start")
         elif t == gst.MESSAGE_ERROR:
             err, debug = message.parse_error()
             print "Error: %s" % err, debug
             self.player.set_state(gst.STATE_NULL)
+            self.sender.set_state(gst.STATE_NULL)
             self.button.set_label("Start")
 
     def on_sync_message(self, bus, message):
