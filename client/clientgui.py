@@ -105,7 +105,7 @@ class ClientGui(hildon.Program):
         self.screens["map"] = self.map
 
         # add the alarm screen
-        self.alarm_screen = AlarmScreen()
+        self.alarm_screen = AlarmScreen(self.db)
         vbox_right.pack_start(self.alarm_screen, True, True, 0)
         self.screens["alarm"] = self.alarm_screen
 
@@ -127,7 +127,8 @@ class ClientGui(hildon.Program):
         self.screens["alarms"] = self.alarm_inbox_screen
 
         # add the obstacle screen
-        self.obstacle_screen = ObstacleScreen()
+        self.obstacle_screen = ObstacleScreen(self.db)
+        self.obstacle_screen.connect("okbutton-clicked", self.back_button_function)
         vbox_right.pack_start(self.obstacle_screen, True, True, 0)
         self.screens["obstacle"] = self.obstacle_screen
         
@@ -224,6 +225,7 @@ class ClientGui(hildon.Program):
     ''' Handle events
     ''' 
     def back_button_function(self, event):
+        print "back"
         self.show(self.prev_page[-2])
     
     def ok_button_function(self, event):
@@ -288,7 +290,10 @@ class ClientGui(hildon.Program):
 #        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
 #        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
         self.db.add(poi_data)
-
+        
+        enhet3 = UnitData(15.5746475, 58.4077164 ,u"Enhet3",datetime.now(), UnitType.ambulance)
+        self.db.add(enhet3)
+        
     # add object view event handlers
     def show_add_object(self, event):
         self.toggle_show("add_object", 

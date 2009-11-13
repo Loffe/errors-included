@@ -51,16 +51,23 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                         gtk.gdk.POINTER_MOTION_HINT_MASK)
                          #|                        gtk.gdk.KEY_PRESS_MASK)
         # add all current objects in db to map
-        self.update_map()
+        self.update_map(data = "all")
     
-    def update_map(self, w = None):
+    def update_map(self, database = None, data = None):
+        print "update_data:", type(data), data
         # add all units to dict with objects to draw
-        mapobjectdata = self.db.get_all_mapobjects()
-        for data in mapobjectdata:
+        if data == "all":
+            mapobjectdata = self.db.get_all_mapobjects()
+            for data in mapobjectdata:
+                if data.__class__ == shared.data.UnitData:
+                    self.mapdata.objects[data.name] = Unit(data)
+                elif data.__class__ == shared.data.POIData:
+                    self.mapdata.objects[data.name] = POI(data)
+        else:
             if data.__class__ == shared.data.UnitData:
                 self.mapdata.objects[data.name] = Unit(data)
             elif data.__class__ == shared.data.POIData:
-                self.mapdata.objects[data.name] = POI(data)
+                self.mapdata.objects[data.name] = POI(data)  
         self.queue_draw()
 
     def zoom(self, change):

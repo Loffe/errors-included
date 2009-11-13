@@ -3,6 +3,7 @@
 import gtk
 import map.mapdata
 import shared.data
+import datetime
 import gui
 import pango
 
@@ -17,8 +18,10 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
     name_entry = None
     number_entry = None
     random_entry = None
+    db = None
 
-    def __init__(self):
+    def __init__(self, db):
+        self.db
         '''
         Constructor. Create the alarmscreen and its entries.
         '''
@@ -49,7 +52,10 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         left_box.add(label)
         right_box.add(self.event_entry)
         
+        
+        
         label, self.location_entry = new_entry("Skadeplats:")
+        self.location_entry.set_text("15.5769069,58.4074884")
         left_box.add(label)
         right_box.add(self.location_entry)
 
@@ -80,3 +86,15 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         right_box.add(self.random_entry)
         
         self.show_all()
+
+    def ok_button_function(self, event):
+       
+        
+        print "ok3"        
+        #mission = shared.data.MissionData(self.event_entry.get_text(), alarm.poi, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text())
+        #self.db.add(mission)
+        poi_data3 = shared.data.POIData(self.location_entry, u"goal", datetime.datetime.now(), shared.data.POIType.accident)
+#        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
+#        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
+        self.db.add(poi_data3)
+

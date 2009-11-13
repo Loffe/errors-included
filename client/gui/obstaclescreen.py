@@ -2,15 +2,18 @@
 import gtk
 import gobject
 import shared.data
+import datetime
 import gui
+import clientgui
 
 class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
     
+    db = None
     selected_type = None
     
-    def __init__(self):
+    def __init__(self, db):
         gtk.ScrolledWindow.__init__(self)
-        
+        self.db = db
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
@@ -77,3 +80,19 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         '''
         # set the selected type
         self.selected_type = combobox.get_active()
+        
+        
+        
+    def ok_button_function(self, event):
+        print "ok2"        
+        #mission = shared.data.MissionData(self.event_entry.get_text(), alarm.poi, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text())
+        #self.db.add(mission)
+        poi_data2 = shared.data.POIData(15.5799069,58.4085884, u"goal", datetime.datetime.now(), shared.data.POIType.accident)
+#        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
+#        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
+        self.db.add(poi_data2)
+        self.emit("okbutton-clicked")
+        
+gobject.type_register(ObstacleScreen)
+gobject.signal_new("okbutton-clicked", ObstacleScreen, gobject.SIGNAL_RUN_FIRST,
+                   gobject.TYPE_NONE, ())

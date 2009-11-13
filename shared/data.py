@@ -52,12 +52,12 @@ class Database(gobject.GObject):
     def add(self, object):
         self.session.add(object)
         self.session.commit()
-        self.emit("mapobject-added")
+        self.emit("mapobject-added", object)
         
     def delete(self, object):
         self.session.delete(object)
         self.session.commit()
-        self.emit("mapobject-added")
+        self.emit("mapobject-added", object)
         
     def get_all_alarms(self):
         list = []
@@ -83,13 +83,6 @@ class Database(gobject.GObject):
         for u in q:
             list.append(u)
         return list
-
-''' TODO: We could create mapobject-removed/deleted and mapobject-changed for further optimisation
-    for now all changes emit the "mapobject-added"-signal
-'''
-gobject.type_register(Database)
-gobject.signal_new("mapobject-added", Database, gobject.SIGNAL_RUN_FIRST,
-                   gobject.TYPE_NONE, ())
 
 class UnitType(object):
     (ambulance, # Regular unit
@@ -148,7 +141,13 @@ class MapObjectData(Base, Packable):
         try:
             return repr.encode('utf-8')
         except:
-            return repr 
+            return repr
+        
+''' TODO: We could create mapobject-removed/deleted and mapobject-changed for further optimisation
+    for now all changes emit the "mapobject-added"-signal
+'''
+gobject.type_register(Database)
+gobject.signal_new("mapobject-added", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
 
 class UnitData(MapObjectData):
     '''

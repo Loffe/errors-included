@@ -4,6 +4,7 @@ import gobject
 import shared.data
 import gui
 import pango
+import datetime
 from selectunit import SelectUnitButton
 from selectunit import SelectUnitDialog
 
@@ -116,5 +117,12 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         for a in self.db.get_all_alarms():
             if a.event == self.selected_alarm:
                 alarm = a
-        mission = shared.data.MissionData(self.event_entry.get_text(), alarm.poi, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text())
-        self.db.add(mission)
+        
+        print "ok"        
+        #mission = shared.data.MissionData(self.event_entry.get_text(), alarm.poi, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text())
+        #self.db.add(mission)
+        #poi_data = shared.data.POIData(15.5799069,58.4085884, u"goal", datetime.datetime.now(), shared.data.POIType.accident)
+#        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
+#        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
+        #self.db.add(poi_data)
+        
