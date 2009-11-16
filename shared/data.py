@@ -304,45 +304,6 @@ class MissionData(Base, Packable):
         except:
             return repr
 
-class EventType(object):
-    '''
-    Enumeration of all event types.
-    '''
-    add, change, remove = range(3)
-
-class Event(Base, Packable):
-    '''
-    An Event declares what to be done with a specified object. It's possible to 
-    pack/unpack. This makes it possible to send it as a message.
-    '''
-    __tablename__ = "Events"
-    id = Column(Integer, primary_key = True)
-    object_id = Column(Integer)
-    type = Column(Integer)
-    timestamp = Column(DateTime)
-    
-    def __init__(self, object_id, type, timestamp = datetime.now()):
-        '''
-        Constructor. Creates an event.
-        @param object_id: the global unique id of the object.
-        @param type: the event type (add, change or remove) specifies what to be
-        done with the object.
-        @param timestamp: the timestamp of this event.
-        '''
-        self.object_id = object_id
-        self.type = type
-        self.timestamp = timestamp
-
-    def __repr__(self):
-        repr = ("<%s: type=%s, %s; obj_id=%s>" % 
-                (self.__class__.__name__, self.type, self.timestamp, 
-                 self.object_id))
-        try:
-            return repr.encode('utf-8')
-        except:
-            return repr
-
-
 class MessageType(object):
     (mission, map, text, alarm, control, low_battery, status_update, mission_response, 
     journal_request, journal_confirmationresponse, journal_confirmationrequest, 
