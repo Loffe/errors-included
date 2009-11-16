@@ -83,6 +83,14 @@ class Database(gobject.GObject):
         for u in q:
             list.append(u)
         return list
+    
+    def get_poi_type(self):
+        list = []
+        p = (eld, saker)
+        for u in p:
+            list.append(u)
+        
+        return list
 
 class UnitType(object):
     (ambulance, # Regular unit

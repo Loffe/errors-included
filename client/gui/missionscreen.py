@@ -103,7 +103,8 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         for alarm in self.db.get_all_alarms():
             if alarm.event == self.selected_alarm:
                 self.event_entry.set_text(alarm.event)
-                self.location_entry.set_text(alarm.location_name)
+                self.location_entry2.set_text(str(alarm.poi.coordx))
+                self.location_entry3.set_text(str(alarm.poi.coordy))                
                 self.name_entry.set_text(alarm.contact_person)
                 self.hurted_entry.set_text(str(alarm.number_of_wounded))
                 self.number_entry.set_text(alarm.contact_number)
@@ -121,7 +122,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
         
-        poi_data4 = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.accident)
+        poi_data4 = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.fire)
         selected = self.select_unit_button.select_dialog.selected_units
         units = self.db.get_units(selected)
         

@@ -313,6 +313,11 @@ class ClientGui(hildon.Program):
         self.show(["alarm", "buttons"])
         self.screens["alarm"].location_entry2.set_text(str(self.screens["map"].gps_x))
         self.screens["alarm"].location_entry3.set_text(str(self.screens["map"].gps_y))
+        
+        
+        
+        
+        
     
     def create_obstacle(self, event):
         self.show(["obstacle", "buttons"])
