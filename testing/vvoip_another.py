@@ -125,7 +125,7 @@ class GTK_Main:
         convert = gst.element_factory_make("audioconvert", "convert")
 #
         pipeline.add(convert)
-        sink = gst.element_factory_make("gstappsink", "sink")
+        sink = gst.element_factory_make("alsasink", "sink")
 
         pipeline.add(sink)
 

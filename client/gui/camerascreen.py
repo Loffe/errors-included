@@ -62,7 +62,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
 
         pipeline = gst.Pipeline(pipelineName)
 
-        src = gst.parse_bin_from_description("stappsrc ! queue ! audio/x-raw-int,rate=8000,channels=1,depth=8 ! audioconvert ! speexenc ! queue", True)
+        src = gst.parse_bin_from_description("alsasrc ! queue ! audio/x-raw-int,rate=8000,channels=1,depth=8 ! audioconvert ! speexenc ! queue", True)
         pipeline.add(src)
 
         client = gst.element_factory_make("tcpclientsink", "client")
@@ -105,7 +105,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         convert = gst.element_factory_make("audioconvert", "convert")
 #
         pipeline.add(convert)
-        sink = gst.element_factory_make("gstappsink", "sink")
+        sink = gst.element_factory_make("alsasink", "sink")
 
         pipeline.add(sink)
 
