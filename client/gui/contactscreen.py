@@ -15,6 +15,7 @@ class ContactScreen(gtk.ScrolledWindow, gui.Screen):
         '''
         Constructor.
         '''
+        self.ip = None
         gtk.ScrolledWindow.__init__(self)
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -35,6 +36,8 @@ class ContactScreen(gtk.ScrolledWindow, gui.Screen):
         for button in self.buttons:
             if button != event:
                 button.set_active(False)
+            else:
+                ip = "130.236.219.104"
 
         
 

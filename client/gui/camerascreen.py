@@ -12,7 +12,7 @@ import clientgui
 
 class CamScreen(gtk.ScrolledWindow, gui.Screen):
 
-    def __init__(self,db):
+    def __init__(self,db,ip):
         gtk.ScrolledWindow.__init__(self)
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -46,7 +46,8 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
 #        gst-launch v4l2src ! video/x-raw-yuv,width=352,height=288,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host=<other N800's ip> port=5434 
 
         #Stream to another device
-        #self.sender = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host=130.236.219.107 port=5434")
+        print ip
+        self.sender = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+str(ip)+" port=5434")
         
         #Show the incoming video
         #self.player = gst.parse_launch("udpsrc port=5432 caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink")
@@ -56,7 +57,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
             #Even try rate=48000
         
         # Show my webcam
-        self.player = gst.parse_launch ("v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink")
+        #self.player = gst.parse_launch ("v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink")
 
         bus = self.player.get_bus()
         bus.add_signal_watch()
