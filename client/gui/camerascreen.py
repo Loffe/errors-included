@@ -37,6 +37,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         hbox.add(gtk.Label())
         self.show_all()
 
+
         #Listening for Input:
 #        gst-launch udpsrc port=5434 caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink
 
