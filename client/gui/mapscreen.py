@@ -63,14 +63,14 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
             mapobjectdata = self.db.get_all_mapobjects()
             for data in mapobjectdata:
                 if data.__class__ == shared.data.UnitData:
-                    self.mapdata.objects[data.name] = Unit(data)
+                    self.mapdata.objects[data.id] = Unit(data)
                 elif data.__class__ == shared.data.POIData:
-                    self.mapdata.objects[data.name] = POI(data)
+                    self.mapdata.objects[data.id] = POI(data)
         else:
             if data.__class__ == shared.data.UnitData:
-                self.mapdata.objects[data.name] = Unit(data)
+                self.mapdata.objects[data.id] = Unit(data)
             elif data.__class__ == shared.data.POIData:
-                self.mapdata.objects[data.name] = POI(data)  
+                self.mapdata.objects[data.id] = POI(data)  
         self.queue_draw()
 
     def zoom(self, change):

@@ -232,8 +232,8 @@ class MapData():
         self.objects = {}
         self.redraw()
 
-    def add_object(self, id, map_object):
-        self.objects[id] = map_object
+    def add_object(self, map_object):
+        self.objects[mapobject.id] = map_object
         self.redraw()
 
     def delete_object(self, object_id):
