@@ -13,9 +13,10 @@ import clientgui
 class CamScreen(gtk.ScrolledWindow, gui.Screen):
 
     def __init__(self,db):
+        gtk.ScrolledWindow.__init__(self)
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        gtk.ScrolledWindow.__init__(self)
+        
 #        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 #        window.set_title("Webcam-Viewer")
 #        window.set_default_size(500, 400)
@@ -102,7 +103,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         if message_name == "prepare-xwindow-id":
             # Assign the viewport
             imagesink = message.src
-            imagesink.set_property("force-aspect-ratio", True)
+            imagesink.set_property("force-aspect-ratio", False)
             imagesink.set_xwindow_id(self.movie_window.window.xid)
 
 
