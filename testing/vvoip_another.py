@@ -57,7 +57,7 @@ class GTK_Main:
 #        bus2.connect("message", self.on_message)
 #        bus2.connect("sync-message::element", self.on_sync_message)
 
-        self.player = gst.parse_launch("udpsrc port=5434 caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! dsppcmsink")
+        self.player = gst.parse_launch("udpsrc port=5434 caps=application/x-rtp,clock-rate=90000 ! dsppcmsink")
         
         # Show my webcam
 #        self.player = gst.parse_launch ("v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink")
