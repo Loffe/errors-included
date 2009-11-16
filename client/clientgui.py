@@ -378,7 +378,6 @@ class ClientGui(hildon.Program):
                 self.window.unfullscreen()
             else:
                 self.window.fullscreen()
-            self.screens["map"].dirty = True
         # Zoom out (-)
         if event.keyval == gtk.keysyms.F8:
             self.map.zoom("-")
