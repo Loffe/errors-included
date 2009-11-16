@@ -68,7 +68,7 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
 #        print "----", coords[0], coords[1]
         # add selectable types
         types = []
-        for type in shared.data.ObstacleType.__dict__.keys():
+        for type in shared.data.POIType.__dict__.keys():
             if type[0] != "_":
                 types.append(type)
         types.sort()
@@ -94,8 +94,10 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         '''
         # set the selected type
         self.selected_type = combobox.get_active()
+        print (self.selected_type)
         
         
+        self.type = shared.data.POIType.accident
         
     def ok_button_function(self, event):
 
@@ -103,7 +105,7 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
         
-        poi_data2 = shared.data.POIData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), shared.data.POIType.accident)
+        poi_data2 = shared.data.POIData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), self.type)
         
         self.db.add(poi_data2)
 

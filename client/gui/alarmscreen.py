@@ -112,7 +112,7 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
  
         poi_data3 = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.accident)
         
-        alarm = shared.data.Alarm(self.event_entry.get_text(), u"Linköping", poi_data3, self.name_entry.get_text(), self.number_entry.get_text(), 7)
+        alarm = shared.data.Alarm(self.event_entry.get_text(), u"Linköping", poi_data3, self.name_entry.get_text(), self.number_entry.get_text(), self.hurted_entry.get_text())
         
 
         self.db.add(poi_data3)
