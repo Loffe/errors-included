@@ -8,7 +8,7 @@ if __name__ == "__main__":
     if "stop" in sys.argv:
         import dbus
         bus = dbus.SessionBus()
-        remote_object = bus.get_object("com.example.Queue", "/Queue")
+        remote_object = bus.get_object("included.errors.Client", "/Queue")
         remote_object.dbus_close()
         sys.exit(0)
 
