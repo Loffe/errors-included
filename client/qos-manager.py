@@ -172,7 +172,7 @@ class QoSManager(dbus.service.Object):
         '''
         Start service level updater, gps updater and dbus loop.
         '''
-        print "Running client QoS-Manager (errors-included)"
+        print "Running QoS-Manager"
         self.running = True
         try:
             self.wlan_start()
