@@ -1,0 +1,4 @@
+# Copy this file do /usr/share/dbus-1/services/
+[D-BUS Service]
+Name=com.example.Queue
+Exec=/usr/bin/python2.5 /home/eriel743/errors-included/client/queue-main.py
