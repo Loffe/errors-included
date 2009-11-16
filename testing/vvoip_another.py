@@ -39,8 +39,25 @@ class GTK_Main:
         #Stream to another device
         #self.sender = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host=130.236.218.199 port=5432") 
 
-        #Listening for Input:
-        self.player = gst.parse_launch("udpsrc port=5434 caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink")
+#        #Listening for Input:
+#        self.player = gst.parse_launch("udpsrc port=5434 caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink")
+#        
+#        # Show my webcam
+##        self.player = gst.parse_launch ("v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink")
+#
+#        bus = self.player.get_bus()
+#        bus.add_signal_watch()
+#        bus.enable_sync_message_emission()
+#        bus.connect("message", self.on_message)
+#        bus.connect("sync-message::element", self.on_sync_message)
+        
+#        bus2 = self.sender.get_bus()
+#        bus2.add_signal_watch()
+#        bus2.enable_sync_message_emission()
+#        bus2.connect("message", self.on_message)
+#        bus2.connect("sync-message::element", self.on_sync_message)
+
+        self.player = gst.parse_launch("udpsrc port=5434 caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! dsppcmsink")
         
         # Show my webcam
 #        self.player = gst.parse_launch ("v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink")
@@ -50,12 +67,6 @@ class GTK_Main:
         bus.enable_sync_message_emission()
         bus.connect("message", self.on_message)
         bus.connect("sync-message::element", self.on_sync_message)
-        
-#        bus2 = self.sender.get_bus()
-#        bus2.add_signal_watch()
-#        bus2.enable_sync_message_emission()
-#        bus2.connect("message", self.on_message)
-#        bus2.connect("sync-message::element", self.on_sync_message)
 
     def start_stop(self, w):
         self.start_audio_recv("localhost", 5432)

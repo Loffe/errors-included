@@ -51,29 +51,31 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
 #        bus2.enable_sync_message_emission()
 #        bus2.connect("message", self.on_message)
 #        bus2.connect("sync-message::element", self.on_sync_message)
-    def start_audio_send(self,serverIp,serverPort):
-        '''
-        Starts an audio client
-        @param serverIp
-        @param serverPort
-        '''
-        print "Starting client to %s:%d" %(serverIp,serverPort)
-        pipelineName = "client%d" % serverPort
+    def start_audio_send(self,ip,port):
+#        sink = "dsppcmsink "
+#        srcsink = "dsppcmsrc"
+#        pout_r, pout_w = os.pipe()
+#        pin_r, pin_w = os.pipe()
+#    
+#        pipeline_out = "fdsrc fd=%d ! audio/x-raw-int,endianness=(int)1234,width=(int)16,depth=(int)16,signed=(boolean)true,channels=(int)1,rate=(int)8000"\
+#            " ! %s" % (pout_r, sink)
+#    
+#        pipeline_in = "%s ! audioconvert ! audio/x-raw-int,endianness=(int)1234,width=(int)16,depth=(int)16,signed=(boolean)true,channels=(int)1,rate=(int)8000"\
+#            " ! fdsink fd=%d" % (srcsink, pin_w)
+#            
+#        pipeline_out = gst.parse_launch(pipeline_out)
+#        pipeline_in = gst.parse_launch(pipeline_in)
+#        pipeline_out.set_state(gst.STATE_PLAYING)
+#        pipeline_in.set_state(gst.STATE_PLAYING)
+        self.sender = gst.parse_launch("dsppcmsrc ! audio/x-raw-int,endianness=(int)1234,width=(int)16,depth=(int)16,signed=(boolean)true,channels=(int)1,rate=(int)8000 ! rtph263pay ! udpsink host="+str(ip)+" port="+str(port))
+        bus = self.sender.get_bus()
+        bus.add_signal_watch()
+        bus.enable_sync_message_emission()
+        bus.connect("message", self.on_message)
+        bus.connect("sync-message::element", self.on_sync_message)
+        self.sender.set_state(gst.STATE_PLAYING)
 
-        pipeline = gst.Pipeline(pipelineName)
 
-        src = gst.parse_bin_from_description("dsppcmsrc ! audio/x-raw-int,rate=8000,channels=1,depth=8", True)
-        pipeline.add(src)
-        
-
-        client = gst.element_factory_make("tcpclientsink", "client")
-        pipeline.add(client)
-        client.set_property("host", serverIp)
-        #client.set_property("host", "localhost")
-        client.set_property("port", serverPort)
-        src.link(client)
-
-        pipeline.set_state(gst.STATE_PLAYING)
 
     def start_audio_recv(self,myIp,port):
         '''
@@ -82,37 +84,38 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         @param port
         '''
 
-        print "Starting server at %s:%d" % (myIp,port)
-        pipelineName = "server%d" % (port)
-
-        def new_decode_pad(dbin, pad, islast):
-            pad.link(convert.get_pad("sink"))
-
-        pipeline = gst.Pipeline(pipelineName)
-
-        tcpsrc = gst.element_factory_make("tcpserversrc", "source")
-
-        pipeline.add(tcpsrc)
-
-        tcpsrc.set_property("host", myIp)
-        #tcpsrc.set_property("host", "localhost")
-
-        tcpsrc.set_property("port", port)
-
-        decode = gst.element_factory_make("decodebin", "decode")
-        decode.connect("new-decoded-pad", new_decode_pad)
-        pipeline.add(decode)
-        tcpsrc.link(decode)
-        convert = gst.element_factory_make("audioconvert", "convert")
+#        print "Starting server at %s:%d" % (myIp,port)
+#        pipelineName = "server%d" % (port)
 #
-        pipeline.add(convert)
-        sink = gst.element_factory_make("dsppcmsink", "sink")
-
-        pipeline.add(sink)
-
-        convert.link(sink)
-
-        pipeline.set_state(gst.STATE_PLAYING)
+#        def new_decode_pad(dbin, pad, islast):
+#            pad.link(convert.get_pad("sink"))
+#
+#        pipeline = gst.Pipeline(pipelineName)
+#
+#        tcpsrc = gst.element_factory_make("tcpserversrc", "source")
+#
+#        pipeline.add(tcpsrc)
+#
+#        tcpsrc.set_property("host", myIp)
+#        #tcpsrc.set_property("host", "localhost")
+#
+#        tcpsrc.set_property("port", port)
+#
+#        decode = gst.element_factory_make("decodebin", "decode")
+#        decode.connect("new-decoded-pad", new_decode_pad)
+#        pipeline.add(decode)
+#        tcpsrc.link(decode)
+#        convert = gst.element_factory_make("audioconvert", "convert")
+##
+#        pipeline.add(convert)
+#        sink = gst.element_factory_make("dsppcmsink", "sink")
+#
+#        pipeline.add(sink)
+#
+#        convert.link(sink)
+#
+#        pipeline.set_state(gst.STATE_PLAYING)
+        self.player.set_state(gst.STATE_PLAYING)
 
     
     
