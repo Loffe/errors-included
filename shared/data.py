@@ -92,7 +92,10 @@ class UnitType(object):
      other) = range(5)
 
 class POIType(object):
-    accident, fire, pasta_wagon = range(3)
+    accident, fire, pasta_wagon, obstacle = range(4)
+
+class POISubType(object):
+    tree, broken_brigde, broken_nuclear_power_plant = range(3)
 
 class NetworkInQueueItem(Base):
     __tablename__ = 'InQueue'
@@ -196,6 +199,7 @@ class POIData(MapObjectData):
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
     
     type = Column(Integer)
+    subtype = Column(Integer)
 
     def __init__(self, coordx, coordy, name, timestamp, 
                  type = POIType.pasta_wagon, id = None):
@@ -290,6 +294,12 @@ class MessageType(object):
     journal_request, journal_confirmationresponse, journal_confirmationrequest, 
     journal_transfer, alarm_ack, vvoip_request, vvoip_response, login, login_ack, action) = range(18)
 
+class ActionType(object):
+    add, update, remove = range(3)
+
+class JournalType(object):
+    request, confirmation_response, confirmation_request, transfer = range(4)
+
 class Message(object):
     '''
     All messages must be instances of this class.
@@ -299,6 +309,7 @@ class Message(object):
     sender = None
     # The type of this message
     type = None
+    subtype = None
     # The priority of this message (lowest 0 - 9 highest)
     prio = 0
     # The packed data (json dumps) to send (a dict containing all variables)
@@ -308,28 +319,21 @@ class Message(object):
     # The timestamp of this message
     timestamp = None
     
-    def __init__(self, sender, reciever, type = None, unpacked_data = None, packed_data = None):
+    def __init__(self, sender, reciever, type = None, subtype = None, unpacked_data = None):
         '''
         Constructor. Creates a message.
         @param type: the type of this message
         @param unpacked_data: the unpacked data to pack
-        @param packed_data: the packed data to unpack
         '''
         self.sender = sender
         self.reciever = reciever
         self.type = type
+        self.subtype = subtype
         self.unpacked_data = unpacked_data
-        self.packed_data = packed_data
         self.timestamp = datetime.now()
         
-        # message created from unpacked data
-        if unpacked_data:
-            # pack the unpacked data
-            self.pack()
-        # message created from packed data
-        elif packed_data:
-            # unpack the packed data
-            self.unpack(packed_data)
+        # pack the unpacked data
+        self.pack()
     
     def pack(self):
         '''
@@ -337,6 +341,7 @@ class Message(object):
         '''
         dict = {}
         dict["type"] = self.type
+        dict["subtype"] = self.subtype
         dict["prio"] = self.prio
         dict["timestamp"] = self.timestamp.strftime("%s")
         dict["sender"] = self.sender
@@ -348,7 +353,8 @@ class Message(object):
         self.packed_data = json.dumps(dict)
         return self.packed_data
 
-    def unpack(self, raw_message):
+    def unpack(cls, raw_message):
+        self = cls()
         '''
         Unpack a simplejson string to an object.
         @param raw_message: the simplejson string
@@ -356,6 +362,7 @@ class Message(object):
         try:
             dict = json.loads(raw_message)
             self.type = dict["type"]
+            self.subtype = dict["subtype"]
             self.prio = dict["prio"]
             self.sender = dict["sender"]
             self.reciever = dict["reciever"]
@@ -403,6 +410,8 @@ class Message(object):
         except KeyError, ke:
             raise ValueError("Not a valid Message. Missing any keys maybe?")
 
+    unpack = classmethod(unpack)
+
     def __repr__(self):
         repr = ("<%s: sender=%s, receiver=%s, prio=%s, type=%s, %s; packed=%s, unpacked=%s>" % 
                 (self.__class__.__name__, self.sender, self.reciever, self.prio,
@@ -413,11 +422,10 @@ class Message(object):
             return repr
 
 
-def create_database():
+def create_database(db = Database()):
     '''
     Create the database.
     '''
-    db = Database()
 
     # create tables and columns
     Base.metadata.create_all(db.engine)
