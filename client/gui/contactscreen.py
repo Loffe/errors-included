@@ -16,18 +16,26 @@ class ContactScreen(gtk.ScrolledWindow, gui.Screen):
         Constructor.
         '''
         gtk.ScrolledWindow.__init__(self)
+        # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
         self.db = db
         units = self.db.get_all_units()
-        vbox = gtk.VBox(False,0)
+        self.vbox = gtk.VBox(False,0)
+        self.buttons = []
         for u in units:
-            unit_button = gtk.ToggleButton("%s (%d)" % (u.name, u.id))
-            unit_button.show()
-            self.vbox.pack_start(unit_button)
-            self.buttons[u.id] = unit_button
+            button = gtk.ToggleButton("%s" % u.name)
+            button.show()
+            self.vbox.pack_start(button)
+            button.connect("pressed", self.select_contacts)
+            self.buttons.append(button)
+        self.add_with_viewport(self.vbox)
+        
+    def select_contacts(self, event):
+        for button in self.buttons:
+            if button != event:
+                button.set_active(False)
 
-        # set automatic horizontal and vertical scrolling
         
 
  
