@@ -91,10 +91,6 @@ class UnitType(object):
      srsa, # Swedish Rescue Services Agency (SRSA) 
      other) = range(5)
 
-class ObstacleType(object):
-    # always sort in alphabetic order!!!
-    bridge, other, road, tree = range(4)
-
 class POIType(object):
     accident, fire, pasta_wagon = range(3)
 
@@ -188,21 +184,6 @@ class UnitData(MapObjectData):
 
     def __init__(self, coordx, coordy, name, timestamp, 
                  type = UnitType.ambulance, id = None):
-        MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
-        self.type = type
-
-class ObstacleData(MapObjectData):
-    '''
-    All obstacles have data objects of this class.
-    '''
-    __tablename__ = 'ObstacleData'
-    __mapper_args__ = {'polymorphic_identity': 'ObstacleData'}
-    id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
-    
-    type = Column(Integer)
-
-    def __init__(self, coordx, coordy, name, timestamp, 
-                 type = ObstacleType.tree, id = None):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
 
