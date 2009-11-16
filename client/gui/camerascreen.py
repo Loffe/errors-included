@@ -51,8 +51,71 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
 #        bus2.enable_sync_message_emission()
 #        bus2.connect("message", self.on_message)
 #        bus2.connect("sync-message::element", self.on_sync_message)
+    def start_audio_send(self,serverIp,serverPort):
+        '''
+        Starts an audio client
+        @param serverIp
+        @param serverPort
+        '''
+        print "Starting client to %s:%d" %(serverIp,serverPort)
+        pipelineName = "client%d" % serverPort
 
-    def start_send(self, ip):
+        pipeline = gst.Pipeline(pipelineName)
+
+        src = gst.parse_bin_from_description("alsasrc ! queue ! audio/x-raw-int,rate=8000,channels=1,depth=8 ! audioconvert ! speexenc ! queue", True)
+        pipeline.add(src)
+
+        client = gst.element_factory_make("tcpclientsink", "client")
+        pipeline.add(client)
+        client.set_property("host", serverIp)
+        #client.set_property("host", "localhost")
+        client.set_property("port", serverPort)
+        src.link(client)
+
+        pipeline.set_state(gst.STATE_PLAYING)
+
+    def start_audio_recv(self,myIp,port):
+        '''
+        Starts an audio server
+        @param myIp
+        @param port
+        '''
+
+        print "Starting server at %s:%d" % (myIp,port)
+        pipelineName = "server%d" % (port)
+
+        def new_decode_pad(dbin, pad, islast):
+            pad.link(convert.get_pad("sink"))
+
+        pipeline = gst.Pipeline(pipelineName)
+
+        tcpsrc = gst.element_factory_make("tcpserversrc", "source")
+
+        pipeline.add(tcpsrc)
+
+        tcpsrc.set_property("host", myIp)
+        #tcpsrc.set_property("host", "localhost")
+
+        tcpsrc.set_property("port", port)
+
+        decode = gst.element_factory_make("decodebin", "decode")
+        decode.connect("new-decoded-pad", new_decode_pad)
+        pipeline.add(decode)
+        tcpsrc.link(decode)
+        convert = gst.element_factory_make("audioconvert", "convert")
+#
+        pipeline.add(convert)
+        sink = gst.element_factory_make("alsasink", "sink")
+
+        pipeline.add(sink)
+
+        convert.link(sink)
+
+        pipeline.set_state(gst.STATE_PLAYING)
+
+    
+    
+    def start_video_send(self, ip):
         print ip
         #Stream to another device
         self.sender = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+str(ip)+" port=5434")

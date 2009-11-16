@@ -58,14 +58,15 @@ class GTK_Main:
 #        bus2.connect("sync-message::element", self.on_sync_message)
 
     def start_stop(self, w):
-        if self.button.get_label() == "Start":
-            self.button.set_label("Stop")
-            self.player.set_state(gst.STATE_PLAYING)
-           # self.sender.set_state(gst.STATE_PLAYING)
-        else:
-            self.player.set_state(gst.STATE_NULL)
-           # self.sender.set_state(gst.STATE_NULL)
-            self.button.set_label("Start")
+        self.start_audio_recv("localhost", 5432)
+#        if self.button.get_label() == "Start":
+#            self.button.set_label("Stop")
+#            self.player.set_state(gst.STATE_PLAYING)
+#           # self.sender.set_state(gst.STATE_PLAYING)
+#        else:
+#            self.player.set_state(gst.STATE_NULL)
+#           # self.sender.set_state(gst.STATE_NULL)
+#            self.button.set_label("Start")
 
     def exit(self, widget, data=None):
         gtk.main_quit()
@@ -92,6 +93,45 @@ class GTK_Main:
             imagesink = message.src
             imagesink.set_property("force-aspect-ratio", True)
             imagesink.set_xwindow_id(self.movie_window.window.xid)
+            
+    def start_audio_recv(self,myIp,port):
+        '''
+        Starts an audio server
+        @param myIp
+        @param port
+        '''
+
+        print "Starting server at %s:%d" % (myIp,port)
+        pipelineName = "server%d" % (port)
+
+        def new_decode_pad(dbin, pad, islast):
+            pad.link(convert.get_pad("sink"))
+
+        pipeline = gst.Pipeline(pipelineName)
+
+        tcpsrc = gst.element_factory_make("tcpserversrc", "source")
+
+        pipeline.add(tcpsrc)
+
+        tcpsrc.set_property("host", myIp)
+        #tcpsrc.set_property("host", "localhost")
+
+        tcpsrc.set_property("port", port)
+
+        decode = gst.element_factory_make("decodebin", "decode")
+        decode.connect("new-decoded-pad", new_decode_pad)
+        pipeline.add(decode)
+        tcpsrc.link(decode)
+        convert = gst.element_factory_make("audioconvert", "convert")
+#
+        pipeline.add(convert)
+        sink = gst.element_factory_make("alsasink", "sink")
+
+        pipeline.add(sink)
+
+        convert.link(sink)
+
+        pipeline.set_state(gst.STATE_PLAYING)
 
 GTK_Main()
 gtk.gdk.threads_init()
