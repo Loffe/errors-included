@@ -8,11 +8,12 @@ import gobject
 
 class ClientController(object):
     '''
-    Self. This is me. Holds my unit_type, status and gps-coordinates.
+    Self. This is me. Holds my name, unit_type, status and gps-coordinates.
     '''
-    def __init__(self, unit_type, status):
+    def __init__(self, name, unit_type, status):
         '''
-        Constructor.
+        Constructor. Creates a client controller.
+        @param name: my name.
         @param unit_type: my unit type.
         @param status: my status.
         '''
@@ -24,12 +25,14 @@ class ClientController(object):
         # listen to QoSManagers signaling of new GPS-coordinates
         interface.connect_to_signal("signal_new_gps_coord", self.update_coords)
 
+        # My name
+        self.name = name
         # My unit type
         self.unit_type = unit_type
-        # My mission
-        self.mission = None
         # My status
         self.status = status
+        # My mission
+        self.mission = None
         # My position (GPS-coordinates)
         self.coords = (0,0)
 
@@ -51,7 +54,7 @@ class ClientController(object):
     def dbusloop(self):
         self.mainloop = gobject.MainLoop()
         gobject.threads_init()
-        print "Running selfness loop listening to da buzz."
+        print "Running ClientController"
         while self.mainloop.is_running():
             try:
                 self.mainloop.run()
@@ -60,10 +63,11 @@ class ClientController(object):
                 self.close()
 
     def close(self):
-        print "Selfness aborted"
+        print "ClientController aborted"
 
 if __name__ == "__main__":
+    name = "Ragnar Dahlberg"
     unit_type = shared.data.UnitType.commander
     status = "Available"
-    client = ClientController(unit_type, status)
+    client = ClientController(name, unit_type, status)
     client.run()
