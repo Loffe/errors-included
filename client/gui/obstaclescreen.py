@@ -15,10 +15,10 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
     location_entry2 = None
     location_entry = None
     
-    def __init__(self, db, parent):
+    def __init__(self, db):
         gtk.ScrolledWindow.__init__(self)
         self.db = db
-        self.parent = parent
+
         
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -53,24 +53,19 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         label, self.location_entry = new_entry("Händelse:")
         self.location_entry.set_text("Nagot kul")
         left_box.add(label)
-        right_box.add(self.location_entry)
-        
-        label, self.location_entry2 = new_entry("Skadeplats GPS-lon:")
-        coords = parent.get_map_coords()
-        self.location_entry2.set_text(coords[0])
-        
+        right_box.add(self.location_entry)        
+        label, self.location_entry2 = new_entry("Skadeplats GPS-lon:")      
                
         left_box.add(label)
-        right_box.add(self.location_entry2)
-        
+        right_box.add(self.location_entry2)        
         label, self.location_entry3 = new_entry("Skadeplats GPS-lat:")
-        self.location_entry3.set_text(coords[1])
+
         
         left_box.add(label)
         right_box.add(self.location_entry3)
         
         
-        print "----", coords[0], coords[1]
+#        print "----", coords[0], coords[1]
         # add selectable types
         types = []
         for type in shared.data.ObstacleType.__dict__.keys():
@@ -108,17 +103,10 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
         
-        #print self.coords[0], self.coords[1]
-#        mission = shared.data.MissionData(self.event_entry.get_text(), alarm.poi, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text())
-#        self.db.add(mission)
-
         poi_data2 = shared.data.POIData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), shared.data.POIType.accident)
-        #obstacle_data = shared.data.ObstacleData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), shared.data.POIType.accident)
         
-#        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
-#        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
         self.db.add(poi_data2)
-        #self.db.add(obstacle_data)
+
         self.emit("okbutton-clicked")
         
 gobject.type_register(ObstacleScreen)

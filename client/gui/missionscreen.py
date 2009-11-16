@@ -16,7 +16,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
     def __init__(self, db):
         gtk.ScrolledWindow.__init__(self)
         self.db = db
-        
+
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
@@ -64,20 +64,11 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         self.event_entry.set_text("vad har hänt här?")
 
         self.location_entry2 = new_entry("     Skadeplats: lon-Gps", main_box)
-        self.location_entry3 = new_entry("     Skadeplats: lat-Gps", main_box)
-        
-        self.location_entry2.set_text("15.5799")
-        self.location_entry3.set_text("58.40748")
-        
-        
+        self.location_entry3 = new_entry("     Skadeplats: lat-Gps", main_box)        
         self.hurted_entry = new_entry("     Antal skadade:", main_box)
-
         new_section("Kontaktperson", main_box)
-
         self.name_entry = new_entry("     Namn:", main_box)
-
         self.number_entry = new_entry("     Nummer:", main_box)
-
         new_section("Övrigt", main_box)
         self.random_entry = new_entry("     Information:", main_box)
         
@@ -125,12 +116,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
                 alarm = a
         
         print "ok"        
-        #mission = shared.data.MissionData(self.event_entry.get_text(), alarm.poi, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text())
-        #self.db.add(mission)
-        #poi_data = shared.data.POIData(15.5799069,58.4085884, u"goal", datetime.datetime.now(), shared.data.POIType.accident)
-#        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
-#        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
-        #self.db.add(poi_data)
+        
         
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
@@ -141,9 +127,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         
 
         mission_data = shared.data.MissionData(self.event_entry.get_text(), poi_data4, self.hurted_entry.get_text(), u"Me Messen", u"det gör jävligt ont", units)
-        
-#        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
-#        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
+
         self.db.add(poi_data4)
         self.db.add(mission_data)
         

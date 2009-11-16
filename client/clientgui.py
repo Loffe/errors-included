@@ -133,7 +133,7 @@ class ClientGui(hildon.Program):
         self.screens["alarms"] = self.alarm_inbox_screen
 
         # add the obstacle screen
-        self.obstacle_screen = ObstacleScreen(self.db, self)
+        self.obstacle_screen = ObstacleScreen(self.db)
         self.obstacle_screen.connect("okbutton-clicked", self.back_button_function)
         vbox_right.pack_start(self.obstacle_screen, True, True, 0)
         self.screens["obstacle"] = self.obstacle_screen
@@ -297,8 +297,7 @@ class ClientGui(hildon.Program):
     def show_faq(self, event):
         print "faq the system!"
         poi_data = shared.data.POIData(15.5769069,58.4088884, u"goal", datetime.now(), shared.data.POIType.accident)
-#        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
-#        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
+
         self.db.add(poi_data)
         
         enhet3 = UnitData(15.5746475, 58.4077164 ,u"Enhet3",datetime.now(), UnitType.ambulance)
@@ -313,6 +312,8 @@ class ClientGui(hildon.Program):
     # add object buttons event handlers
     def create_alarm(self, event):
         self.show(["alarm", "buttons"])
+        self.screens["alarm"].location_entry2.set_text(str(self.screens["map"].gps_x))
+        self.screens["alarm"].location_entry3.set_text(str(self.screens["map"].gps_y))
     
     def create_obstacle(self, event):
         self.show(["obstacle", "buttons"])
@@ -321,6 +322,8 @@ class ClientGui(hildon.Program):
     
     def create_mission(self, event):
         self.show(["make_mission", "buttons"])
+        self.screens["make_mission"].location_entry2.set_text(str(self.screens["map"].gps_x))
+        self.screens["make_mission"].location_entry3.set_text(str(self.screens["map"].gps_y))
 
     def create_new_message(self, event):
         self.show(["new_message", "buttons"])

@@ -26,8 +26,9 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         '''
         Constructor. Create the alarmscreen and its entries.
         '''
-        self.db = db
         gtk.ScrolledWindow.__init__(self)
+        self.db = db
+        
 
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -58,12 +59,12 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         
         
         label, self.location_entry2 = new_entry("Skadeplats lon-Gps:")
-        self.location_entry2.set_text("15.5769")
+
         left_box.add(label)
         right_box.add(self.location_entry2)
         
         label, self.location_entry3 = new_entry("Skadeplats lat-Gps:")
-        self.location_entry3.set_text("58.40748")
+
         left_box.add(label)
         right_box.add(self.location_entry3)
 
@@ -108,14 +109,12 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         
         
             
-        #mission = shared.data.MissionData(self.event_entry.get_text(), alarm.poi, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text())
-        #self.db.add(mission)
+ 
         poi_data3 = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.accident)
         
         alarm = shared.data.Alarm(self.event_entry.get_text(), u"Linköping", poi_data3, self.name_entry.get_text(), self.number_entry.get_text(), 7)
         
-#        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
-#        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
+
         self.db.add(poi_data3)
         self.db.add(alarm)
         
