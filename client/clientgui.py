@@ -146,7 +146,7 @@ class ClientGui(hildon.Program):
         self.screens["contact"] = self.contact_screen
         
         # Videocamera
-        self.cam_screen = CamScreen(self.db, screens["contact"].ip)
+        self.cam_screen = CamScreen(self.db, self.screens["contact"].ip)
         vbox_right.pack_start(self.cam_screen, True, True, 0)
         self.screens["camera"] = self.cam_screen
         
