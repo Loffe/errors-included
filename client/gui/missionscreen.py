@@ -61,9 +61,15 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         
         # create entries
         self.event_entry = new_entry("     Händelse:", main_box)
+        self.event_entry.set_text("vad har hänt här?")
 
-        self.location_entry = new_entry("     Skadeplats:", main_box)
-
+        self.location_entry2 = new_entry("     Skadeplats: lon-Gps", main_box)
+        self.location_entry3 = new_entry("     Skadeplats: lat-Gps", main_box)
+        
+        self.location_entry2.set_text("15.5799")
+        self.location_entry3.set_text("58.40748")
+        
+        
         self.hurted_entry = new_entry("     Antal skadade:", main_box)
 
         new_section("Kontaktperson", main_box)
@@ -76,8 +82,8 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         self.random_entry = new_entry("     Information:", main_box)
         
 
-        select_unit_button = SelectUnitButton(self.db)
-        main_box.add(select_unit_button)
+        self.select_unit_button = SelectUnitButton(self.db)
+        main_box.add(self.select_unit_button)
         
         # add selectable types
         for alarm in self.db.get_all_alarms():
@@ -125,4 +131,25 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
 #        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
 #        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
         #self.db.add(poi_data)
+        
+        lon = float(self.location_entry2.get_text())
+        lat = float(self.location_entry3.get_text())
+        
+        poi_data4 = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.accident)
+        selected = self.select_unit_button.select_dialog.selected_units
+        units = self.db.get_units(selected)
+        
+
+        mission_data = shared.data.MissionData(self.event_entry.get_text(), poi_data4, self.hurted_entry.get_text(), u"Me Messen", u"det gör jävligt ont", units)
+        
+#        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
+#        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
+        self.db.add(poi_data4)
+        self.db.add(mission_data)
+        
+        self.emit("okbutton-clicked3")
+        
+gobject.type_register(MissionScreen)
+gobject.signal_new("okbutton-clicked3", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
+        
         

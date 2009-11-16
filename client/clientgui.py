@@ -135,6 +135,7 @@ class ClientGui(hildon.Program):
         
         # add the create_mission screen
         self.mission_screen = MissionScreen(self.db)
+        self.mission_screen.connect("okbutton-clicked3", self.back_button_function) 
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
         

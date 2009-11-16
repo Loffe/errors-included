@@ -102,12 +102,17 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
    
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
+        
 #        mission = shared.data.MissionData(self.event_entry.get_text(), alarm.poi, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text())
 #        self.db.add(mission)
+
         poi_data2 = shared.data.POIData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), shared.data.POIType.accident)
+        #obstacle_data = shared.data.ObstacleData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), shared.data.POIType.accident)
+        
 #        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
 #        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
         self.db.add(poi_data2)
+        #self.db.add(obstacle_data)
         self.emit("okbutton-clicked")
         
 gobject.type_register(ObstacleScreen)

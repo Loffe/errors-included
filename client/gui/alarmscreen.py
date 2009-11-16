@@ -51,7 +51,7 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
 
         # create entries
         label, self.event_entry = new_entry("Händelse:")
-        self.event_entry.set_text("wooting ar ok ibland")
+        self.event_entry.set_text("Det vill vi vet")
         left_box.add(label)
         right_box.add(self.event_entry)
         
@@ -77,7 +77,8 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         left_box.add(contact)
         right_box.add(invisible_label)
         
-        label, self.name_entry = new_entry("Namn:")       
+        label, self.name_entry = new_entry("Namn:")  
+        self.name_entry.set_text("Sven")     
         
         label.set_alignment(0.5, 0.5)
         label.modify_font(pango.FontDescription("sans 12"))
@@ -85,6 +86,8 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         right_box.add(self.name_entry)
         
         label, self.number_entry = new_entry("Nummer:")
+        self.number_entry.set_text("070-741337") 
+        
         label.set_alignment(0.5, 0.5)
         label.modify_font(pango.FontDescription("sans 12"))
         left_box.add(label)
@@ -104,13 +107,18 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         lat = float(self.location_entry3.get_text())
         
         
-        print "ok3"        
+            
         #mission = shared.data.MissionData(self.event_entry.get_text(), alarm.poi, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text())
         #self.db.add(mission)
         poi_data3 = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.accident)
+        
+        alarm = shared.data.Alarm(self.event_entry.get_text(), u"Linköping", poi_data3, self.name_entry.get_text(), self.number_entry.get_text(), 7)
+        
 #        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
 #        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
         self.db.add(poi_data3)
+        self.db.add(alarm)
+        
         self.emit("okbutton-clicked2")
         
 gobject.type_register(AlarmScreen)
