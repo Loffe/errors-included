@@ -97,14 +97,19 @@ class NetworkInQueue(NetworkQueue):
         This method blocks so using select before calling is good practice.
         '''
         if self.socket == None:
+            self.emit("socket-broken")
             return
         length = 0
         hex_length = ""
         try:
-            self.socket.setblocking(0)
             hex_length = self.socket.recv(6)
+            print type(hex_length), hex_length
+            if hex_length == '':
+                self.emit("socket-broken")
             length = int(hex_length, 16)
-        except ValueError:
+        except ValueError, e:
+            print e
+            self.emit("socket-broken")
             pass
         except socket.error:
             self.emit("socket-broken")

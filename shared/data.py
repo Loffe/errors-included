@@ -386,11 +386,6 @@ class Message(object):
                         dict["timestamp"] = datetime.fromtimestamp(float(dict["timestamp"]))
                     except:
                         pass
-                    try:
-                        # create the poi from its dict
-                        dict["poi"] = create(dict["poi"])
-                    except:
-                        pass
                     # create and return an instance of the object
                     if classname == "dict":
                         return dict
@@ -398,7 +393,8 @@ class Message(object):
                         try:
                             return globals()[classname](**dict)
                         except Exception, e:
-                            print "Failed with class:", classname, ", dict:", dict
+                            raise ValueError("Failed with class: %s, dict: %s"
+                                    % (classname, str(dict)))
                             print e
 
                 # create and set data
