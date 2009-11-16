@@ -103,6 +103,8 @@ class ClientNetworkHandler(dbus.service.Object):
                     if junk.startswith("quit"):
                         print "got quit"
                         running = False
+                    else:
+                        print "got", junk
                 elif s == self.socket:
                     print "gettin' msg"
                     self.input.receive()
