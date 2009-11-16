@@ -106,6 +106,7 @@ class ClientGui(hildon.Program):
 
         # add the alarm screen
         self.alarm_screen = AlarmScreen(self.db)
+        self.alarm_screen.connect("okbutton-clicked2", self.back_button_function) 
         vbox_right.pack_start(self.alarm_screen, True, True, 0)
         self.screens["alarm"] = self.alarm_screen
 
@@ -122,7 +123,7 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.outbox_screen, True, True, 0)
         self.screens["output"] = self.outbox_screen
         
-        self.alarm_inbox_screen = AlarmInboxScreen()
+        self.alarm_inbox_screen = AlarmInboxScreen()               
         vbox_right.pack_start(self.alarm_inbox_screen, True, True, 0)
         self.screens["alarms"] = self.alarm_inbox_screen
 
