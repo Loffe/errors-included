@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 import gtk
-import hildon
 import gobject
 import pango
 
@@ -24,6 +23,16 @@ from gui.missionscreen import MissionScreen
 from gui.newmessagescreen import NewMessageScreen
 from gui.outboxscreen import OutboxScreen
 from gui.alarminboxscreen import AlarmInboxScreen
+
+try:
+    import hildon
+    Program = hildon.Program
+except:
+    hildon = gtk
+    class Program(object):
+        def add_window(self, window):
+            pass
+    hildon.Program = Program
 
 log.debug("imports ready")
 
