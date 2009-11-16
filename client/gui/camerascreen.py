@@ -62,7 +62,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
 
         pipeline = gst.Pipeline(pipelineName)
 
-        src = gst.parse_bin_from_description("dsppcmsrc ! audio/x-raw-int,rate=8000,channels=1,depth=8 ! audioconvert", True)
+        src = gst.parse_bin_from_description("dsppcmsrc ! audio/x-raw-int,rate=8000,channels=1,depth=8", True)
         pipeline.add(src)
         
 
