@@ -107,8 +107,9 @@ class NetworkInQueue(NetworkQueue):
 
         if length == 0:
             log.info("Invalid content length: " + hex_length)
+            self.emit("socket-broken")
             return
-        data = self.socket.recv(length)
+        data = self.socket.recv(length, timeout=1.0)
         if data:
             log.debug("data from server:" + str(data))
             self.queue.put(data, 37)
