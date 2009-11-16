@@ -14,6 +14,7 @@ log = getLogger("client.log")
 log.debug("clientgui imported log")
 from map.mapdata import *
 
+from database import ClientDatabase
 from gui.gui import Screen
 from gui.mapscreen import MapScreen
 from gui.alarmscreen import AlarmScreen
@@ -50,10 +51,8 @@ class ClientGui(hildon.Program):
         # Creates a empty list that contains provius screens
         self.prev_page = []
         # create the database
-        self.db = shared.data.create_database()
-        
-        
-        
+        db = ClientDatabase(self.queue)
+        self.db = shared.data.create_database(db)
 
         # A dict containing all the containers (used for hiding/showing) 
         self.screens = {}

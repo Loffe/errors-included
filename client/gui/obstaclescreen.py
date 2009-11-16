@@ -67,6 +67,8 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         
 #        print "----", coords[0], coords[1]
         # add selectable types
+        '''
+        @TODO: find this from POISubType
         types = []
         for type in shared.data.ObstacleType.__dict__.keys():
             if type[0] != "_":
@@ -74,6 +76,7 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         types.sort()
         for type in types:
             combo_box.append_text(type)
+        '''
 
         # add event handler
         combo_box.connect('changed', self.select_type)

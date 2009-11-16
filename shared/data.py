@@ -91,12 +91,11 @@ class UnitType(object):
      srsa, # Swedish Rescue Services Agency (SRSA) 
      other) = range(5)
 
-class ObstacleType(object):
-    # always sort in alphabetic order!!!
-    bridge, other, road, tree = range(4)
-
 class POIType(object):
-    accident, fire, pasta_wagon = range(3)
+    accident, fire, pasta_wagon, obstacle = range(4)
+
+class POISubType(object):
+    tree, broken_brigde, broken_nuclear_power_plant = range(3)
 
 class NetworkInQueueItem(Base):
     __tablename__ = 'InQueue'
@@ -131,8 +130,8 @@ class MapObjectData(Base, Packable):
     '''
     __tablename__ = 'MapObjectData'
     id = Column(Integer, primary_key=True)
-    data_type = Column(Integer)
-    __mapper_args__ = {'polymorphic_identity': 'MapObjectData', "polymorphic_on": data_type} 
+    _data_type = Column(Integer)
+    __mapper_args__ = {'polymorphic_identity': 'MapObjectData', "polymorphic_on": _data_type} 
     
     coordx = Column(Float)
     coordy = Column(Float)
@@ -191,21 +190,6 @@ class UnitData(MapObjectData):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
 
-class ObstacleData(MapObjectData):
-    '''
-    All obstacles have data objects of this class.
-    '''
-    __tablename__ = 'ObstacleData'
-    __mapper_args__ = {'polymorphic_identity': 'ObstacleData'}
-    id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
-    
-    type = Column(Integer)
-
-    def __init__(self, coordx, coordy, name, timestamp, 
-                 type = ObstacleType.tree, id = None):
-        MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
-        self.type = type
-
 class POIData(MapObjectData):
     '''
     All Points of Interest (POIs) have data objects of this class.
@@ -215,9 +199,10 @@ class POIData(MapObjectData):
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
     
     type = Column(Integer)
+    subtype = Column(Integer)
 
     def __init__(self, coordx, coordy, name, timestamp, 
-                 type = POIType.pasta_wagon, id = None):
+                 type = POIType.pasta_wagon, subtype = None, id = None):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
 
@@ -304,49 +289,16 @@ class MissionData(Base, Packable):
         except:
             return repr
 
-class EventType(object):
-    '''
-    Enumeration of all event types.
-    '''
-    add, change, remove = range(3)
-
-class Event(Base, Packable):
-    '''
-    An Event declares what to be done with a specified object. It's possible to 
-    pack/unpack. This makes it possible to send it as a message.
-    '''
-    __tablename__ = "Events"
-    id = Column(Integer, primary_key = True)
-    object_id = Column(Integer)
-    type = Column(Integer)
-    timestamp = Column(DateTime)
-    
-    def __init__(self, object_id, type, timestamp = datetime.now()):
-        '''
-        Constructor. Creates an event.
-        @param object_id: the global unique id of the object.
-        @param type: the event type (add, change or remove) specifies what to be
-        done with the object.
-        @param timestamp: the timestamp of this event.
-        '''
-        self.object_id = object_id
-        self.type = type
-        self.timestamp = timestamp
-
-    def __repr__(self):
-        repr = ("<%s: type=%s, %s; obj_id=%s>" % 
-                (self.__class__.__name__, self.type, self.timestamp, 
-                 self.object_id))
-        try:
-            return repr.encode('utf-8')
-        except:
-            return repr
-
-
 class MessageType(object):
     (mission, map, text, alarm, control, low_battery, status_update, mission_response, 
     journal_request, journal_confirmationresponse, journal_confirmationrequest, 
     journal_transfer, alarm_ack, vvoip_request, vvoip_response, login, login_ack, action) = range(18)
+
+class ActionType(object):
+    add, update, remove = range(3)
+
+class JournalType(object):
+    request, confirmation_response, confirmation_request, transfer = range(4)
 
 class Message(object):
     '''
@@ -357,6 +309,7 @@ class Message(object):
     sender = None
     # The type of this message
     type = None
+    subtype = None
     # The priority of this message (lowest 0 - 9 highest)
     prio = 0
     # The packed data (json dumps) to send (a dict containing all variables)
@@ -366,28 +319,21 @@ class Message(object):
     # The timestamp of this message
     timestamp = None
     
-    def __init__(self, sender, reciever, type = None, unpacked_data = None, packed_data = None):
+    def __init__(self, sender, reciever, type = None, subtype = None, unpacked_data = None):
         '''
         Constructor. Creates a message.
         @param type: the type of this message
         @param unpacked_data: the unpacked data to pack
-        @param packed_data: the packed data to unpack
         '''
         self.sender = sender
         self.reciever = reciever
         self.type = type
+        self.subtype = subtype
         self.unpacked_data = unpacked_data
-        self.packed_data = packed_data
         self.timestamp = datetime.now()
         
-        # message created from unpacked data
-        if unpacked_data:
-            # pack the unpacked data
-            self.pack()
-        # message created from packed data
-        elif packed_data:
-            # unpack the packed data
-            self.unpack(packed_data)
+        # pack the unpacked data
+        self.pack()
     
     def pack(self):
         '''
@@ -395,6 +341,7 @@ class Message(object):
         '''
         dict = {}
         dict["type"] = self.type
+        dict["subtype"] = self.subtype
         dict["prio"] = self.prio
         dict["timestamp"] = self.timestamp.strftime("%s")
         dict["sender"] = self.sender
@@ -406,14 +353,17 @@ class Message(object):
         self.packed_data = json.dumps(dict)
         return self.packed_data
 
-    def unpack(self, raw_message):
+    def unpack(cls, raw_message):
         '''
         Unpack a simplejson string to an object.
         @param raw_message: the simplejson string
         '''
+        # raw_message contains sender and reciever
+        self = cls(None, None)
         try:
             dict = json.loads(raw_message)
             self.type = dict["type"]
+            self.subtype = dict["subtype"]
             self.prio = dict["prio"]
             self.sender = dict["sender"]
             self.reciever = dict["reciever"]
@@ -447,8 +397,9 @@ class Message(object):
                     else:
                         try:
                             return globals()[classname](**dict)
-                        except:
+                        except Exception, e:
                             print "Failed with class:", classname, ", dict:", dict
+                            print e
 
                 # create and set data
                 self.unpacked_data = create(self.packed_data)
@@ -461,6 +412,8 @@ class Message(object):
         except KeyError, ke:
             raise ValueError("Not a valid Message. Missing any keys maybe?")
 
+    unpack = classmethod(unpack)
+
     def __repr__(self):
         repr = ("<%s: sender=%s, receiver=%s, prio=%s, type=%s, %s; packed=%s, unpacked=%s>" % 
                 (self.__class__.__name__, self.sender, self.reciever, self.prio,
@@ -471,11 +424,10 @@ class Message(object):
             return repr
 
 
-def create_database():
+def create_database(db = Database()):
     '''
     Create the database.
     '''
-    db = Database()
 
     # create tables and columns
     Base.metadata.create_all(db.engine)

@@ -1,4 +1,5 @@
 import gobject
+import socket
 import threading
 import Queue
 
@@ -95,9 +96,12 @@ class NetworkInQueue(NetworkQueue):
 
         This method blocks so using select before calling is good practice.
         '''
-        self.socket.setblocking(0)
+        if self.socket == None:
+            return
         length = 0
+        hex_length = ""
         try:
+            self.socket.setblocking(0)
             hex_length = self.socket.recv(6)
             length = int(hex_length, 16)
         except ValueError:
