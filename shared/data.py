@@ -130,8 +130,8 @@ class MapObjectData(Base, Packable):
     '''
     __tablename__ = 'MapObjectData'
     id = Column(Integer, primary_key=True)
-    data_type = Column(Integer)
-    __mapper_args__ = {'polymorphic_identity': 'MapObjectData', "polymorphic_on": data_type} 
+    _data_type = Column(Integer)
+    __mapper_args__ = {'polymorphic_identity': 'MapObjectData', "polymorphic_on": _data_type} 
     
     coordx = Column(Float)
     coordy = Column(Float)
@@ -202,7 +202,7 @@ class POIData(MapObjectData):
     subtype = Column(Integer)
 
     def __init__(self, coordx, coordy, name, timestamp, 
-                 type = POIType.pasta_wagon, id = None):
+                 type = POIType.pasta_wagon, subtype = None, id = None):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
 
@@ -354,11 +354,12 @@ class Message(object):
         return self.packed_data
 
     def unpack(cls, raw_message):
-        self = cls()
         '''
         Unpack a simplejson string to an object.
         @param raw_message: the simplejson string
         '''
+        # raw_message contains sender and reciever
+        self = cls(None, None)
         try:
             dict = json.loads(raw_message)
             self.type = dict["type"]
@@ -396,8 +397,9 @@ class Message(object):
                     else:
                         try:
                             return globals()[classname](**dict)
-                        except:
+                        except Exception, e:
                             print "Failed with class:", classname, ", dict:", dict
+                            print e
 
                 # create and set data
                 self.unpacked_data = create(self.packed_data)
