@@ -37,7 +37,7 @@ class ContactScreen(gtk.ScrolledWindow, gui.Screen):
             if button != event:
                 button.set_active(False)
             else:
-                ip = "130.236.219.104"
+                self.ip = "130.236.219.104"
 
         
 

@@ -146,7 +146,7 @@ class ClientGui(hildon.Program):
         self.screens["contact"] = self.contact_screen
         
         # Videocamera
-        self.cam_screen = CamScreen(self.db, self.screens["contact"].ip)
+        self.cam_screen = CamScreen(self.db)
         vbox_right.pack_start(self.cam_screen, True, True, 0)
         self.screens["camera"] = self.cam_screen
         
@@ -340,7 +340,8 @@ class ClientGui(hildon.Program):
         self.show(["new_message", "buttons"])
         
     def show_cam(self, event):
-        self.show(["camera", "buttons"])
+        self.screens["camera"].start_send(self.screens["contact"].ip)
+        self.show(["camera"])
         
     def show_outbox(self, event):
         self.show(["output", "message_menu"])

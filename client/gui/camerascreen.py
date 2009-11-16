@@ -12,7 +12,7 @@ import clientgui
 
 class CamScreen(gtk.ScrolledWindow, gui.Screen):
 
-    def __init__(self,db,ip):
+    def __init__(self,db):
         gtk.ScrolledWindow.__init__(self)
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -44,9 +44,16 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
 
         #Sending Video Output:
 #        gst-launch v4l2src ! video/x-raw-yuv,width=352,height=288,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host=<other N800's ip> port=5434 
+        
+#        bus2 = self.sender.get_bus()
+#        bus2.add_signal_watch()
+#        bus2.enable_sync_message_emission()
+#        bus2.connect("message", self.on_message)
+#        bus2.connect("sync-message::element", self.on_sync_message)
 
-        #Stream to another device
+    def start_send(self, ip):
         print ip
+        #Stream to another device
         self.sender = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+str(ip)+" port=5434")
         
         #Show the incoming video
@@ -64,12 +71,6 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         bus.enable_sync_message_emission()
         bus.connect("message", self.on_message)
         bus.connect("sync-message::element", self.on_sync_message)
-        
-#        bus2 = self.sender.get_bus()
-#        bus2.add_signal_watch()
-#        bus2.enable_sync_message_emission()
-#        bus2.connect("message", self.on_message)
-#        bus2.connect("sync-message::element", self.on_sync_message)
 
     def start_stop(self, w):
        if self.button.get_label() == "Start":
