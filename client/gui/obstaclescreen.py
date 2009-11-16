@@ -16,7 +16,7 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
     def __init__(self, db):
         gtk.ScrolledWindow.__init__(self)
         self.db = db
-        self.location_entry2 = "15.5769069, 58.4074884"
+
         
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -98,11 +98,10 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         
         
     def ok_button_function(self, event):
-        print "hej"
-        print self.location_entry2.get_text()   
+
+   
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
-        print "hej"     
 #        mission = shared.data.MissionData(self.event_entry.get_text(), alarm.poi, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text())
 #        self.db.add(mission)
         poi_data2 = shared.data.POIData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), shared.data.POIType.accident)
@@ -114,3 +113,5 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
 gobject.type_register(ObstacleScreen)
 gobject.signal_new("okbutton-clicked", ObstacleScreen, gobject.SIGNAL_RUN_FIRST,
                    gobject.TYPE_NONE, ())
+
+
