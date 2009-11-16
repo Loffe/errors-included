@@ -13,7 +13,6 @@ import time
 from networkqueue import NetworkOutQueue, NetworkInQueue
 from shared.util import getLogger
 log = getLogger("queue.log")
-log.debug("hej")
 
 class ClientNetworkHandler(dbus.service.Object):
     output = None
@@ -27,7 +26,7 @@ class ClientNetworkHandler(dbus.service.Object):
         log.info("Queue startin up")
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         self.session_bus = dbus.SessionBus()
-        self.name = dbus.service.BusName("com.example.Queue", self.session_bus)
+        self.name = dbus.service.BusName("included.errors.Client", self.session_bus)
         dbus.service.Object.__init__(self, self.session_bus,
                                      '/Queue')
         self.server = (host, port)
@@ -37,7 +36,7 @@ class ClientNetworkHandler(dbus.service.Object):
 
         self.output.connect("socket-broken", self._socket_broken)
 
-    @dbus.service.method(dbus_interface='com.example.Queue',
+    @dbus.service.method(dbus_interface='included.errors.Client',
                          in_signature='si', out_signature='s')
     def enqueue(self, msg, prio):
         self.output.enqueue(msg, prio)
@@ -45,7 +44,7 @@ class ClientNetworkHandler(dbus.service.Object):
         #print self.output
         return "Message queued :)"
 
-    @dbus.service.method(dbus_interface='com.example.Queue',
+    @dbus.service.method(dbus_interface='included.errors.Client',
                          in_signature='', out_signature='s')
     def dbus_close(self):
         self.close()
@@ -82,9 +81,11 @@ class ClientNetworkHandler(dbus.service.Object):
         if self.mainloop is not None:
             self.mainloop.quit()
         self.closing = True
+        self.running = False
         self.socket.close()
+        sys.exit(0)
 
-    @dbus.service.signal(dbus_interface='com.example.Queue',
+    @dbus.service.signal(dbus_interface='included.errors.Client',
                          signature='')
     def message_received(self):
         #msg = self.input.dequeue()
