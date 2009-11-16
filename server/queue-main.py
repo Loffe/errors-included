@@ -111,7 +111,7 @@ class ServerNetworkHandler(dbus.service.Object):
             log.debug("logged in and now has a named queue")
             ack = shared.data.Message("server", id,
                                       type=shared.data.MessageType.login_ack,
-                                      unpacked_data={"result": "ok"})
+                                      unpacked_data={"result": "ok", "class": "dict"})
             self.enqueue(m.sender, ack.packed_data, 5)
         else:
             log.debug("no such socket or user already logged in")
