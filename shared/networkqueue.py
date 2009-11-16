@@ -95,7 +95,7 @@ class NetworkInQueue(NetworkQueue):
 
         This method blocks so using select before calling is good practice.
         '''
-
+        self.socket.setblocking(0)
         length = 0
         try:
             hex_length = self.socket.recv(6)
@@ -109,7 +109,7 @@ class NetworkInQueue(NetworkQueue):
             log.info("Invalid content length: " + hex_length)
             self.emit("socket-broken")
             return
-        data = self.socket.recv(length, timeout=1.0)
+        data = self.socket.recv(length)
         if data:
             log.debug("data from server:" + str(data))
             self.queue.put(data, 37)
