@@ -56,6 +56,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
 
         # the current zoom level
         self.zoom_level = 1
+        
+        self.dirty = True
 
         # handle events; connect signals to callback functions
         self.set_flags(gtk.CAN_FOCUS)
@@ -106,7 +108,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         # get the new level (map tiles)
         level = self.mapdata.get_level(self.zoom_level)
         # clear memory by unloading tiles
-        level.unload_tiles("all")
+#        level.unload_tiles("all")
 
         # change the zoom-level
         if change == "+":
@@ -117,6 +119,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                 self.zoom_level -= 1
 
         # redraw
+        self.dirty = True
         self.queue_draw()
 
     def handle_button_press_event(self, widget, event):
@@ -130,6 +133,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
 
     def handle_button_release_event(self, widget, event):
         self.allow_movement = False
+        self.dirty = True
         return True
 
     def handle_motion_notify_event(self, widget, event):
@@ -152,7 +156,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                 self.movement_from["y"] = y
             
                 # redraw
-                self.queue_draw()
+                self.dirty = True
+#                self.queue_draw()
 
         return True
 
@@ -163,7 +168,9 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.context.rectangle(event.area.x, event.area.y,
                                event.area.width, event.area.height)
         self.context.clip()
-        self.draw()
+        if self.dirty:
+            self.draw()
+            self.dirty = False
         return False
 
     def draw(self):
