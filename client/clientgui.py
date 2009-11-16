@@ -29,6 +29,8 @@ log.debug("imports ready")
 class ClientGui(hildon.Program):
     queue = shared.queueinterface.interface
     db = None
+    gps_x = None
+    gps_y = None
     '''
     The main GUI-process of the client
     '''
@@ -49,6 +51,9 @@ class ClientGui(hildon.Program):
         self.prev_page = []
         # create the database
         self.db = shared.data.create_database()
+        
+        
+        
 
         # A dict containing all the containers (used for hiding/showing) 
         self.screens = {}
@@ -128,7 +133,7 @@ class ClientGui(hildon.Program):
         self.screens["alarms"] = self.alarm_inbox_screen
 
         # add the obstacle screen
-        self.obstacle_screen = ObstacleScreen(self.db)
+        self.obstacle_screen = ObstacleScreen(self.db, self)
         self.obstacle_screen.connect("okbutton-clicked", self.back_button_function)
         vbox_right.pack_start(self.obstacle_screen, True, True, 0)
         self.screens["obstacle"] = self.obstacle_screen
@@ -215,6 +220,9 @@ class ClientGui(hildon.Program):
         # Change to default True?
         self.window_in_fullscreen = False
         log.info("ClientGui created")
+        
+    def get_map_coords(self):
+        return self.screens["map"].gps_x, self.screens["map"].gps_y
         
     def run(self):
         '''
@@ -308,6 +316,8 @@ class ClientGui(hildon.Program):
     
     def create_obstacle(self, event):
         self.show(["obstacle", "buttons"])
+        self.screens["obstacle"].location_entry2.set_text(str(self.screens["map"].gps_x))
+        self.screens["obstacle"].location_entry3.set_text(str(self.screens["map"].gps_y))
     
     def create_mission(self, event):
         self.show(["make_mission", "buttons"])

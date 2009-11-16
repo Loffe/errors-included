@@ -5,18 +5,20 @@ import shared.data
 import datetime
 import gui
 import clientgui
+import mapscreen
 
 class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
     
     db = None
+    parent = None
     selected_type = None
     location_entry2 = None
-    location_entry =None
+    location_entry = None
     
-    def __init__(self, db):
+    def __init__(self, db, parent):
         gtk.ScrolledWindow.__init__(self)
         self.db = db
-
+        self.parent = parent
         
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -54,18 +56,21 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         right_box.add(self.location_entry)
         
         label, self.location_entry2 = new_entry("Skadeplats GPS-lon:")
-        self.location_entry2.set_text("15.5769069")
+        coords = parent.get_map_coords()
+        self.location_entry2.set_text(coords[0])
         
                
         left_box.add(label)
         right_box.add(self.location_entry2)
         
         label, self.location_entry3 = new_entry("Skadeplats GPS-lat:")
-        self.location_entry3.set_text("58.4074884")
+        self.location_entry3.set_text(coords[1])
         
         left_box.add(label)
         right_box.add(self.location_entry3)
         
+        
+        print "----", coords[0], coords[1]
         # add selectable types
         types = []
         for type in shared.data.ObstacleType.__dict__.keys():
@@ -103,6 +108,7 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
         
+        #print self.coords[0], self.coords[1]
 #        mission = shared.data.MissionData(self.event_entry.get_text(), alarm.poi, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text())
 #        self.db.add(mission)
 
