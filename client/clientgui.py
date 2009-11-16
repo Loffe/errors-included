@@ -23,6 +23,8 @@ from gui.missionscreen import MissionScreen
 from gui.newmessagescreen import NewMessageScreen
 from gui.outboxscreen import OutboxScreen
 from gui.alarminboxscreen import AlarmInboxScreen
+from gui.contactscreen import ContactScreen
+from gui.camerascreen import CamScreen
 
 log.debug("imports ready")
 
@@ -137,6 +139,29 @@ class ClientGui(hildon.Program):
         self.mission_screen = MissionScreen(self.db)
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
+        
+        # add the contact_screen and their menu
+        self.contact_screen = ContactScreen(self.db)
+        vbox_right.pack_start(self.contact_screen, True, True, 0)
+        self.screens["contact"] = self.contact_screen
+        
+        # Videocamera
+        self.cam_screen = CamScreen(self.db)
+        vbox_right.pack_start(self.cam_screen, True, True, 0)
+        self.screens["camera"] = self.cam_screen
+        
+        #Contact menu
+        self.contact_menu = gtk.HBox(False, 0)
+        self.contact_menu.set_size_request(0, 60)
+        vbox_right.pack_start(self.contact_menu, False, False, 0)
+        self.screens["contact_menu"] = self.contact_menu
+        call = gtk.Button("Bröstsamtal")
+        #call.connect("clicked", self.create_new_message)
+        video = gtk.Button("Videosamtal")
+        video.connect("clicked", self.show_cam)
+        self.contact_menu.add(call)
+        self.contact_menu.add(video)
+
         
         # Mission buttons and their menu
         self.mission_menu = gtk.HBox(False, 0)
@@ -314,6 +339,9 @@ class ClientGui(hildon.Program):
     def create_new_message(self, event):
         self.show(["new_message", "buttons"])
         
+    def show_cam(self, event):
+        self.show(["camera", "buttons"])
+        
     def show_outbox(self, event):
         self.show(["output", "message_menu"])
         
@@ -325,7 +353,7 @@ class ClientGui(hildon.Program):
         
     # contacts view event handlers
     def show_contacts(self,event):
-        self.toggle_show("contacts", ["notifications"], "Här visas dina kontakter och du kan ringa till dem")
+        self.toggle_show("contacts", ["notifications","contact", "contact_menu"], "Här visas dina kontakter och du kan ringa till dem")
 
     # messages view event handlers
     def show_messages(self, event):
