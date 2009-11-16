@@ -10,7 +10,7 @@ import subprocess
 import sys
 import threading
 import time
-from networkqueue import NetworkOutQueue, NetworkInQueue
+from shared.networkqueue import NetworkOutQueue, NetworkInQueue
 from shared.util import getLogger
 log = getLogger("queue.log")
 

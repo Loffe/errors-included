@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import shared.clientnetworkhandler
+import clientnetworkhandler
 import config
 import sys
 
@@ -13,7 +13,7 @@ if __name__ == "__main__":
         remote_object.dbus_close()
         sys.exit(0)
 
-    q = shared.clientnetworkhandler.ClientNetworkHandler(config.server.ip,config.server.port)
+    q = clientnetworkhandler.ClientNetworkHandler(config.server.ip,config.server.port)
 
     try:
         q.mainloop()
