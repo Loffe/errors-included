@@ -18,7 +18,6 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
     def __init__(self, db):
         gtk.ScrolledWindow.__init__(self)
         self.db = db
-
         
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)

@@ -47,50 +47,63 @@ class Database(gobject.GObject):
         gobject.GObject.__init__(self)
         self.engine = create_engine('sqlite:///database.db', echo=False)
         self._Session = sessionmaker(bind=self.engine)
-        self.session = self._Session()
+#        self.session = self._Session()
         
     def add(self, object):
-        self.session.add(object)
-        self.session.commit()
+        session = self._Session()
+        session.add(object)
+        session.commit()
+        session.close()
         self.emit("mapobject-added", object)
         
     def delete(self, object):
-        self.session.delete(object)
-        self.session.commit()
+        session = self._Session()
+        session.delete(object)
+        session.commit()
+        session.close()
         self.emit("mapobject-added", object)
         
     def get_all_alarms(self):
+        session = self._Session()
         list = []
-        for a in self.session.query(Alarm):
+        for a in session.query(Alarm):
             list.append(a)
+        session.close()
         return list
 
     def get_all_units(self):
+        session = self._Session()
         list = []
-        for u in self.session.query(UnitData):
+        for u in session.query(UnitData):
             list.append(u)
+        session.close()
         return list
     
     def get_all_mapobjects(self):
+        session = self._Session()
         list = []
-        for u in self.session.query(MapObjectData):
+        for u in session.query(MapObjectData):
             list.append(u)
+        session.close()
         return list
 
     def get_units(self, unit_ids):
+        session = self._Session()
         list = []
-        q = self.session.query(UnitData).filter(UnitData.id.in_(unit_ids))
-        for u in q:
+        units = session.query(UnitData).filter(UnitData.id.in_(unit_ids))
+        for u in units:
             list.append(u)
+        session.close()
         return list
     
-    def get_poi_type(self):
-        list = []
-        p = (eld, saker)
-        for u in p:
-            list.append(u)
-        
-        return list
+#    def get_poi_type(self):
+#        session = self._Session()
+#        list = []
+#        p = (eld, saker)
+#        for u in p:
+#            list.append(u)
+#        
+#        return list
 
 class UnitType(object):
     (ambulance, # Regular unit

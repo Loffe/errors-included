@@ -11,20 +11,28 @@ class ClientController(object):
     '''
     Self. This is me. Holds my name, unit_type, status and gps-coordinates.
     '''
-    def __init__(self, name, unit_type, status):
+    def __init__(self, name, unit_type, status, db, mainloop):
         '''
         Constructor. Creates a client controller.
         @param name: my name.
         @param unit_type: my unit type.
         @param status: my status.
+        @param db: the database to save to.
+        @param mainloop: the mainloop
         '''
         # create dbus session
-        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+#        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+        dbus.set_default_main_loop(mainloop)
         bus = dbus.SessionBus()
         remote_object = bus.get_object("included.errors.QoSManager", "/QoSManager")
         interface = dbus.Interface(remote_object, "included.errors.QoSManager")
         # listen to QoSManagers signaling of new GPS-coordinates
         interface.connect_to_signal("signal_new_gps_coord", self.update_coords)
+
+        # the database to save to
+        self.db = db
+        # set sender name in db
+        self.db.name = name
 
         # My name
         self.name = name
@@ -49,22 +57,22 @@ class ClientController(object):
         self.unit_data.timestamp = datetime.datetime.now()
         print "Got coords update"
 
-    def run(self):
-        '''
-        Start the mainloop.
-        '''
-        self.dbusloop()
-
-    def dbusloop(self):
-        self.mainloop = gobject.MainLoop()
-        gobject.threads_init()
-        print "Running ClientController"
-        while self.mainloop.is_running():
-            try:
-                self.mainloop.run()
-            except KeyboardInterrupt:
-                self.mainloop.quit()
-                self.close()
+#    def run(self):
+#        '''
+#        Start the mainloop.
+#        '''
+#        self.dbusloop()
+#
+#    def dbusloop(self):
+#        
+#        gobject.threads_init()
+#        print "Running ClientController"
+#        while self.mainloop.is_running():
+#            try:
+#                self.mainloop.run()
+#            except KeyboardInterrupt:
+#                self.mainloop.quit()
+#                self.close()
 
     def close(self):
         print "ClientController aborted"

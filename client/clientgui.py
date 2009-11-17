@@ -3,16 +3,15 @@
 import gtk
 import gobject
 import pango
-
+import threading
 import datetime
-
 from shared.data import *
 import shared.queueinterface
 from shared.util import getLogger
 log = getLogger("client.log")
 log.debug("clientgui imported log")
 from map.mapdata import *
-
+import controller
 from database import ClientDatabase
 from gui.gui import Screen
 from gui.mapscreen import MapScreen
@@ -41,12 +40,7 @@ class ClientGui(hildon.Program):
     db = None
     gps_x = None
     gps_y = None
-    '''
-    The main GUI-process of the client
-    '''
-    
-    ''' create GUI Structure
-    '''
+
     def __init__(self):
         '''
         Constructor. Creates the GUI (window and containing components).
@@ -57,8 +51,9 @@ class ClientGui(hildon.Program):
         self.window.set_title("ClientGui")
         self.add_window(self.window)
         
-        # Creates a empty list that contains provius screens
+        # Creates a empty list that contains previous screens
         self.prev_page = []
+
         # create the database
         db = ClientDatabase(self.queue)
         self.db = shared.data.create_database(db)
@@ -228,18 +223,26 @@ class ClientGui(hildon.Program):
         # Change to default True?
         self.window_in_fullscreen = False
         log.info("ClientGui created")
-        
-    def get_map_coords(self):
-        return self.screens["map"].gps_x, self.screens["map"].gps_y
-        
+
     def run(self):
         '''
         Main GUI loop
         '''
         self.window.show_all()
         self.show_default()
-        gtk.main()
-    
+#        gobject.threads_init()
+        # start gtk main (gui) thread
+        threading.Thread(self.start_controller).start()
+        self.mainloop = gtk.main()
+
+    def start_controller(self):
+        # Create ClientController
+        name = "Ragnar Dahlberg"
+        unit_type = shared.data.UnitType.commander
+        status = "Available"
+        print "start controller:", self.mainloop
+        self.controller = controller.ClientController(name,unit_type,status, self.db, self.mainloop)
+
     ''' Handle events
     ''' 
     def back_button_function(self, event):
