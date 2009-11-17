@@ -5,6 +5,7 @@ import shared.data
 import dbus
 import dbus.mainloop.glib
 import gobject
+import datetime
 
 class ClientController(object):
     '''
@@ -33,16 +34,19 @@ class ClientController(object):
         self.status = status
         # My mission
         self.mission = None
-        # My position (GPS-coordinates)
-        self.coords = (0,0)
-
+        # The unit I am
+        self.unit_data = shared.data.UnitData(0, 0, name, datetime.datetime.now(), 
+                 unit_type)
+        
     def update_coords(self, coordx, coordy):
         '''
         Update my GPS-coordinates.
         @param coordx: the x-coordinate to set.
         @param coordy: the y-coordinate to set.
         '''
-        self.coords = (coordx, coordy)
+        self.unit_data.coordx = coordx
+        self.unit_data.coordy = coordy
+        self.unit_data.timestamp = datetime.datetime.now()
         print "Got coords update"
 
     def run(self):
