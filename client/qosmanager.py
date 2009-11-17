@@ -205,6 +205,8 @@ class QoSManager(dbus.service.Object):
             except:
                 # Not in N810, got no GPS-device; do nothing...
                 print "gps failure"
+                # @todo: REMOVE, THIS IS ONLY A TEST! 
+                self.signal_new_gps_coord(13, 37)
     
     def service_level_updater(self):
         '''
@@ -224,8 +226,6 @@ class QoSManager(dbus.service.Object):
             except:
                 # Not in N810, modules doesn't work; do nothing...
                 print "battery level: failure"
-                # @todo: REMOVE, THIS IS ONLY A TEST! 
-                self.signal_new_gps_coord(13, 37)
 
             # get signal strength
             try:
