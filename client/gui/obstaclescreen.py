@@ -76,6 +76,7 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         types.sort()
         for type in types:
             combo_box.append_text(type)
+            
         '''
 
         # add event handler
