@@ -52,10 +52,10 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         hbox.pack_start(type_label, True, True, 0)
         
         # create and pack combobox
-        combo_box = gtk.combo_box_new_text()
-        combo_box.set_size_request(300,50)
-        combo_box.append_text("Välj ett larm här")
-        hbox.pack_start(combo_box, True,True, 0)
+        self.combo_box = gtk.combo_box_new_text()
+        self.combo_box.set_size_request(300,50)
+        self.combo_box.append_text("Välj ett larm här")
+        hbox.pack_start(self.combo_box, True,True, 0)
         
         new_section("Nytt uppdrag", main_box)
         
@@ -77,15 +77,14 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         main_box.add(self.select_unit_button)
         
         # add selectable types
-        for alarm in self.db.get_all_alarms():
-                combo_box.append_text(alarm.event)
+        
                 
 
         # add event handler
-        combo_box.connect('changed', self.select_alarm)
+        self.combo_box.connect('changed', self.select_alarm)
 
         # set the first item added as active
-        combo_box.set_active(0)
+        self.combo_box.set_active(0)
 
         # show 'em all! (:
         main_box.show_all()
@@ -99,7 +98,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         @param combobox: the changed combobox
         '''
         # set the selected type
-        self.selected_alarm = combobox.get_active_text()
+        self.selected_alarm = self.combo_box.get_active_text()
         for alarm in self.db.get_all_alarms():
             if alarm.event == self.selected_alarm:
                 self.event_entry.set_text(alarm.event)

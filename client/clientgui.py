@@ -323,11 +323,9 @@ class ClientGui(hildon.Program):
         self.screens["alarm"].location_entry2.set_text(str(self.screens["map"].gps_x))
         self.screens["alarm"].location_entry3.set_text(str(self.screens["map"].gps_y))
         
+            
         
-        
-        
-        
-    
+            
     def create_obstacle(self, event):
         self.show(["obstacle", "buttons"])
         self.screens["obstacle"].location_entry2.set_text(str(self.screens["map"].gps_x))
@@ -337,6 +335,11 @@ class ClientGui(hildon.Program):
         self.show(["make_mission", "buttons"])
         self.screens["make_mission"].location_entry2.set_text(str(self.screens["map"].gps_x))
         self.screens["make_mission"].location_entry3.set_text(str(self.screens["map"].gps_y))
+        
+        for alarm in self.db.get_all_alarms():
+            self.screens["make_mission"].combo_box.append_text(alarm.event)
+
+
 
     def create_new_message(self, event):
         self.show(["new_message", "buttons"])

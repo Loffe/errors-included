@@ -116,7 +116,7 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         
 
         self.db.add(poi_data3)
-        #self.db.add(alarm)
+        self.db.add(alarm)
         
         self.emit("okbutton-clicked2")
         
