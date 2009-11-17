@@ -7,10 +7,11 @@ class ClientDatabase(Database):
     def __init__(self, queue):
         Database.__init__(self)
         self.queue = queue
+        self.name = "Anonymous"
 
     def add(self, object):
         # @TODO: decide order of local commit, network commit and signal emit
         Database.add(self, object)
-        msg = Message("ragnar", "server", MessageType.action, ActionType.add,
+        msg = Message(self.name, "server", MessageType.action, ActionType.add,
                       unpacked_data=object)
         self.queue.enqueue(msg.packed_data, msg.prio)

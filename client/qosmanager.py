@@ -178,6 +178,7 @@ class QoSManager(dbus.service.Object):
             self.wlan_start()
         except:
             pass
+
         threading.Thread(target=self.service_level_updater).start()
         threading.Thread(target=self.gps_updater).start()
         self.dbusloop()
@@ -223,6 +224,8 @@ class QoSManager(dbus.service.Object):
             except:
                 # Not in N810, modules doesn't work; do nothing...
                 print "battery level: failure"
+                # @todo: REMOVE, THIS IS ONLY A TEST! 
+                self.signal_new_gps_coord(13, 37)
 
             # get signal strength
             try:
@@ -270,6 +273,7 @@ class QoSManager(dbus.service.Object):
 
     def dbusloop(self):
         self.mainloop = gobject.MainLoop()
+        dbus.set_default_main_loop(self.mainloop)
         gobject.threads_init()
         while self.mainloop.is_running():
             try:
@@ -292,7 +296,3 @@ class QoSManager(dbus.service.Object):
     @dbus.service.method(dbus_interface='included.errors.QoSManager', in_signature='', out_signature='v')
     def get_service_level(self):
         return self.service_level
-
-if __name__ == '__main__':
-    qos = QoSManager()
-    qos.start()
