@@ -4,17 +4,23 @@ import gtk
 import gui
 import shared.data
 import map.map_xml_reader
+import map
+from map.mapdata import *
+from datetime import datetime
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
+    db = None
+
     bounds = {"min_latitude":0,
                 "max_latitude":0,
                 "min_longitude":0,
                 "max_longitude":0}
 
-    def __init__(self):
+    def __init__(self, db):
         gui.Screen.__init__(self, "Map")
         gtk.DrawingArea.__init__(self)
-
+        self.db = db
+        self.db.connect('mapobject-added', self.update_map)
         mapxml = map.map_xml_reader.MapXML("map/data/map.xml")
         self.mapdata = map.mapdata.MapData(mapxml.name, mapxml.levels)
         # queue_draw() ärvs från klassen gtk.DrawingArea
@@ -30,22 +36,42 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.last_movement_timestamp = 0.0
         self.zoom_level = 1
 
+        self.gps_x = "15.5799"
+        self.gps_y = "58.40748"
+
         # events ;O
         self.set_flags(gtk.CAN_FOCUS)
         self.connect("expose_event", self.handle_expose_event)
         self.connect("button_press_event", self.handle_button_press_event)
         self.connect("button_release_event", self.handle_button_release_event)
         self.connect("motion_notify_event", self.handle_motion_notify_event)
-        self.connect("key_press_event", self.handle_key_press_event)
+#        self.connect("key_press_event", self.handle_key_press_event)
         self.set_events(gtk.gdk.BUTTON_PRESS_MASK |
                         gtk.gdk.BUTTON_RELEASE_MASK |
                         gtk.gdk.EXPOSURE_MASK |
                         gtk.gdk.LEAVE_NOTIFY_MASK |
                         gtk.gdk.POINTER_MOTION_MASK |
-                        gtk.gdk.POINTER_MOTION_HINT_MASK |
-                        gtk.gdk.KEY_PRESS_MASK)
-        
-
+                        gtk.gdk.POINTER_MOTION_HINT_MASK)
+                         #|                        gtk.gdk.KEY_PRESS_MASK)
+        # add all current objects in db to map
+        self.update_map(data = "all")
+    
+    def update_map(self, database = None, data = None):
+        print "update_data:", type(data), data
+        # add all units to dict with objects to draw
+        if data == "all":
+            mapobjectdata = self.db.get_all_mapobjects()
+            for data in mapobjectdata:
+                if data.__class__ == shared.data.UnitData:
+                    self.mapdata.objects[data.id] = Unit(data)
+                elif data.__class__ == shared.data.POIData:
+                    self.mapdata.objects[data.id] = POI(data)
+        else:
+            if data.__class__ == shared.data.UnitData:
+                self.mapdata.objects[data.id] = Unit(data)
+            elif data.__class__ == shared.data.POIData:
+                self.mapdata.objects[data.id] = POI(data)  
+        self.queue_draw()
 
     def zoom(self, change):
         # Frigör minnet genom att ladda ur alla tiles för föregående nivå
@@ -62,32 +88,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         # Ritar ny nivå
         self.queue_draw()
 
-    def handle_key_press_event(self, widget, event):
-#        # Ifall "fullscreen"-knappen på handdatorn har aktiverats.
-#        if event.keyval == gtk.keysyms.F6:
-#            if self.window_in_fullscreen:
-#                self.window.unfullscreen()
-#            else:
-#                self.window.fullscreen()
-#        # Pil vänster, byter vy
-#        if event.keyval == 65361:
-#            if (self.view.get_current_page() != 0):
-#                self.view.prev_page()
-#        # Pil höger, byter vy
-#        elif event.keyval == 65363:
-#            if (self.view.get_current_page() != 1):
-#                self.view.next_page()
-        # Zoom -
-        if event.keyval == 65477:
-            self.zoom("-")
-        # Zoom +
-        elif event.keyval == 65476:
-            self.zoom("+")
-        # Our own functions
-        elif event.keyval == gtk.keysyms.p:
-            self.mapdata.add_object("Trailerpark",
-                map.mapdata.POI(shared.data.POIData((15.5766, 58.3900),
-                                "trailer1", 0)))
+#    def handle_key_press_event(self, widget, event):
+#        pass
 
     # Hanterar rörelse av kartbilden
     def handle_button_press_event(self, widget, event):
@@ -96,6 +98,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.origin_position = self.mapdata.focus
         self.last_movement_timestamp = time.time()
         self.allow_movement = True
+        self.draw_clicked_pos(event)
         return True
 
     def handle_button_release_event(self, widget, event):
@@ -144,6 +147,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.gps_data = gps_data
         self.queue_draw()
 
+
+
     def draw(self):
         # Hämtar alla tiles för en nivå
         level = self.mapdata.get_level(self.zoom_level)
@@ -165,15 +170,17 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
             tile.picture.draw(self.context, x, y)
 
         # Ritar ut eventuella objekt
+
         objects = self.mapdata.objects
+            
         for item in objects:
-            x, y = self.gps_to_pixel(objects[item].map_object_data.coord[0],
-                                     objects[item].map_object_data.coord[1])
+            x, y = self.gps_to_pixel(objects[item].map_object_data.coords[0],
+                                     objects[item].map_object_data.coords[1])
 
             if x != 0 and y != 0:
                 objects[item].picture.draw(self.context, x, y)
 
-   
+
     def gps_to_pixel(self, lon, lat):
         cols = self.cols
         rows = self.rows
@@ -212,11 +219,34 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         height = self.bounds["min_latitude"] - self.bounds["max_latitude"]
         gps_per_pix_width = width / (cols * 300)
         gps_per_pix_height = height / (rows * 160)
-      
+
         # Observera att kartans GPS-koordinatsystem börjar i vänstra nedre
         # hörnet, medan cairo börjar i vänstra övre hörnet! På grund av detta
         # inverterar vi värdet vi räknar fram så båda koordinatsystemen
         # överensstämmer.
         return [gps_per_pix_width * movement_x,
                 gps_per_pix_height * movement_y]
+        
+    def get_clicked_coord(self, event):
+        x, y, state = event.window.get_pointer()
+        (lon,lat) = self.pixel_to_gps(x,y)
+#        rect = self.get_allocation()
+#        dx = 1.0*x/rect.width
+#        dy = 1.0*y/rect.height
+#        
+#        width = self.bounds["max_longitude"] - self.bounds["min_longitude"]
+#        height = self.bounds["max_latitude"] - self.bounds["min_latitude"]
+        
+        self.gps_x = self.bounds["min_longitude"] + lon#dx*width
+        self.gps_y = self.bounds["min_latitude"] - lat - 0.002 #dy*height
 
+        print self.gps_x, self.gps_y
+        return self.gps_x, self.gps_y
+        
+    def draw_clicked_pos(self,event):
+        (lon,lat) = self.get_clicked_coord(event)
+        #print (lon,lat)
+        
+#        poi_data = shared.data.POIData((lon, lat), "goal", datetime.now(), shared.data.POIType.pasta_wagon)
+#        self.mapdata.add_object("Shape1", map.mapdata.MapObject(poi_data))
+#        self.draw()

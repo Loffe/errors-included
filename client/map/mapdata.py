@@ -13,7 +13,7 @@ class Picture(object):
         else:
             self.path = path
 
-#ovärd?
+#ovärd? JA
 #    def draw_picture(self, context, x, y):
 #        try:
 #            context.set_source_pixbuf(self.get_picture(), x, y)
@@ -196,6 +196,8 @@ class MapData():
     bounds = None
     objects = {}
 #    __mission_objects = []
+    """ Contains all the tiles
+    """
     levels = {}
     redraw_function = None
     focus = {"latitude":0,
@@ -230,8 +232,8 @@ class MapData():
         self.objects = {}
         self.redraw()
 
-    def add_object(self, id, map_object):
-        self.objects[id] = map_object
+    def add_object(self, map_object):
+        self.objects[mapobject.id] = map_object
         self.redraw()
 
     def delete_object(self, object_id):
@@ -265,7 +267,11 @@ class Unit(MapObject):
         if unit_data.type == shared.data.UnitType.ambulance:
             path = "map/data/icons/ambulance.png"
         elif unit_data.type == shared.data.UnitType.commander:
-            path = "map/data/icons/totempole.png"
+            path = "map/data/icons/commander.png"
+        elif unit_data.type == shared.data.UnitType.army:
+            path = "map/data/icons/tank.png"
+        elif unit_data.type == shared.data.UnitType.srsa:
+            path = "map/data/icons/firetruck.png"
         self.picture = Picture(path)    
 
 class Obstacle(MapObject):
@@ -286,6 +292,10 @@ class POI(MapObject):
         path = "map/data/icons/default.png"
         if poi_data.type == shared.data.POIType.pasta_wagon:
             path = "map/data/icons/pastawagon.png"
+        elif poi_data.type == shared.data.POIType.fire:
+            path = "map/data/icons/fire.png"
+        elif poi_data.type == shared.data.POIType.accident:
+            path = "map/data/icons/accident.png"
         self.picture = Picture(path)
 
 class Mission():

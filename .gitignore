@@ -4,3 +4,4 @@
 .project
 .pydevproject
 .metadata
+*.log

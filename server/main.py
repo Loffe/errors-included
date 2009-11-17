@@ -1,89 +1,42 @@
+import gobject
+import dbus
+import dbus.mainloop.glib
 
-import select
-import socket
-import sys
 import threading
+import shared.data
 
-all = []
 
-class Server:
+class ServerManager(object):
+    queueinterface = None
+    database = None
+
     def __init__(self):
-        self.host = ''
-        self.port = 50000
-        self.backlog = 5
-        self.size = 1024
-        self.server = None
-        self.threads = []
+        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+        bus = dbus.SessionBus()
+        remote_object = bus.get_object("included.errors.Server", "/Queue")
+        self.queueinterface = dbus.Interface(remote_object, "included.errors.Server")
 
-    def open_socket(self):
-        try:
-            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            if 'arm' not in sys.version.lower():
-                self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            self.server.bind((self.host, self.port))
-            self.server.listen(5)
-        except socket.error, (value, message):
-            if self.server:
-                self.server.close()
-            print "Could not open socket: " + message
-            sys.exit()
+        self.queueinterface.connect_to_signal("message_available", self._message_available)
 
-    def run(self):
-        global all
-        self.open_socket()
-        input = [self.server, sys.stdin]
-        running = True
-        while running:
-            inputready, outputready, exceptready = select.select(input, [], [])
-            for s in inputready:
-                if s == self.server:
-                    c = Client(self.server.accept())
-                    c.start()
-                    self.threads.append(c)
-                    all.append(c)
-                elif s == sys.stdin:
-                    junk = sys.stdin.readline()
-                    if junk.startswith("quit"):
-                        running = False
+    def _message_available(self, packed_data):
+        print "_message_available"
+        packed_data = str(packed_data)
+        msg = shared.data.Message.unpack(packed_data)
+        print msg
 
-        print "Shutting down server"
-        self.server.close()
-        # Wait for clients to exit
-        for c in self.threads:
-            c.join()
+    def dbusloop(self):
+        self.mainloop = gobject.MainLoop()
+        gobject.threads_init()
 
-class Client(threading.Thread):
-    def __init__(self, (client, address)):
-        threading.Thread.__init__(self)
-        self.client = client
-        self.address = address
-        self.size = 1024
+        print "Running server on dbus."
+        while self.mainloop.is_running():
+            try:
+                self.mainloop.run()
+            except KeyboardInterrupt:
+                self.mainloop.quit()
 
-    def run(self):
-        global all
-        running = True
-        while running:
-            data = self.client.recv(self.size)
-            if data:
-                self.send_message(data)
-                for c in all:
-                    if c != self:
-                        c.send_message(data)
-                print data
-            else:
-                self.client.close()
-                all.remove(self)
-                running = False
-
-    def send_message(self, message):
-        global all
-        try:
-            self.client.send(message)
-        except socket.error, (value, message):
-            print (value, message)
-            all.remove(self)
 
 
 if __name__ == "__main__":
-    s = Server()
-    s.run()
+    server = ServerManager()
+    server.dbusloop()
