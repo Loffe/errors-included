@@ -8,6 +8,7 @@ import threading
 import gobject
 import struct
 import binascii
+import sys
 try:
     import conic
 except:
@@ -270,10 +271,10 @@ class QoSManager(dbus.service.Object):
         except:
             # No GPS-device loaded/started
             pass
+        sys.exit(0)
 
     def dbusloop(self):
         self.mainloop = gobject.MainLoop()
-        dbus.set_default_main_loop(self.mainloop)
         gobject.threads_init()
         while self.mainloop.is_running():
             try:
@@ -296,3 +297,14 @@ class QoSManager(dbus.service.Object):
     @dbus.service.method(dbus_interface='included.errors.QoSManager', in_signature='', out_signature='v')
     def get_service_level(self):
         return self.service_level
+
+if __name__ == '__main__':
+    if "stop" in sys.argv:
+        import dbus
+        print "Stopping QoSManager"
+        bus = dbus.SessionBus()
+        remote_object = bus.get_object("included.errors.QoSManager", "/QoSManager")
+        remote_object.dbus_close()
+        sys.exit(0)
+    qos = QoSManager()
+    qos.start()
