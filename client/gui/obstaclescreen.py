@@ -50,7 +50,6 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         right_box.pack_start(combo_box, True, False, 0)
         
         label, self.location_entry = new_entry("Händelse:")
-        self.location_entry.set_text("Nagot kul")
         left_box.add(label)
         right_box.add(self.location_entry)        
         label, self.location_entry2 = new_entry("Skadeplats GPS-lon:")      
