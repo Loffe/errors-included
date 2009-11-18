@@ -54,14 +54,13 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         # create and pack combobox
         self.combo_box = gtk.combo_box_new_text()
         self.combo_box.set_size_request(300,50)
-        self.combo_box.append_text("Välj ett larm här")
+        self.combo_box.append_text("Välj larm...")
         hbox.pack_start(self.combo_box, True,True, 0)
         
         new_section("Nytt uppdrag", main_box)
         
         # create entries
         self.event_entry = new_entry("     Händelse:", main_box)
-        self.event_entry.set_text("vad har hänt här?")
 
         self.location_entry2 = new_entry("     Skadeplats: lon-Gps", main_box)
         self.location_entry3 = new_entry("     Skadeplats: lat-Gps", main_box)        
