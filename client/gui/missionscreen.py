@@ -115,8 +115,8 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         lat = float(self.location_entry3.get_text())
         selected = self.select_unit_button.select_dialog.selected_units
         units = self.db.get_units(selected)
-
-        if lon != alarm.poi.coordx and lat != alarm.poi.coordy:
+        
+        if alarm == None or (lon != alarm.poi.coordx and lat != alarm.poi.coordy):
             # @todo CHANGE POI-TYPE, SHOULDNT BE HARDCODED!
             poi_data = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.fire)
         else:
