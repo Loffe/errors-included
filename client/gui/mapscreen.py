@@ -73,6 +73,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                 self.mapdata.objects[data.id] = POI(data)  
             elif data.__class__ == shared.data.Alarm:
                 self.mapdata.objects[data.poi.id] = POI(data.poi)  
+            elif data.__class__ == shared.data.MissionData:
+                self.mapdata.objects[data.poi.id] = POI(data.poi)
         self.queue_draw()
 
     def zoom(self, change):
@@ -243,7 +245,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         
         
         #self.movement_from["x"] = event.x
-        #self.movement_from["y"] = event.y
+        #self.movement_from["y"] = evData(self.event_entry.get_text(), poi_data, seent.y
         
         (a,b) = self.pixel_to_gps(self.movement_from["x"],self.movement_from["y"])
         r = self.get_allocation()
