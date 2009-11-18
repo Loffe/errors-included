@@ -36,8 +36,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.last_movement_timestamp = 0.0
         self.zoom_level = 1
 
-        self.gps_x = "15.5799"
-        self.gps_y = "58.40748"
+        self.gps_x = None#"15.5799"
+        self.gps_y = None#"58.40748"
 
         # events ;O
         self.set_flags(gtk.CAN_FOCUS)
@@ -57,7 +57,6 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.update_map(data = "all")
     
     def update_map(self, database = None, data = None):
-        print "update_data:", type(data), data
         # add all units to dict with objects to draw
         if data == "all":
             mapobjectdata = self.db.get_all_mapobjects()
@@ -71,12 +70,14 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                 self.mapdata.objects[data.id] = Unit(data)
             elif data.__class__ == shared.data.POIData:
                 self.mapdata.objects[data.id] = POI(data)  
+            elif data.__class__ == shared.data.Alarm:
+                self.mapdata.objects[data.poi.id] = POI(data.poi)  
         self.queue_draw()
 
     def zoom(self, change):
         # Frigör minnet genom att ladda ur alla tiles för föregående nivå
-        level = self.mapdata.get_level(self.zoom_level)
-        level.unload_tiles("all")
+#        level = self.mapdata.get_level(self.zoom_level)
+#        level.unload_tiles("all")
       
         if change == "+":
             if self.zoom_level < 3:
@@ -142,10 +143,10 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
 
         return False
 
-    # skicka in skiten här linus, gogo!
-    def set_gps_data(self, gps_data):
-        self.gps_data = gps_data
-        self.queue_draw()
+#    # skicka in skiten här linus, gogo!
+#    def set_gps_data(self, gps_data):
+#        self.gps_data = gps_data
+#        self.queue_draw()
 
 
 
