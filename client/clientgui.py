@@ -328,6 +328,8 @@ class ClientGui(hildon.Program):
         self.screens["make_mission"].location_entry2.set_text(str(self.screens["map"].gps_x))
         self.screens["make_mission"].location_entry3.set_text(str(self.screens["map"].gps_y))
         
+        self.screens["make_mission"].combo_box.clear()
+        
         for alarm in self.db.get_all_alarms():
             self.screens["make_mission"].combo_box.append_text(alarm.event)
 
