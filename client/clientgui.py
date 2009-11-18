@@ -149,6 +149,7 @@ class ClientGui(hildon.Program):
         # add the create_mission screen
         self.mission_screen = MissionScreen(self.db)
         self.mission_screen.connect("okbutton-clicked3", self.back_button_function) 
+        self.mission_screen.connect("new-mission", self.set_mission)
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
         
@@ -245,7 +246,9 @@ class ClientGui(hildon.Program):
                 self.mainloop.quit()
 
     def start_controller(self):
-        # Create ClientController
+        '''
+        Create and start ClientController
+        '''
         name = "Ragnar Dahlberg"
         unit_type = shared.data.UnitType.commander
         status = "Available"
@@ -254,13 +257,16 @@ class ClientGui(hildon.Program):
     ''' Handle events
     ''' 
     def back_button_function(self, event):
-        print "back"
         self.show(self.prev_page[-2])
     
     def ok_button_function(self, event):
         for screen in self.screens.values():
             if screen.props.visible and isinstance(screen, Screen):
                 screen.ok_button_function(event)
+    
+    def set_mission(self, event, data):
+        self.controller.missions.append(data)
+        print "got new mission:", type(data), data
     
     # mission view event handlers
     def show_mission(self, event):
@@ -272,43 +278,44 @@ class ClientGui(hildon.Program):
         pass
     
     def show_status(self, event):
-        
-        dialog = gtk.Dialog("Samtal",
-                 self.window,  #the toplevel wgt of your app
-                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
-                 ("     Svara     ", 77, "  Upptaget  ", 666))
-        who = gtk.Label("DT ringer...")
-        who.show()
-        dialog.set_size_request(400,200)
-        #dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-
-        dialog.vbox.pack_start(who)
-        question = gtk.Label("Vill du svara?")
-        question.show()
-        dialog.vbox.pack_start(question)
-        dialog.show()
-        result = dialog.run()
-        if result == 77:
-           print "svara"
-
-           dia = gtk.Dialog("Samtal",
-                 self.window,  #the toplevel wgt of your app
-                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
-                 ("       Lägg på       ", 11))
-        
-           dia.set_size_request(400,200)
-
-           qu = gtk.Label("Vill du lägga på?")
-           qu.show()
-           dia.vbox.pack_start(qu)
-           dia.show()
-           result = dia.run()
-           
-           dia.destroy()
-           
-        elif result == 666:
-            print "upptaget"
-        dialog.destroy()
+        pass
+  
+#        dialog = gtk.Dialog("Samtal",
+#                 self.window,  #the toplevel wgt of your app
+#                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
+#                 ("     Svara     ", 77, "  Upptaget  ", 666))
+#        who = gtk.Label("DT ringer...")
+#        who.show()
+#        dialog.set_size_request(400,200)
+#        #dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+#
+#        dialog.vbox.pack_start(who)
+#        question = gtk.Label("Vill du svara?")
+#        question.show()
+#        dialog.vbox.pack_start(question)
+#        dialog.show()
+#        result = dialog.run()
+#        if result == 77:
+#           print "svara"
+#
+#           dia = gtk.Dialog("Samtal",
+#                 self.window,  #the toplevel wgt of your app
+#                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
+#                 ("       Lägg på       ", 11))
+#        
+#           dia.set_size_request(400,200)
+#
+#           qu = gtk.Label("Vill du lägga på?")
+#           qu.show()
+#           dia.vbox.pack_start(qu)
+#           dia.show()
+#           result = dia.run()
+#           
+#           dia.destroy()
+#           
+#        elif result == 666:
+#            print "upptaget"
+#        dialog.destroy()
     
     def show_journals(self, event):
         pass
