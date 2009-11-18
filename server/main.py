@@ -38,5 +38,28 @@ class ServerManager(object):
 
 
 if __name__ == "__main__":
-    server = ServerManager()
-    server.dbusloop()
+    import sys
+    if "resetdb" in sys.argv:
+        import os
+        from shared.data import create_database, UnitData
+        from data import User
+        from datetime import datetime
+        if os.path.exists("database.db"):
+            os.remove("database.db")
+        db = create_database()
+        session = db._Session()
+
+        # Create users
+        u = User(u"Ragnar", u"prydlig frisyr")
+        session.add(u)
+        u = User(u"Slanggurka", u"smakar som nors")
+        session.add(u)
+
+        # Create units
+        u = UnitData(13, 37, "RD1337", datetime.now())
+        session.add(u)
+
+        session.commit()
+    else:
+        server = ServerManager()
+        server.dbusloop()
