@@ -9,6 +9,7 @@ import dbus
 import dbus.service
 import shared.networkqueue
 from shared.util import getLogger
+from database import ServerDatabase
 log = getLogger("server.log")
 import shared.data
 import handler
@@ -24,7 +25,8 @@ class ServerNetworkHandler(dbus.service.Object):
         self.name = dbus.service.BusName("included.errors.Server", self.session_bus)
         dbus.service.Object.__init__(self, self.session_bus,
                                      '/Queue')
-        self.db = shared.data.create_database()
+        db = ServerDatabase()
+        self.db = shared.data.create_database(db)
         self.host = '127.0.0.1'
         self.port = 50000
         self.backlog = 5
@@ -105,14 +107,21 @@ class ServerNetworkHandler(dbus.service.Object):
     def _login_client(self, socket, message):
         m = message
         if self.outqueues.has_key(socket):
-            id = m.sender
-            self.outqueues[id] = self.outqueues[socket]
-            del self.outqueues[socket]
-            log.debug("logged in and now has a named queue")
-            ack = shared.data.Message("server", id,
-                                      type=shared.data.MessageType.login_ack,
-                                      unpacked_data={"result": "ok", "class": "dict"})
-            self.enqueue(m.sender, ack.packed_data, 5)
+            if self.db.is_valid_login(m.sender, m.unpacked_data.password):
+                id = m.sender
+                self.outqueues[id] = self.outqueues[socket]
+                del self.outqueues[socket]
+                log.debug("logged in and now has a named queue")
+                ack = shared.data.Message("server", id,
+                                          type=shared.data.MessageType.login_ack,
+                                          unpacked_data={"result": "yes", "class": "dict"})
+                self.enqueue(m.sender, ack.packed_data, 5)
+            else:
+                log.debug("login denied")
+                nack = shared.data.Message("server", id,
+                                           type=shared.data.MessageType.login_ack,
+                                           unpacked_data={"result": "no", "class": "dict"})
+                self.enqueue(m.sender, nack.packed_data, 5)
         else:
             log.debug("no such socket or user already logged in")
 
