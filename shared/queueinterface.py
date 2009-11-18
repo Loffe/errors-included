@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 import dbus
 
-bus = dbus.SessionBus()
-remote_object = bus.get_object("included.errors.Client", "/Queue")
-interface = dbus.Interface(remote_object, "included.errors.Client")
+def get_interface():
+    bus = dbus.SessionBus()
+    remote_object = bus.get_object("included.errors.Client", "/Queue")
+    interface = dbus.Interface(remote_object, "included.errors.Client")
 
 if __name__ == '__main__':
     import data
     from datetime import datetime
+    interface = get_interface()
     login_msg = data.Message("ragnar dahlberg", "server", type=data.MessageType.login,
                              unpacked_data={"class": "dict", "password": "prydlig frisyr"})
     interface.enqueue(login_msg.packed_data, 5)

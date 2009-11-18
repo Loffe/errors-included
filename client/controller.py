@@ -11,18 +11,15 @@ class ClientController(object):
     '''
     Self. This is me. Holds my name, unit_type, status and gps-coordinates.
     '''
-    def __init__(self, name, unit_type, status, db, mainloop):
+    def __init__(self, name, unit_type, status, db):
         '''
         Constructor. Creates a client controller.
         @param name: my name.
         @param unit_type: my unit type.
         @param status: my status.
         @param db: the database to save to.
-        @param mainloop: the mainloop
         '''
         # create dbus session
-#        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-        dbus.set_default_main_loop(mainloop)
         bus = dbus.SessionBus()
         remote_object = bus.get_object("included.errors.QoSManager", "/QoSManager")
         interface = dbus.Interface(remote_object, "included.errors.QoSManager")

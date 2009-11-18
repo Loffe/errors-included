@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 import gtk
+import dbus.mainloop.glib
 import gobject
 import pango
 import threading
@@ -36,7 +37,7 @@ except:
 log.debug("imports ready")
 
 class ClientGui(hildon.Program):
-    queue = shared.queueinterface.interface
+    queue = None
     db = None
     gps_x = None
     gps_y = None
@@ -46,6 +47,11 @@ class ClientGui(hildon.Program):
         Constructor. Creates the GUI (window and containing components).
         '''
         log.debug("ClientGui started")
+
+        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+        self.queue = shared.queueinterface.get_interface()
+        self.mainloop = gobject.MainLoop()
+
         hildon.Program.__init__(self)
         self.window = hildon.Window()
         self.window.set_title("ClientGui")
@@ -216,7 +222,7 @@ class ClientGui(hildon.Program):
         
         vbox_right.pack_start(self.buttons_box, False, False, 0)
 
-        self.window.connect("destroy", gtk.main_quit)
+        self.window.connect("destroy", lambda event: self.mainloop.quit())
         self.window.connect("key-press-event", self.on_key_press)
         self.window.connect("window-state-event", self.on_window_state_change)
 
@@ -230,18 +236,21 @@ class ClientGui(hildon.Program):
         '''
         self.window.show_all()
         self.show_default()
-#        gobject.threads_init()
+        gobject.threads_init()
         # start gtk main (gui) thread
-        threading.Thread(self.start_controller).start()
-        self.mainloop = gtk.main()
+        self.start_controller()
+        while self.mainloop.is_running():
+            try:
+                self.mainloop.run()
+            except KeyboardInterrupt:
+                self.mainloop.quit()
 
     def start_controller(self):
         # Create ClientController
         name = "Ragnar Dahlberg"
         unit_type = shared.data.UnitType.commander
         status = "Available"
-        print "start controller:", self.mainloop
-        self.controller = controller.ClientController(name,unit_type,status, self.db, self.mainloop)
+        self.controller = controller.ClientController(name,unit_type,status, self.db)
 
     ''' Handle events
     ''' 

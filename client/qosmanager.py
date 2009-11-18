@@ -273,7 +273,6 @@ class QoSManager(dbus.service.Object):
 
     def dbusloop(self):
         self.mainloop = gobject.MainLoop()
-        dbus.set_default_main_loop(self.mainloop)
         gobject.threads_init()
         while self.mainloop.is_running():
             try:
@@ -296,3 +295,7 @@ class QoSManager(dbus.service.Object):
     @dbus.service.method(dbus_interface='included.errors.QoSManager', in_signature='', out_signature='v')
     def get_service_level(self):
         return self.service_level
+
+if __name__ == '__main__':
+    qos = QoSManager()
+    qos.start()
