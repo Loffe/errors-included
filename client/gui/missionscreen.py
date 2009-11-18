@@ -116,13 +116,13 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         selected = self.select_unit_button.select_dialog.selected_units
         units = self.db.get_units(selected)
 
-        if lon != alarm.poi.coordx and lat != alarm.poi.coordy:
-            # @todo CHANGE POI-TYPE, SHOULDNT BE HARDCODED!
-            poi_data = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.fire)
-        else:
-            poi_data = alarm.poi
-        mission_data = shared.data.MissionData(self.event_entry.get_text(), poi_data, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text(), units)
-        self.db.add(mission_data)
+#        if lon != alarm.poi.coordx and lat != alarm.poi.coordy:
+#            # @todo CHANGE POI-TYPE, SHOULDNT BE HARDCODED!
+#            poi_data = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.fire)
+#        else:
+#            poi_data = alarm.poi
+#        mission_data = shared.data.MissionData(lon,lat, poi_data, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text(), units)
+#        self.db.add(mission_data)
         
         self.emit("okbutton-clicked3")
         
