@@ -123,10 +123,11 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
             poi_data = alarm.poi
         mission_data = shared.data.MissionData(self.event_entry.get_text(), poi_data, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text(), units)
         self.db.add(mission_data)
-        
+        self.emit("new-mission", mission_data)
         self.emit("okbutton-clicked3")
         
 gobject.type_register(MissionScreen)
 gobject.signal_new("okbutton-clicked3", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
+gobject.signal_new("new-mission", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
         
         

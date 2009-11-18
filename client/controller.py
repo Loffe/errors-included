@@ -37,12 +37,14 @@ class ClientController(object):
         self.unit_type = unit_type
         # My status
         self.status = status
-        # My mission
-        self.mission = None
+        # My missions
+        self.missions = []
         # The unit I am
         self.unit_data = shared.data.UnitData(0, 0, name, datetime.datetime.now(), 
                  unit_type)
-        
+        # add myself to the database
+        self.db.add(self.unit_data)
+
     def update_coords(self, coordx, coordy):
         '''
         Update my GPS-coordinates.
@@ -53,30 +55,3 @@ class ClientController(object):
         self.unit_data.coordy = coordy
         self.unit_data.timestamp = datetime.datetime.now()
         print "Got coords update"
-
-#    def run(self):
-#        '''
-#        Start the mainloop.
-#        '''
-#        self.dbusloop()
-#
-#    def dbusloop(self):
-#        
-#        gobject.threads_init()
-#        print "Running ClientController"
-#        while self.mainloop.is_running():
-#            try:
-#                self.mainloop.run()
-#            except KeyboardInterrupt:
-#                self.mainloop.quit()
-#                self.close()
-
-    def close(self):
-        print "ClientController aborted"
-
-if __name__ == "__main__":
-    name = "Ragnar Dahlberg"
-    unit_type = shared.data.UnitType.commander
-    status = "Available"
-    client = ClientController(name, unit_type, status)
-    client.run()
