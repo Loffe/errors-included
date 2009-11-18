@@ -345,7 +345,7 @@ class ClientGui(hildon.Program):
         self.screens["make_mission"].location_entry2.set_text(str(self.screens["map"].gps_x))
         self.screens["make_mission"].location_entry3.set_text(str(self.screens["map"].gps_y))
         
-        #self.screens["make_mission"].combo_box.clear()
+#        self.screens["make_mission"].combo_box.clear()
         
         for alarm in self.db.get_all_alarms():
             self.screens["make_mission"].combo_box.append_text(alarm.event)
@@ -386,6 +386,12 @@ class ClientGui(hildon.Program):
             self.screens["notifications"].set_label(notification_text)
         else:
             self.show_default()
+        if "add_object" in button_key and self.menu_buttons[button_key].get_active() == True:
+            self.screens["map"].sign = True
+            self.screens["map"].draw_sign()
+        else:
+            self.screens["map"].sign = False
+            self.screens["map"].remove_sign()
     
     def show(self, keys):
         '''
@@ -408,6 +414,8 @@ class ClientGui(hildon.Program):
         self.screens["notifications"].set_label("Team Med Fel")
         self.screens["notifications"].show()
         self.screens["map"].show()
+        self.screens["map"].sign = False
+        self.screens["map"].remove_sign()
 
     # handle key press events
     def on_key_press(self, widget, event, *args):

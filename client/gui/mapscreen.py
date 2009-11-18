@@ -10,6 +10,7 @@ from datetime import datetime
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
     db = None
+    sign = False
 
     bounds = {"min_latitude":0,
                 "max_latitude":0,
@@ -36,8 +37,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.last_movement_timestamp = 0.0
         self.zoom_level = 1
 
-        self.gps_x = None#"15.5799"
-        self.gps_y = None#"58.40748"
+        self.gps_x = self.mapdata.focus["longitude"]
+        self.gps_y = self.mapdata.focus["latitude"]
 
         # events ;O
         self.set_flags(gtk.CAN_FOCUS)
@@ -248,12 +249,11 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         r = self.get_allocation()
         #(m,n) = self.pixel_to_gps(r.width/2,r.height/2)
         (m,n) = self.pixel_to_gps(300, 160)
-        print r.width,r.height
+        #print r.width,r.height
         
-        print lon, lat , "-" , a, b
-        
-        self.gps_x = self.origin_position["longitude"] - m + lon - 0.001
-        self.gps_y = self.origin_position["latitude"] + n  - lat
+        #print lon, lat , "-" , a, b
+        self.gps_x = self.origin_position["longitude"] - m + lon - 0.002
+        self.gps_y = self.origin_position["latitude"] + n  - lat + 0.0005
         
         #print p,q
         #print a,b
@@ -279,17 +279,41 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         
         #print lon, lat
         
-        print "----------------"
+        #print "----------------"
 
         #print self.gps_x, self.gps_y
-        return self.gps_x, self.gps_y 
+        #return self.gps_x, self.gps_y 
         
         #print "-------------"
-    def draw_clicked_pos(self, event):
-        pass    
+    
+    def draw_sign(self):  
+        poi_data = shared.data.POIData(self.gps_x, self.gps_y, "goal", datetime.now(), shared.data.POIType.flag)
+        self.mapdata.objects["add-sign"] = POI(poi_data)
+        self.queue_draw()
+        
+    def remove_sign(self):
+        try:
+            del self.mapdata.objects["add-sign"]
+            self.queue_draw()  
+        except:
+            pass
 
-        (lon,lat) = self.get_clicked_coord(event)
+    def draw_clicked_pos(self, event):
+        self.get_clicked_coord(event)
+        if self.sign:
+            self.draw_sign()
+        
+        
+        
+#        self.clientgui.draw_sign()
+#        (self.gps_x, self.gps_y) = self.get_clicked_coord(event)
+#        
+#        poi_data = shared.data.POIData(self.gps_x, self.gps_y, "goal", datetime.now(), shared.data.POIType.pasta_wagon)
+#        mapdata.objects["add-sign"] = POI(poi_data)
+        
+        #(lon,lat) = self.get_clicked_coord(event)
         #print (lon,lat)
         
-#        poi_data = shared.data.POIData((lon, lat), "goal", datetime.now(), shared.data.POIType.pasta_wagon)
+        #poi_data = shared.data.POIData((lon, lat), "goal", datetime.now(), shared.data.POIType.pasta_wagon)
+        #self.db.add(poi_data)
 #        self.mapdata.add_object("Shape1", map.mapdata.MapObject(poi_data))

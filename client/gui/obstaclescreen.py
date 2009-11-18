@@ -107,7 +107,7 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
         
-        poi_data2 = shared.data.POIData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), self.type)
+        poi_data2 = shared.data.POIData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), shared.data.POIType.accident)
         
         self.db.add(poi_data2)
 

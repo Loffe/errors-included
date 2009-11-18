@@ -303,6 +303,8 @@ class POI(MapObject):
             path = "map/data/icons/fire.png"
         elif poi_data.type == shared.data.POIType.accident:
             path = "map/data/icons/accident.png"
+        elif poi_data.type == shared.data.POIType.flag:
+            path = "map/data/icons/default.png"
         self.picture = Picture(path)
 
 class Mission():
