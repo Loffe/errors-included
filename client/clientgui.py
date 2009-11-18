@@ -53,6 +53,7 @@ class ClientGui(hildon.Program):
         hildon.Program.__init__(self)
         self.window = hildon.Window()
         self.window.set_title("ClientGui")
+        self.window.set_size_request(800,480)
         self.add_window(self.window)
         
         # Creates a empty list that contains previous screens
