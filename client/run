@@ -1,0 +1,8 @@
+#!/bin/sh
+# Goto script dir
+cd `dirname $0`
+
+echo "Starting queue"
+run-standalone.sh python2.5 queue-main.py &
+echo "Starting main"
+run-standalone.sh python2.5 main.py &
