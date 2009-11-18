@@ -39,8 +39,6 @@ log.debug("imports ready")
 class ClientGui(hildon.Program):
     queue = None
     db = None
-    gps_x = None
-    gps_y = None
 
     def __init__(self):
         '''
@@ -315,13 +313,7 @@ class ClientGui(hildon.Program):
         pass
     
     def show_faq(self, event):
-        print "faq the system!"
-        poi_data = shared.data.POIData(15.5769069,58.4088884, u"goal", datetime.now(), shared.data.POIType.accident)
-
-        self.db.add(poi_data)
-        
-        enhet3 = UnitData(15.5746475, 58.4077164 ,u"Enhet3",datetime.now(), UnitType.ambulance)
-        self.db.add(enhet3)
+        pass
         
     # add object view event handlers
     def show_add_object(self, event):
@@ -334,9 +326,6 @@ class ClientGui(hildon.Program):
         self.show(["alarm", "buttons"])
         self.screens["alarm"].location_entry2.set_text(str(self.screens["map"].gps_x))
         self.screens["alarm"].location_entry3.set_text(str(self.screens["map"].gps_y))
-        
-            
-        
             
     def create_obstacle(self, event):
         self.show(["obstacle", "buttons"])
@@ -348,10 +337,10 @@ class ClientGui(hildon.Program):
         self.screens["make_mission"].location_entry2.set_text(str(self.screens["map"].gps_x))
         self.screens["make_mission"].location_entry3.set_text(str(self.screens["map"].gps_y))
         
+        #self.screens["make_mission"].combo_box.clear()
+        
         for alarm in self.db.get_all_alarms():
             self.screens["make_mission"].combo_box.append_text(alarm.event)
-
-
 
     def create_new_message(self, event):
         self.show(["new_message", "buttons"])

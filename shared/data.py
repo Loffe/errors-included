@@ -3,7 +3,7 @@ import simplejson as json
 from datetime import datetime
 import gobject
 from sqlalchemy import *
-from sqlalchemy.orm import sessionmaker, relation
+from sqlalchemy.orm import sessionmaker, relation, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 
 # Create a base class to extend in order to be able to save to the database. 
@@ -46,14 +46,14 @@ class Database(gobject.GObject):
         '''
         gobject.GObject.__init__(self)
         self.engine = create_engine('sqlite:///database.db', echo=False)
-        self._Session = sessionmaker(bind=self.engine)
+        self._Session = scoped_session(sessionmaker(bind=self.engine))
 #        self.session = self._Session()
         
     def add(self, object):
-        session = self._Session()
-        session.add(object)
-        session.commit()
-        session.close()
+#        session = self._Session()
+        self._Session().add(object)
+        self._Session().commit()
+#        self._Session().remove()
         self.emit("mapobject-added", object)
         
     def delete(self, object):
@@ -65,11 +65,13 @@ class Database(gobject.GObject):
         
     def get_all_alarms(self):
         session = self._Session()
-        list = []
+        alarms = []
         for a in session.query(Alarm):
-            list.append(a)
+            for p in session.query(POIData).filter_by(id=a.poi_id):
+                a.poi = p
+            alarms.append(a)
         session.close()
-        return list
+        return alarms
 
     def get_all_units(self):
         session = self._Session()
@@ -242,7 +244,7 @@ class Alarm(Base, Packable):
     number_of_wounded = Column(Integer)
 
     def __init__(self, event, location_name, poi, contact_person, 
-                 contact_number, number_of_wounded, timestamp = datetime.now(), other = u""):
+                 contact_number, number_of_wounded, other, timestamp = datetime.now()):
         self.event = event
         self.location_name = location_name
         self.poi = poi

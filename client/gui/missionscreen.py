@@ -54,14 +54,13 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         # create and pack combobox
         self.combo_box = gtk.combo_box_new_text()
         self.combo_box.set_size_request(300,50)
-        self.combo_box.append_text("Välj ett larm här")
+        self.combo_box.append_text("Välj larm...")
         hbox.pack_start(self.combo_box, True,True, 0)
         
         new_section("Nytt uppdrag", main_box)
         
         # create entries
         self.event_entry = new_entry("     Händelse:", main_box)
-        self.event_entry.set_text("vad har hänt här?")
 
         self.location_entry2 = new_entry("     Skadeplats: lon-Gps", main_box)
         self.location_entry3 = new_entry("     Skadeplats: lat-Gps", main_box)        
@@ -74,11 +73,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         
 
         self.select_unit_button = SelectUnitButton(self.db)
-        main_box.add(self.select_unit_button)
-        
-        # add selectable types
-        
-                
+        main_box.add(self.select_unit_button)        
 
         # add event handler
         self.combo_box.connect('changed', self.select_alarm)
@@ -99,7 +94,8 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         '''
         # set the selected type
         self.selected_alarm = self.combo_box.get_active_text()
-        for alarm in self.db.get_all_alarms():
+        alarms = self.db.get_all_alarms()
+        for alarm in alarms:
             if alarm.event == self.selected_alarm:
                 self.event_entry.set_text(alarm.event)
                 self.location_entry2.set_text(str(alarm.poi.coordx))
@@ -114,21 +110,18 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         for a in self.db.get_all_alarms():
             if a.event == self.selected_alarm:
                 alarm = a
-        
-        print "ok"        
-        
-        
+
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
-        
-        poi_data4 = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.fire)
         selected = self.select_unit_button.select_dialog.selected_units
         units = self.db.get_units(selected)
-        
 
-        mission_data = shared.data.MissionData(self.event_entry.get_text(), poi_data4, self.hurted_entry.get_text(), u"Me Messen", u"det gör jävligt ont", units)
-
-        self.db.add(poi_data4)
+        if lon != alarm.poi.coordx and lat != alarm.poi.coordy:
+            # @todo CHANGE POI-TYPE, SHOULDNT BE HARDCODED!
+            poi_data = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.fire)
+        else:
+            poi_data = alarm.poi
+        mission_data = shared.data.MissionData(self.event_entry.get_text(), poi_data, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text(), units)
         self.db.add(mission_data)
         
         self.emit("okbutton-clicked3")
