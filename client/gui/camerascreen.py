@@ -30,7 +30,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         hbox.set_border_width(10)
         hbox.pack_start(gtk.Label())
         self.button = gtk.Button("Lägg på")
-        self.button.connect("clicked", self.stop)
+        self.button.connect("clicked", self.start_stop)
         hbox.pack_start(self.button, False)
         #self.button2 = gtk.Button("Quit")
         #self.button2.connect("clicked", self.exit)
@@ -74,7 +74,6 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         bus.enable_sync_message_emission()
         bus.connect("message", self.on_message)
         bus.connect("sync-message::element", self.on_sync_message)
-        self.audio_sender.set_state(gst.STATE_PLAYING)
 
 
     def start_audio_recv(self,port):
@@ -92,7 +91,6 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         bus1.enable_sync_message_emission()
         bus1.connect("message", self.on_message)
         bus1.connect("sync-message::element", self.on_sync_message)
-        self.audio_recv.set_state(gst.STATE_PLAYING)
     
     
     def start_video_send(self, ip):
@@ -115,7 +113,6 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         bus2.enable_sync_message_emission()
         bus2.connect("message", self.on_message)
         bus2.connect("sync-message::element", self.on_sync_message)
-        self.video_sender.set_state(gst.STATE_PLAYING)
         
     def start_video_recv(self,port):
         #Show the incoming video
@@ -133,13 +130,22 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         bus3.enable_sync_message_emission()
         bus3.connect("message", self.on_message)
         bus3.connect("sync-message::element", self.on_sync_message)
-        self.video_recv.set_state(gst.STATE_PLAYING)
+        
+        
+    def start_stop(self, w):
+        if self.button.get_label() == "Start":
+            self.button.set_label("Stop")
+            self.audio_sender.set_state(gst.STATE_PLAYING)
+            self.video_sender.set_state(gst.STATE_PLAYING)
+            self.video_recv.set_state(gst.STATE_PLAYING)
+            self.audio_recv.set_state(gst.STATE_PLAYING)
+        else:
+            self.audio_sender.set_state(gst.STATE_NULL)
+            self.video_sender.set_state(gst.STATE_NULL)
+            self.video_recv.set_state(gst.STATE_NULL)
+            self.audio_recv.set_state(gst.STATE_NULL)
+            self.button.set_label("Start")
 
-    def stop(self, w):
-        self.audio_sender.set_state(gst.STATE_NULL)
-        self.video_sender.set_state(gst.STATE_NULL)
-        self.video_recv.set_state(gst.STATE_NULL)
-        self.audio_recv.set_state(gst.STATE_NULL)
 
     def exit(self, widget, data=None):
         gtk.main_quit()
@@ -147,14 +153,19 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
     def on_message(self, bus, message):
         t = message.type
         if t == gst.MESSAGE_EOS:
-#            self.player.set_state(gst.STATE_NULL)
-            self.sender.set_state(gst.STATE_NULL)
+            self.audio_sender.set_state(gst.STATE_NULL)
+            self.video_sender.set_state(gst.STATE_NULL)
+            self.audio_recv.set_state(gst.STATE_NULL)
+            self.video_recv.set_state(gst.STATE_NULL)
             self.button.set_label("Start")
         elif t == gst.MESSAGE_ERROR:
             err, debug = message.parse_error()
             print "Error: %s" % err, debug
 #            self.player.set_state(gst.STATE_NULL)
-            self.sender.set_state(gst.STATE_NULL)
+            self.audio_sender.set_state(gst.STATE_NULL)
+            self.video_sender.set_state(gst.STATE_NULL)
+            self.audio_recv.set_state(gst.STATE_NULL)
+            self.video_recv.set_state(gst.STATE_NULL)
             self.button.set_label("Start")
 
     def on_sync_message(self, bus, message):
