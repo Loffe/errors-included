@@ -88,6 +88,10 @@ class Database(gobject.GObject):
 #        self.session = self._Session()
         
     def add(self, object):
+        '''
+        Add a new object to the database.
+        @param object: the object to add.
+        '''
         session = self._Session()
         session.add(object)
         session.commit()
@@ -95,13 +99,22 @@ class Database(gobject.GObject):
         self.emit("mapobject-added", object)
         
     def change(self, object):
+        '''
+        Change an existing objects state in the database.
+        @param object: the object that has changed.
+        '''
         session = self._Session()
+        object.timestamp = datetime.now()
         session.add(object)
         session.commit()
         session.close()
         self.emit("mapobject-changed", object)
         
     def delete(self, object):
+        '''
+        Delete an object from the database.
+        @param object: the object to delete.
+        '''
         session = self._Session()
         session.delete(object)
         session.commit()
@@ -142,15 +155,6 @@ class Database(gobject.GObject):
             list.append(u)
         session.close()
         return list
-    
-#    def get_poi_type(self):
-#        session = self._Session()
-#        list = []
-#        p = (eld, saker)
-#        for u in p:
-#            list.append(u)
-#        
-#        return list
 
 class UnitType(object):
     (ambulance, # Regular unit
@@ -236,10 +240,7 @@ class MapObjectData(Base, Packable):
             return repr.encode('utf-8')
         except:
             return repr
-        
-''' TODO: We could create mapobject-removed/deleted and mapobject-changed for further optimisation
-    for now all changes emit the "mapobject-added"-signal
-'''
+
 gobject.type_register(Database)
 gobject.signal_new("mapobject-added", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
 gobject.signal_new("mapobject-changed", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
@@ -505,9 +506,7 @@ if __name__ == '__main__':
     print "Testing db"
     db = create_database()
 
-
-
-    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident, POISubType.tree)
+    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.accident, POISubType.tree)
 #    print poi_data, poi_data.to_dict()
 #    db.add(poi_data)
 #    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
@@ -521,40 +520,4 @@ if __name__ == '__main__':
     alarm.event = "kuk"
     db.change(alarm)
 
-    
-#    db.add(mission_data)
-    
-#    for i in range(5):
-#        u = UnitData((0, 15), "Enhet " + str(i), datetime.now(), UnitType.ambulance)
-#        print u
-#        db.add(u)
-#    
-#    units = db.get_all_units()
-#    for u in units:
-#        print u.id, u.name
-#
-#    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident)
-#    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå")
-#    print mission_data
-#    alarm = Alarm(u"Bilolycka", u"Linköping", poi_data, u"Laban Andersson", u"070-741337", 7)
-#    alarm2 = Alarm(u"Hjärtattack", u"Norrköping", poi_data, u"Jakob johansson", u"070-741338", 1)
-#    alarm3 = Alarm(u"Barnmisshandel", u"Motala", poi_data, u"Muhammad Alzhein", u"n/a", 4)
-#    db.add(alarm)
-#    db.add(alarm2)
-#    db.add(alarm3)
-#    
-#    enhet = UnitData(15.56564, 58.4047 ,u"Enhet1",datetime.now(), UnitType.ambulance)
-#    enhet2 = UnitData(15.552864, 58.40554901 ,u"Enhet2",datetime.now(), UnitType.ambulance)
-#    enhet3 = UnitData(15.5656475, 58.4047164 ,u"Enhet3",datetime.now(), UnitType.ambulance)
-#    db.add(enhet)
-#    db.add(enhet2)
-#    db.add(enhet3)
-#    event = Event(object = alarm)
-#    event = Event(poi_data.id, EventType.add)
-#    print "ALARM:", alarm
-#    print "POI:", poi_data.__dict__
-#    print Message(type = MessageType.map, unpacked_data = mission_data)
-#    print "packed:", m1
-#    m2 = Message(packed_data = m1.packed_data)
-#    print "unpacked:", m2
 
