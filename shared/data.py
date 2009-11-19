@@ -50,10 +50,10 @@ class Database(gobject.GObject):
 #        self.session = self._Session()
         
     def add(self, object):
-#        session = self._Session()
-        self._Session().add(object)
-        self._Session().commit()
-#        self._Session().remove()
+        session = self._Session()
+        session.add(object)
+        session.commit()
+        session.close()
         self.emit("mapobject-added", object)
         
     def delete(self, object):
@@ -228,6 +228,7 @@ class POIData(MapObjectData):
                  type = POIType.pasta_wagon, subtype = None, id = None):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
+        self.subtype = subtype
 
 class Alarm(Base, Packable):
     __tablename__ = 'Alarm'
@@ -456,8 +457,8 @@ def create_database(db = Database()):
 if __name__ == '__main__':
     print "Testing db"
     db = create_database()
-#    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident)
-#    db.add(poi_data)
+    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident, POISubType.tree)
+    db.add(poi_data)
 #    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
 #    db.add(unit_data)
 #    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
