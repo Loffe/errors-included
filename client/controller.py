@@ -59,6 +59,6 @@ class ClientController(object):
         '''
         self.unit_data.coordx = float(coordx)
         self.unit_data.coordy = float(coordy)
+        print "Got coords update", self.unit_data.coordx, self.unit_data.coordy
         self.unit_data.timestamp = datetime.datetime.now()
         self.db.change(self.unit_data)
-        print "Got coords update"

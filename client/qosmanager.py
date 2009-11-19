@@ -160,8 +160,8 @@ class QoSManager(dbus.service.Object):
 
         # TODO: LIMIT TRIES COUNT?!
         print "tries:", str(tries)
-#        if tries >= 29:
-#            (x,y) = (15.5726, 58.4035)
+        if tries >= 29:
+            (x,y) = (15.572612345, 58.403512345)
         # Stop the GPS
         gpsbt.stop(self.gps_context)
 
