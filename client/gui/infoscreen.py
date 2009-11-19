@@ -32,25 +32,29 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
 
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
-#        def new_entry(labeltext, parent):
-#            hbox = gtk.HBox(True, 0)
-#            label = gtk.Label(labeltext)
-#            label.set_alignment(0, 0.5)
-#            label.modify_font(pango.FontDescription("sans 12"))
-#
-#            entry = gtk.entry()
-#            entry.set_max_length(300)
-#            entry.set_text("")
-#            entry.select_region(0, len(entry.get_text()))
-#            hbox.add(label)
-#            hbox.add(entry)
-#            parent.add(hbox)
-#            return entry
-#
-#        def new_section(title, parent):
-#            label = gtk.Label(title)
-#            label.set_alignment(0, 0.5)
-#            parent.add(label)
+        def new_entry(labeltext, parent):
+            hbox = gtk.HBox(True, 0)
+            label = gtk.Label(labeltext)
+            label.set_alignment(0, 0.5)
+            #label.modify_font(pango.FontDescription("sans 12"))
+            
+
+
+
+            entry = gtk.Label()
+            entry.set_alignment(0, 0.5)
+            #entry.modify_font(pango.FontDescription("sans 12"))
+            entry.select_region(0, len(entry.get_text()))
+            hbox.add(label)
+            hbox.add(entry)
+            parent.add(hbox)
+            return entry
+
+        def new_section(title, parent):
+            label = gtk.Label(title)
+            label.modify_font(pango.FontDescription("sans 12"))
+            label.set_alignment(0, 0.5)
+            parent.add(label)
 #        
         # create layout boxes
         main_box = gtk.VBox(False,0)
@@ -72,16 +76,18 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
 #        new_section("Nytt uppdrag", main_box)
         
         # create entries
-#        self.event_entry = new_entry("     Händelse:", main_box)
-#
-#        self.location_entry2 = new_entry("     Skadeplats: lon-Gps", main_box)
-#        self.location_entry3 = new_entry("     Skadeplats: lat-Gps", main_box)        
-#        self.hurted_entry = new_entry("     Antal skadade:", main_box)
-#        new_section("Kontaktperson", main_box)
-#        self.name_entry = new_entry("     Namn:", main_box)
-#        self.number_entry = new_entry("     Nummer:", main_box)
-#        new_section("Övrigt", main_box)
-#        self.random_entry = new_entry("     Information:", main_box)
+        
+        new_section("Mitt uppdarag", main_box)
+        self.event_entry = new_entry("     Händelse:", main_box)
+
+        self.location_entry2 = new_entry("     Skadeplats: lon-Gps", main_box)
+        self.location_entry3 = new_entry("     Skadeplats: lat-Gps", main_box)        
+        self.hurted_entry = new_entry("     Antal skadade:", main_box)
+        new_section("Kontaktperson", main_box)
+        self.name_entry = new_entry("     Namn:", main_box)
+        self.number_entry = new_entry("     Nummer:", main_box)
+        new_section("Övrigt", main_box)
+        self.random_entry = new_entry("     Information:", main_box)
         
 
 #        self.select_unit_button = SelectUnitButton(self.db)
@@ -119,7 +125,13 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
 #                self.random_entry.set_text(alarm.other)
                 
     def ok_button_function(self, event):
-        pass
+        self.event_entry.set_text("hej")
+        self.location_entry2.set_text(str("hej"))
+        self.location_entry3.set_text(str("hej"))                
+        self.name_entry.set_text("hej")
+        self.hurted_entry.set_text(str("hej"))
+        self.number_entry.set_text("hej")
+        self.random_entry.set_text("hej")
     
 #        alarm = None
 #        for a in self.db.get_all_alarms():
