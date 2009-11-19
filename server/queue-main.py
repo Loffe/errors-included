@@ -112,13 +112,13 @@ class ServerNetworkHandler(dbus.service.Object):
                 self.outqueues[id] = self.outqueues[socket]
                 del self.outqueues[socket]
                 log.debug("logged in and now has a named queue")
-                ack = shared.data.Message("server", id,
+                ack = shared.data.Message("server", id, response_to=m.message_id,
                                           type=shared.data.MessageType.login_ack,
                                           unpacked_data={"result": "yes", "class": "dict"})
                 self.enqueue(m.sender, ack.packed_data, 5)
             else:
                 log.debug("login denied")
-                nack = shared.data.Message("server", id,
+                nack = shared.data.Message("server", id, response_to=m.message_id,
                                            type=shared.data.MessageType.login_ack,
                                            unpacked_data={"result": "no", "class": "dict"})
                 # queue is not named because login failed

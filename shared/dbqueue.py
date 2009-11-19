@@ -1,5 +1,6 @@
 import Queue
 import data as data
+import simplejson as json
 
 class DatabaseQueue(Queue.Queue):
     direction_in, direction_out = range(2)
@@ -28,9 +29,17 @@ class DatabaseQueue(Queue.Queue):
         return False
 
     # Put a new item in the queue
-    def _put(self, (data, prio)):
+    def _put(self, item):
+        '''
+        Save the packed data (item) and also repack it with message_id
+        before commit to database
+        '''
         session = self.db._Session()
-        item = self.item_type(data, prio)
+        session.add(item)
+        session.flush()
+        d = json.loads(item.data)
+        d["message_id"] = item.id
+        item.data = json.dumps(d)
         session.add(item)
         session.commit()
         session.close()
@@ -51,8 +60,10 @@ class DatabaseQueue(Queue.Queue):
     # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
     def put(self, data, priority=0, block=True, timeout=None):
         item = data, priority
+        item = self.item_type(data, priority)
         print "putting:", data
         Queue.Queue.put(self, item, block, timeout)
+        return item.id
 
     # shadow and wrap Queue.Queue's own `get' to strip auxiliary aspects
     def get(self, block=True, timeout=None):

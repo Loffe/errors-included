@@ -39,12 +39,12 @@ class ClientNetworkHandler(dbus.service.Object):
         self.output.connect("socket-broken", self._socket_broken)
 
     @dbus.service.method(dbus_interface='included.errors.Client',
-                         in_signature='si', out_signature='s')
+                         in_signature='si', out_signature='i')
     def enqueue(self, msg, prio):
-        self.output.enqueue(msg, prio)
+        local_id = self.output.enqueue(msg, prio)
         #print "Queued: ", msg
         #print self.output
-        return "Message queued :)"
+        return local_id
 
     @dbus.service.method(dbus_interface='included.errors.Client',
                          in_signature='', out_signature='s')
@@ -113,8 +113,8 @@ class ClientNetworkHandler(dbus.service.Object):
                         print "got", junk
                 elif s == self.socket:
                     print "gettin' msg"
-                    self.input.receive()
-                    print "Just putted a message in a queue :D"
+                    id = self.input.receive()
+                    print "Just putted a message %s in a queue :D" % id
         self.close()
 
     def mainloop(self):

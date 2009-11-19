@@ -37,9 +37,10 @@ class NetworkOutQueue(NetworkQueue):
 
     def enqueue(self, packed_data, prio):
         print "enqueued"
-        self.queue.put(packed_data, prio)
+        local_id = self.queue.put(packed_data, prio)
         if not self.sending:
             self.start_sending()
+        return local_id
 
     def start_sending(self):
         '''
@@ -129,6 +130,8 @@ class NetworkInQueue(NetworkQueue):
                 log.debug("Crappy data = ! JSON")
                 log.debug(ve)
                 return
+
+            return m.response_to
 
             # For now don't react on incoming messages directly from queue
             '''

@@ -377,6 +377,10 @@ class Message(object):
     All messages must be instances of this class.
     Enables packing and unpacking of raw messages.
     '''
+    message_id = None
+    # The id of the message this one is a response to
+    response_to = None
+
     reciever = None
     sender = None
     # The type of this message
@@ -391,7 +395,7 @@ class Message(object):
     # The timestamp of this message
     timestamp = None
     
-    def __init__(self, sender, reciever, type = None, subtype = None, unpacked_data = None):
+    def __init__(self, sender, reciever, type = None, subtype = None, response_to = 0, unpacked_data = None):
         '''
         Constructor. Creates a message.
         @param type: the type of this message
@@ -403,6 +407,7 @@ class Message(object):
         self.subtype = subtype
         self.unpacked_data = unpacked_data
         self.timestamp = datetime.now()
+        self.response_to = response_to
         
         # pack the unpacked data
         self.pack()
@@ -418,6 +423,7 @@ class Message(object):
         dict["timestamp"] = self.timestamp.strftime("%s")
         dict["sender"] = self.sender
         dict["reciever"] = self.reciever
+        dict["response_to"] = self.response_to
         try:
             dict["packed_data"] = self.unpacked_data.to_dict()
         except:
@@ -441,6 +447,7 @@ class Message(object):
             self.reciever = dict["reciever"]
             self.timestamp = datetime.fromtimestamp(float(dict["timestamp"]))
             self.packed_data = dict["packed_data"]
+            self.response_to = dict["response_to"] if dict.has_key("response_to") else None
 
             # it's data packed to a dict
             if type(self.packed_data) == type({}):
