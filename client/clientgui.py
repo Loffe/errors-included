@@ -23,6 +23,10 @@ from gui.missionscreen import MissionScreen
 from gui.newmessagescreen import NewMessageScreen
 from gui.outboxscreen import OutboxScreen
 from gui.alarminboxscreen import AlarmInboxScreen
+from gui.faqscreen import FAQScreen
+from gui.infoscreen import InfoScreen
+from gui.statusscreen import StatusScreen
+from gui.patientjournalscreen import PatientJournalScreen
 
 try:
     import hildon
@@ -153,6 +157,22 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
         
+        self.faq_screen = FAQScreen(self.db)               
+        vbox_right.pack_start(self.faq_screen, True, True, 0)
+        self.screens["faq"] = self.faq_screen
+        
+        self.info_screen = InfoScreen(self.db)               
+        vbox_right.pack_start(self.info_screen, True, True, 0)
+        self.screens["info"] = self.info_screen
+        
+        self.status_screen = StatusScreen(self.db)               
+        vbox_right.pack_start(self.status_screen, True, True, 0)
+        self.screens["status"] = self.status_screen
+
+        self.patient_journal_screen = PatientJournalScreen(self.db)               
+        vbox_right.pack_start(self.patient_journal_screen, True, True, 0)
+        self.screens["patient_journal"] = self.patient_journal_screen        
+        
         # Mission buttons and their menu
         self.mission_menu = gtk.HBox(False, 0)
         self.mission_menu.set_size_request(0, 60)
@@ -164,6 +184,7 @@ class ClientGui(hildon.Program):
         status_button = gtk.Button("Status")
         status_button.connect("clicked", self.show_status)
         journal_button = gtk.Button("Patient\nJournal")
+        journal_button.connect("clicked", self.show_journals)
         faq_button = gtk.Button("FAQ")
         faq_button.connect("clicked", self.show_faq)
         self.mission_menu.add(info_button)
@@ -275,10 +296,10 @@ class ClientGui(hildon.Program):
     
     # mission buttons event handlers
     def show_mission_info(self, event):
-        pass
+        self.show(["info", "buttons"])
     
     def show_status(self, event):
-        pass
+        self.show(["status", "buttons"])
   
 #        dialog = gtk.Dialog("Samtal",
 #                 self.window,  #the toplevel wgt of your app
@@ -318,10 +339,10 @@ class ClientGui(hildon.Program):
 #        dialog.destroy()
     
     def show_journals(self, event):
-        pass
+        self.show(["patient_journal", "buttons"])
     
     def show_faq(self, event):
-        pass
+        self.show(["faq", "buttons"])
         
     # add object view event handlers
     def show_add_object(self, event):
