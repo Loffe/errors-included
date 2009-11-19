@@ -116,7 +116,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         
     def start_video_recv(self,port):
         #Show the incoming video
-        self.video_recv = gst.parse_launch("udpsrc port="+str(port)+ "caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink")
+        self.video_recv = gst.parse_launch("udpsrc port="+str(port)+ " caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink")
         
         #Stream both audio and video
 #        self.player = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=15/1 ! hantro4200enc stream-type=1 profile-and-level=1001 !video/x-h263,framerate=15/1 ! rtph263ppay mtu=1438 ! udpsink host=130.236.219.107 port=5434 dsppcmsrc ! queue ! audio/x-raw-int,channels=1,rate=8000 ! mulawenc ! rtppcmupay mtu=1438 ! udpsink host=130.236.219.107 port=5432")
