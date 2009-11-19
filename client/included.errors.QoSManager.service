@@ -1,0 +1,4 @@
+# The Quality of Service Manager
+[D-BUS Service]
+Name=included.errors.QoSManager
+Exec=/usr/bin/python2.5 /home/frepe593/errors-included/client/qosmanager.py

@@ -12,3 +12,7 @@ server.ssh = False
 
 queue = Config()
 queue.reconnect_interval = 10*1000
+
+client = Config()
+client.name = 'Ragnar Dahlberg'
+client.password = 'Prydlig frisyr'

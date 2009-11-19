@@ -10,7 +10,7 @@ import subprocess
 import sys
 import threading
 import time
-from networkqueue import NetworkOutQueue, NetworkInQueue
+from shared.networkqueue import NetworkOutQueue, NetworkInQueue
 from shared.util import getLogger
 log = getLogger("queue.log")
 
@@ -33,7 +33,9 @@ class ClientNetworkHandler(dbus.service.Object):
         self.db = shared.data.create_database()
         self.output = NetworkOutQueue(self.socket, self.db)
         self.input = NetworkInQueue(self.socket, self.db)
+        self.inputs = [sys.stdin]
 
+        self.input.connect("socket-broken", self._socket_broken)
         self.output.connect("socket-broken", self._socket_broken)
 
     @dbus.service.method(dbus_interface='included.errors.Client',
@@ -67,6 +69,7 @@ class ClientNetworkHandler(dbus.service.Object):
             self.socket.connect(self.server)
             self.connected = True
             self.closing = False
+            self.inputs.append(self.socket)
             log.info("Connected :D")
             return True
         except socket.error, (errno, errmsg):
@@ -95,14 +98,19 @@ class ClientNetworkHandler(dbus.service.Object):
         running = True
         while running:
             inputready, outputready, exceptready = select.select(
-                    [self.socket, sys.stdin], [], [])
-            print "got input"
+                    self.inputs, [], [], 1.0)
+            if len(inputready) > 0:
+                print "got input from", inputready
             for s in inputready:
                 if s == sys.stdin:
                     junk = sys.stdin.readline()
+                    if junk == '':
+                        self.inputs.remove(s)
                     if junk.startswith("quit"):
                         print "got quit"
                         running = False
+                    else:
+                        print "got", junk
                 elif s == self.socket:
                     print "gettin' msg"
                     self.input.receive()
@@ -145,8 +153,11 @@ class ClientNetworkHandler(dbus.service.Object):
             return False
 
     def _socket_broken(self, event):
-        self.connected = False
-        self._check_connection()
+        print "socket-broken"
+        if self.connected:
+            self.connected = False
+            self.inputs.remove(self.socket)
+            threading.Thread(target=self._check_connection()).start()
 
 
     def _handle_error(self, errno, errmsg=None):

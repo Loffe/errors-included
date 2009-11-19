@@ -8,6 +8,7 @@ import threading
 import gobject
 import struct
 import binascii
+import sys
 try:
     import conic
 except:
@@ -172,12 +173,13 @@ class QoSManager(dbus.service.Object):
         '''
         Start service level updater, gps updater and dbus loop.
         '''
-        print "Running client QoS-Manager (errors-included)"
+        print "Running QoS-Manager"
         self.running = True
         try:
             self.wlan_start()
         except:
             pass
+
         threading.Thread(target=self.service_level_updater).start()
         threading.Thread(target=self.gps_updater).start()
         self.dbusloop()
@@ -204,6 +206,8 @@ class QoSManager(dbus.service.Object):
             except:
                 # Not in N810, got no GPS-device; do nothing...
                 print "gps failure"
+                # @todo: REMOVE, THIS IS ONLY A TEST! 
+                self.signal_new_gps_coord(13, 37)
     
     def service_level_updater(self):
         '''
@@ -267,6 +271,7 @@ class QoSManager(dbus.service.Object):
         except:
             # No GPS-device loaded/started
             pass
+        sys.exit(0)
 
     def dbusloop(self):
         self.mainloop = gobject.MainLoop()
@@ -294,5 +299,12 @@ class QoSManager(dbus.service.Object):
         return self.service_level
 
 if __name__ == '__main__':
+    if "stop" in sys.argv:
+        import dbus
+        print "Stopping QoSManager"
+        bus = dbus.SessionBus()
+        remote_object = bus.get_object("included.errors.QoSManager", "/QoSManager")
+        remote_object.dbus_close()
+        sys.exit(0)
     qos = QoSManager()
     qos.start()

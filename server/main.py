@@ -21,7 +21,7 @@ class ServerManager(object):
     def _message_available(self, packed_data):
         print "_message_available"
         packed_data = str(packed_data)
-        msg = shared.data.Message(None, None, packed_data = packed_data)
+        msg = shared.data.Message.unpack(packed_data)
         print msg
 
     def dbusloop(self):

@@ -3,7 +3,7 @@ import simplejson as json
 from datetime import datetime
 import gobject
 from sqlalchemy import *
-from sqlalchemy.orm import sessionmaker, relation
+from sqlalchemy.orm import sessionmaker, relation, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 
 # Create a base class to extend in order to be able to save to the database. 
@@ -46,43 +46,66 @@ class Database(gobject.GObject):
         '''
         gobject.GObject.__init__(self)
         self.engine = create_engine('sqlite:///database.db', echo=False)
-        self._Session = sessionmaker(bind=self.engine)
-        self.session = self._Session()
+        self._Session = scoped_session(sessionmaker(bind=self.engine))
+#        self.session = self._Session()
         
     def add(self, object):
-        self.session.add(object)
-        self.session.commit()
+        session = self._Session()
+        session.add(object)
+        session.commit()
+        session.close()
         self.emit("mapobject-added", object)
         
     def delete(self, object):
-        self.session.delete(object)
-        self.session.commit()
+        session = self._Session()
+        session.delete(object)
+        session.commit()
+        session.close()
         self.emit("mapobject-added", object)
         
     def get_all_alarms(self):
-        list = []
-        for a in self.session.query(Alarm):
-            list.append(a)
-        return list
+        session = self._Session()
+        alarms = []
+        for a in session.query(Alarm):
+            for p in session.query(POIData).filter_by(id=a.poi_id):
+                a.poi = p
+            alarms.append(a)
+        session.close()
+        return alarms
 
     def get_all_units(self):
+        session = self._Session()
         list = []
-        for u in self.session.query(UnitData):
+        for u in session.query(UnitData):
             list.append(u)
+        session.close()
         return list
     
     def get_all_mapobjects(self):
+        session = self._Session()
         list = []
-        for u in self.session.query(MapObjectData):
+        for u in session.query(MapObjectData):
             list.append(u)
+        session.close()
         return list
 
     def get_units(self, unit_ids):
+        session = self._Session()
         list = []
-        q = self.session.query(UnitData).filter(UnitData.id.in_(unit_ids))
-        for u in q:
+        units = session.query(UnitData).filter(UnitData.id.in_(unit_ids))
+        for u in units:
             list.append(u)
+        session.close()
         return list
+    
+#    def get_poi_type(self):
+#        session = self._Session()
+#        list = []
+#        p = (eld, saker)
+#        for u in p:
+#            list.append(u)
+#        
+#        return list
 
 class UnitType(object):
     (ambulance, # Regular unit
@@ -91,12 +114,11 @@ class UnitType(object):
      srsa, # Swedish Rescue Services Agency (SRSA) 
      other) = range(5)
 
-class ObstacleType(object):
-    # always sort in alphabetic order!!!
-    bridge, other, road, tree = range(4)
-
 class POIType(object):
-    accident, fire, pasta_wagon = range(3)
+    accident, fire, pasta_wagon, obstacle, flag = range(5)
+
+class POISubType(object):
+    tree, broken_brigde, broken_nuclear_power_plant = range(3)
 
 class NetworkInQueueItem(Base):
     __tablename__ = 'InQueue'
@@ -131,8 +153,8 @@ class MapObjectData(Base, Packable):
     '''
     __tablename__ = 'MapObjectData'
     id = Column(Integer, primary_key=True)
-    data_type = Column(Integer)
-    __mapper_args__ = {'polymorphic_identity': 'MapObjectData', "polymorphic_on": data_type} 
+    _data_type = Column(Integer)
+    __mapper_args__ = {'polymorphic_identity': 'MapObjectData', "polymorphic_on": _data_type} 
     
     coordx = Column(Float)
     coordy = Column(Float)
@@ -191,21 +213,6 @@ class UnitData(MapObjectData):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
 
-class ObstacleData(MapObjectData):
-    '''
-    All obstacles have data objects of this class.
-    '''
-    __tablename__ = 'ObstacleData'
-    __mapper_args__ = {'polymorphic_identity': 'ObstacleData'}
-    id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
-    
-    type = Column(Integer)
-
-    def __init__(self, coordx, coordy, name, timestamp, 
-                 type = ObstacleType.tree, id = None):
-        MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
-        self.type = type
-
 class POIData(MapObjectData):
     '''
     All Points of Interest (POIs) have data objects of this class.
@@ -215,11 +222,13 @@ class POIData(MapObjectData):
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
     
     type = Column(Integer)
+    subtype = Column(Integer)
 
     def __init__(self, coordx, coordy, name, timestamp, 
-                 type = POIType.pasta_wagon, id = None):
+                 type = POIType.pasta_wagon, subtype = None, id = None):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
+        self.subtype = subtype
 
 class Alarm(Base, Packable):
     __tablename__ = 'Alarm'
@@ -236,7 +245,7 @@ class Alarm(Base, Packable):
     number_of_wounded = Column(Integer)
 
     def __init__(self, event, location_name, poi, contact_person, 
-                 contact_number, number_of_wounded, timestamp = datetime.now(), other = u""):
+                 contact_number, number_of_wounded, other, timestamp = datetime.now()):
         self.event = event
         self.location_name = location_name
         self.poi = poi
@@ -304,49 +313,16 @@ class MissionData(Base, Packable):
         except:
             return repr
 
-class EventType(object):
-    '''
-    Enumeration of all event types.
-    '''
-    add, change, remove = range(3)
-
-class Event(Base, Packable):
-    '''
-    An Event declares what to be done with a specified object. It's possible to 
-    pack/unpack. This makes it possible to send it as a message.
-    '''
-    __tablename__ = "Events"
-    id = Column(Integer, primary_key = True)
-    object_id = Column(Integer)
-    type = Column(Integer)
-    timestamp = Column(DateTime)
-    
-    def __init__(self, object_id, type, timestamp = datetime.now()):
-        '''
-        Constructor. Creates an event.
-        @param object_id: the global unique id of the object.
-        @param type: the event type (add, change or remove) specifies what to be
-        done with the object.
-        @param timestamp: the timestamp of this event.
-        '''
-        self.object_id = object_id
-        self.type = type
-        self.timestamp = timestamp
-
-    def __repr__(self):
-        repr = ("<%s: type=%s, %s; obj_id=%s>" % 
-                (self.__class__.__name__, self.type, self.timestamp, 
-                 self.object_id))
-        try:
-            return repr.encode('utf-8')
-        except:
-            return repr
-
-
 class MessageType(object):
     (mission, map, text, alarm, control, low_battery, status_update, mission_response, 
     journal_request, journal_confirmationresponse, journal_confirmationrequest, 
     journal_transfer, alarm_ack, vvoip_request, vvoip_response, login, login_ack, action) = range(18)
+
+class ActionType(object):
+    add, update, remove = range(3)
+
+class JournalType(object):
+    request, confirmation_response, confirmation_request, transfer = range(4)
 
 class Message(object):
     '''
@@ -357,6 +333,7 @@ class Message(object):
     sender = None
     # The type of this message
     type = None
+    subtype = None
     # The priority of this message (lowest 0 - 9 highest)
     prio = 0
     # The packed data (json dumps) to send (a dict containing all variables)
@@ -366,28 +343,21 @@ class Message(object):
     # The timestamp of this message
     timestamp = None
     
-    def __init__(self, sender, reciever, type = None, unpacked_data = None, packed_data = None):
+    def __init__(self, sender, reciever, type = None, subtype = None, unpacked_data = None):
         '''
         Constructor. Creates a message.
         @param type: the type of this message
         @param unpacked_data: the unpacked data to pack
-        @param packed_data: the packed data to unpack
         '''
         self.sender = sender
         self.reciever = reciever
         self.type = type
+        self.subtype = subtype
         self.unpacked_data = unpacked_data
-        self.packed_data = packed_data
         self.timestamp = datetime.now()
         
-        # message created from unpacked data
-        if unpacked_data:
-            # pack the unpacked data
-            self.pack()
-        # message created from packed data
-        elif packed_data:
-            # unpack the packed data
-            self.unpack(packed_data)
+        # pack the unpacked data
+        self.pack()
     
     def pack(self):
         '''
@@ -395,6 +365,7 @@ class Message(object):
         '''
         dict = {}
         dict["type"] = self.type
+        dict["subtype"] = self.subtype
         dict["prio"] = self.prio
         dict["timestamp"] = self.timestamp.strftime("%s")
         dict["sender"] = self.sender
@@ -406,14 +377,17 @@ class Message(object):
         self.packed_data = json.dumps(dict)
         return self.packed_data
 
-    def unpack(self, raw_message):
+    def unpack(cls, raw_message):
         '''
         Unpack a simplejson string to an object.
         @param raw_message: the simplejson string
         '''
+        # raw_message contains sender and reciever
+        self = cls(None, None)
         try:
             dict = json.loads(raw_message)
             self.type = dict["type"]
+            self.subtype = dict["subtype"]
             self.prio = dict["prio"]
             self.sender = dict["sender"]
             self.reciever = dict["reciever"]
@@ -436,19 +410,16 @@ class Message(object):
                         dict["timestamp"] = datetime.fromtimestamp(float(dict["timestamp"]))
                     except:
                         pass
-                    try:
-                        # create the poi from its dict
-                        dict["poi"] = create(dict["poi"])
-                    except:
-                        pass
                     # create and return an instance of the object
                     if classname == "dict":
                         return dict
                     else:
                         try:
                             return globals()[classname](**dict)
-                        except:
-                            print "Failed with class:", classname, ", dict:", dict
+                        except Exception, e:
+                            raise ValueError("Failed with class: %s, dict: %s"
+                                    % (classname, str(dict)))
+                            print e
 
                 # create and set data
                 self.unpacked_data = create(self.packed_data)
@@ -461,6 +432,8 @@ class Message(object):
         except KeyError, ke:
             raise ValueError("Not a valid Message. Missing any keys maybe?")
 
+    unpack = classmethod(unpack)
+
     def __repr__(self):
         repr = ("<%s: sender=%s, receiver=%s, prio=%s, type=%s, %s; packed=%s, unpacked=%s>" % 
                 (self.__class__.__name__, self.sender, self.reciever, self.prio,
@@ -471,11 +444,10 @@ class Message(object):
             return repr
 
 
-def create_database():
+def create_database(db = Database()):
     '''
     Create the database.
     '''
-    db = Database()
 
     # create tables and columns
     Base.metadata.create_all(db.engine)
@@ -485,8 +457,8 @@ def create_database():
 if __name__ == '__main__':
     print "Testing db"
     db = create_database()
-#    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident)
-#    db.add(poi_data)
+    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident, POISubType.tree)
+    db.add(poi_data)
 #    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
 #    db.add(unit_data)
 #    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])

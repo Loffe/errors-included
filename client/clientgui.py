@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 # coding: utf-8
 import gtk
-import hildon
+import dbus.mainloop.glib
 import gobject
 import pango
-
+import threading
 import datetime
-
 from shared.data import *
 import shared.queueinterface
 from shared.util import getLogger
 log = getLogger("client.log")
 log.debug("clientgui imported log")
 from map.mapdata import *
-
+import controller
+from database import ClientDatabase
 from gui.gui import Screen
 from gui.mapscreen import MapScreen
 from gui.alarmscreen import AlarmScreen
@@ -26,31 +26,44 @@ from gui.alarminboxscreen import AlarmInboxScreen
 from gui.contactscreen import ContactScreen
 from gui.camerascreen import CamScreen
 
+try:
+    import hildon
+    Program = hildon.Program
+except:
+    hildon = gtk
+    class Program(object):
+        def add_window(self, window):
+            pass
+    hildon.Program = Program
+
 log.debug("imports ready")
 
 class ClientGui(hildon.Program):
-    queue = shared.queueinterface.interface
+    queue = None
     db = None
-    '''
-    The main GUI-process of the client
-    '''
-    
-    ''' create GUI Structure
-    '''
+
     def __init__(self):
         '''
         Constructor. Creates the GUI (window and containing components).
         '''
         log.debug("ClientGui started")
+
+        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+        self.queue = shared.queueinterface.get_interface()
+        self.mainloop = gobject.MainLoop()
+
         hildon.Program.__init__(self)
         self.window = hildon.Window()
         self.window.set_title("ClientGui")
+        self.window.set_size_request(800,480)
         self.add_window(self.window)
         
-        # Creates a empty list that contains provius screens
+        # Creates a empty list that contains previous screens
         self.prev_page = []
+
         # create the database
-        self.db = shared.data.create_database()
+        db = ClientDatabase(self.queue)
+        self.db = shared.data.create_database(db)
 
         # A dict containing all the containers (used for hiding/showing) 
         self.screens = {}
@@ -138,6 +151,7 @@ class ClientGui(hildon.Program):
         # add the create_mission screen
         self.mission_screen = MissionScreen(self.db)
         self.mission_screen.connect("okbutton-clicked3", self.back_button_function) 
+        self.mission_screen.connect("new-mission", self.set_mission)
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
         
@@ -233,32 +247,51 @@ class ClientGui(hildon.Program):
         
         vbox_right.pack_start(self.buttons_box, False, False, 0)
 
-        self.window.connect("destroy", gtk.main_quit)
+        self.window.connect("destroy", lambda event: self.mainloop.quit())
         self.window.connect("key-press-event", self.on_key_press)
         self.window.connect("window-state-event", self.on_window_state_change)
 
         # Change to default True?
         self.window_in_fullscreen = False
         log.info("ClientGui created")
-        
+
     def run(self):
         '''
         Main GUI loop
         '''
         self.window.show_all()
         self.show_default()
-        gtk.main()
-    
+        gobject.threads_init()
+        # start gtk main (gui) thread
+        self.start_controller()
+        while self.mainloop.is_running():
+            try:
+                self.mainloop.run()
+            except KeyboardInterrupt:
+                self.mainloop.quit()
+
+    def start_controller(self):
+        '''
+        Create and start ClientController
+        '''
+        name = "Ragnar Dahlberg"
+        unit_type = shared.data.UnitType.commander
+        status = "Available"
+        self.controller = controller.ClientController(name,unit_type,status, self.db)
+
     ''' Handle events
     ''' 
     def back_button_function(self, event):
-        print "back"
         self.show(self.prev_page[-2])
     
     def ok_button_function(self, event):
         for screen in self.screens.values():
             if screen.props.visible and isinstance(screen, Screen):
                 screen.ok_button_function(event)
+    
+    def set_mission(self, event, data):
+        self.controller.missions.append(data)
+        print "got new mission:", type(data), data
     
     # mission view event handlers
     def show_mission(self, event):
@@ -270,56 +303,50 @@ class ClientGui(hildon.Program):
         pass
     
     def show_status(self, event):
-        
-        dialog = gtk.Dialog("Samtal",
-                 self.window,  #the toplevel wgt of your app
-                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
-                 ("     Svara     ", 77, "  Upptaget  ", 666))
-        who = gtk.Label("DT ringer...")
-        who.show()
-        dialog.set_size_request(400,200)
-        #dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-
-        dialog.vbox.pack_start(who)
-        question = gtk.Label("Vill du svara?")
-        question.show()
-        dialog.vbox.pack_start(question)
-        dialog.show()
-        result = dialog.run()
-        if result == 77:
-           print "svara"
-
-           dia = gtk.Dialog("Samtal",
-                 self.window,  #the toplevel wgt of your app
-                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
-                 ("       Lägg på       ", 11))
-        
-           dia.set_size_request(400,200)
-
-           qu = gtk.Label("Vill du lägga på?")
-           qu.show()
-           dia.vbox.pack_start(qu)
-           dia.show()
-           result = dia.run()
-           
-           dia.destroy()
-           
-        elif result == 666:
-            print "upptaget"
-        dialog.destroy()
+        pass
+  
+#        dialog = gtk.Dialog("Samtal",
+#                 self.window,  #the toplevel wgt of your app
+#                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
+#                 ("     Svara     ", 77, "  Upptaget  ", 666))
+#        who = gtk.Label("DT ringer...")
+#        who.show()
+#        dialog.set_size_request(400,200)
+#        #dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+#
+#        dialog.vbox.pack_start(who)
+#        question = gtk.Label("Vill du svara?")
+#        question.show()
+#        dialog.vbox.pack_start(question)
+#        dialog.show()
+#        result = dialog.run()
+#        if result == 77:
+#           print "svara"
+#
+#           dia = gtk.Dialog("Samtal",
+#                 self.window,  #the toplevel wgt of your app
+#                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
+#                 ("       Lägg på       ", 11))
+#        
+#           dia.set_size_request(400,200)
+#
+#           qu = gtk.Label("Vill du lägga på?")
+#           qu.show()
+#           dia.vbox.pack_start(qu)
+#           dia.show()
+#           result = dia.run()
+#           
+#           dia.destroy()
+#           
+#        elif result == 666:
+#            print "upptaget"
+#        dialog.destroy()
     
     def show_journals(self, event):
         pass
     
     def show_faq(self, event):
-        print "faq the system!"
-        poi_data = shared.data.POIData(15.5769069,58.4088884, u"goal", datetime.now(), shared.data.POIType.accident)
-#        unit_data = shared.data.UnitData(15.5749069, 58.4068884, u"enhet 1337", datetime.now(), shared.data.UnitType.commander)
-#        mission_data = shared.data.MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
-        self.db.add(poi_data)
-        
-        enhet3 = UnitData(15.5746475, 58.4077164 ,u"Enhet3",datetime.now(), UnitType.ambulance)
-        self.db.add(enhet3)
+        pass
         
     # add object view event handlers
     def show_add_object(self, event):
@@ -330,12 +357,23 @@ class ClientGui(hildon.Program):
     # add object buttons event handlers
     def create_alarm(self, event):
         self.show(["alarm", "buttons"])
-    
+        self.screens["alarm"].location_entry2.set_text(str(self.screens["map"].gps_x))
+        self.screens["alarm"].location_entry3.set_text(str(self.screens["map"].gps_y))
+            
     def create_obstacle(self, event):
         self.show(["obstacle", "buttons"])
+        self.screens["obstacle"].location_entry2.set_text(str(self.screens["map"].gps_x))
+        self.screens["obstacle"].location_entry3.set_text(str(self.screens["map"].gps_y))
     
     def create_mission(self, event):
         self.show(["make_mission", "buttons"])
+        self.screens["make_mission"].location_entry2.set_text(str(self.screens["map"].gps_x))
+        self.screens["make_mission"].location_entry3.set_text(str(self.screens["map"].gps_y))
+        
+#        self.screens["make_mission"].combo_box.clear()
+        
+        for alarm in self.db.get_all_alarms():
+            self.screens["make_mission"].combo_box.append_text(alarm.event)
 
     def create_new_message(self, event):
         self.show(["new_message", "buttons"])
@@ -381,6 +419,12 @@ class ClientGui(hildon.Program):
             self.screens["notifications"].set_label(notification_text)
         else:
             self.show_default()
+        if "add_object" in button_key and self.menu_buttons[button_key].get_active() == True:
+            self.screens["map"].sign = True
+            self.screens["map"].draw_sign()
+        else:
+            self.screens["map"].sign = False
+            self.screens["map"].remove_sign()
     
     def show(self, keys):
         '''
@@ -403,6 +447,8 @@ class ClientGui(hildon.Program):
         self.screens["notifications"].set_label("Team Med Fel")
         self.screens["notifications"].show()
         self.screens["map"].show()
+        self.screens["map"].sign = False
+        self.screens["map"].remove_sign()
 
     # handle key press events
     def on_key_press(self, widget, event, *args):

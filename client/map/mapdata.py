@@ -124,10 +124,17 @@ class Tiles:
                     self.bounds["min_longitude"]
         gps_height = self.bounds["min_latitude"] - \
                      self.bounds["max_latitude"]
-
+                     
+        
+	   #r = self.get_allocation()
+       #(m,n) = self.pixel_to_gps(r.width/2,r.height/2)
+	
         # Skärmen på N810:an är 800x480.
-        width = (gps_width / self.width) * 400
-        height = (gps_height / self.height) * 240
+#        width = (gps_width / self.width) * 400
+#        height = (gps_height / self.height) * 240
+
+        width = (gps_width / self.width) * 300
+        height = (gps_height / self.height) * 160
 
         bounds = {"min_longitude":(focus["longitude"] - width),
                   "max_longitude":(focus["longitude"] + width),
@@ -232,8 +239,8 @@ class MapData():
         self.objects = {}
         self.redraw()
 
-    def add_object(self, id, map_object):
-        self.objects[id] = map_object
+    def add_object(self, map_object):
+        self.objects[mapobject.id] = map_object
         self.redraw()
 
     def delete_object(self, object_id):
@@ -296,6 +303,8 @@ class POI(MapObject):
             path = "map/data/icons/fire.png"
         elif poi_data.type == shared.data.POIType.accident:
             path = "map/data/icons/accident.png"
+        elif poi_data.type == shared.data.POIType.flag:
+            path = "map/data/icons/default.png"
         self.picture = Picture(path)
 
 class Mission():
