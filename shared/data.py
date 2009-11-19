@@ -50,10 +50,10 @@ class Database(gobject.GObject):
 #        self.session = self._Session()
         
     def add(self, object):
-#        session = self._Session()
-        self._Session().add(object)
-        self._Session().commit()
-#        self._Session().remove()
+        session = self._Session()
+        session.add(object)
+        session.commit()
+        session.close()
         self.emit("mapobject-added", object)
         
     def delete(self, object):
@@ -228,6 +228,7 @@ class POIData(MapObjectData):
                  type = POIType.pasta_wagon, subtype = None, id = None):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
+        self.subtype = subtype
 
 class Alarm(Base, Packable):
     __tablename__ = 'Alarm'
@@ -456,4 +457,50 @@ def create_database(db = Database()):
 if __name__ == '__main__':
     print "Testing db"
     db = create_database()
+
+
+
+    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident, POISubType.tree)
+    db.add(poi_data)
+#    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
+#    db.add(unit_data)
+#    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
+#    print mission_data
+#    alarm = Alarm("räv", "Linköping", poi_data, "Klasse", "11111")
+    
+#    db.add(mission_data)
+    
+#    for i in range(5):
+#        u = UnitData((0, 15), "Enhet " + str(i), datetime.now(), UnitType.ambulance)
+#        print u
+#        db.add(u)
+#    
+#    units = db.get_all_units()
+#    for u in units:
+#        print u.id, u.name
+#
+#    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident)
+#    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå")
+#    print mission_data
+#    alarm = Alarm(u"Bilolycka", u"Linköping", poi_data, u"Laban Andersson", u"070-741337", 7)
+#    alarm2 = Alarm(u"Hjärtattack", u"Norrköping", poi_data, u"Jakob johansson", u"070-741338", 1)
+#    alarm3 = Alarm(u"Barnmisshandel", u"Motala", poi_data, u"Muhammad Alzhein", u"n/a", 4)
+#    db.add(alarm)
+#    db.add(alarm2)
+#    db.add(alarm3)
+#    
+#    enhet = UnitData(15.56564, 58.4047 ,u"Enhet1",datetime.now(), UnitType.ambulance)
+#    enhet2 = UnitData(15.552864, 58.40554901 ,u"Enhet2",datetime.now(), UnitType.ambulance)
+#    enhet3 = UnitData(15.5656475, 58.4047164 ,u"Enhet3",datetime.now(), UnitType.ambulance)
+#    db.add(enhet)
+#    db.add(enhet2)
+#    db.add(enhet3)
+#    event = Event(object = alarm)
+#    event = Event(poi_data.id, EventType.add)
+#    print "ALARM:", alarm
+#    print "POI:", poi_data.__dict__
+#    print Message(type = MessageType.map, unpacked_data = mission_data)
+#    print "packed:", m1
+#    m2 = Message(packed_data = m1.packed_data)
+#    print "unpacked:", m2
 
