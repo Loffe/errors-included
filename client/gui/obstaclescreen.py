@@ -63,7 +63,7 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         right_box.add(self.location_entry3)
         
         
-#        print "----", coords[0], coords[1]
+
         # add selectable types
         '''
         @TODO: find this from POISubType
