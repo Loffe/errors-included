@@ -29,16 +29,14 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         vbox.pack_start(hbox, False)
         hbox.set_border_width(10)
         hbox.pack_start(gtk.Label())
-        self.button = gtk.Button("Start")
-        self.button.connect("clicked", self.start_stop)
+        self.button = gtk.Button("Lägg på")
+        self.button.connect("clicked", self.stop)
         hbox.pack_start(self.button, False)
         #self.button2 = gtk.Button("Quit")
         #self.button2.connect("clicked", self.exit)
        # hbox.pack_start(self.button2, False)
         hbox.add(gtk.Label())
         self.show_all()
-
-        self.sender = None
 
         #Listening for Input:
 #        gst-launch udpsrc port=5434 caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink
@@ -67,62 +65,40 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
 #        pipeline_in = gst.parse_launch(pipeline_in)
 #        pipeline_out.set_state(gst.STATE_PLAYING)
 #        pipeline_in.set_state(gst.STATE_PLAYING)
-        self.sender = gst.parse_launch("dsppcmsrc ! audio/x-raw-int,endianness=(int)1234,width=(int)16,depth=(int)16,signed=(boolean)true,channels=(int)1,rate=(int)8000 ! udpsink host="+str(ip)+" port="+str(port))
-        bus = self.sender.get_bus()
+        
+        #self.sender = gst.parse_launch("dsppcmsrc ! audio/x-raw-int,endianness=(int)1234,width=(int)16,depth=(int)16,signed=(boolean)true,channels=(int)1,rate=(int)8000 ! udpsink host="+str(ip)+" port="+str(port))
+        #self.player = gst.parse_launch("udpsrc port="+self.MYPORT+" ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! dspilbcsink")
+        self.audio_sender = gst.parse_launch("dspilbcsrc dtx=0 ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! udpsink host="+str(ip)+" port="+str(port))
+        bus = self.audio_sender.get_bus()
         bus.add_signal_watch()
         bus.enable_sync_message_emission()
         bus.connect("message", self.on_message)
         bus.connect("sync-message::element", self.on_sync_message)
-        self.sender.set_state(gst.STATE_PLAYING)
+        self.audio_sender.set_state(gst.STATE_PLAYING)
 
 
-
-    def start_audio_recv(self,myIp,port):
+    def start_audio_recv(self,port):
         '''
         Starts an audio server
         @param myIp
         @param port
         '''
 
-#        print "Starting server at %s:%d" % (myIp,port)
-#        pipelineName = "server%d" % (port)
-#
-#        def new_decode_pad(dbin, pad, islast):
-#            pad.link(convert.get_pad("sink"))
-#
-#        pipeline = gst.Pipeline(pipelineName)
-#
-#        tcpsrc = gst.element_factory_make("tcpserversrc", "source")
-#
-#        pipeline.add(tcpsrc)
-#
-#        tcpsrc.set_property("host", myIp)
-#        #tcpsrc.set_property("host", "localhost")
-#
-#        tcpsrc.set_property("port", port)
-#
-#        decode = gst.element_factory_make("decodebin", "decode")
-#        decode.connect("new-decoded-pad", new_decode_pad)
-#        pipeline.add(decode)
-#        tcpsrc.link(decode)
-#        convert = gst.element_factory_make("audioconvert", "convert")
-##
-#        pipeline.add(convert)
-#        sink = gst.element_factory_make("dsppcmsink", "sink")
-#
-#        pipeline.add(sink)
-#
-#        convert.link(sink)
-#
-#        pipeline.set_state(gst.STATE_PLAYING)
-        self.player.set_state(gst.STATE_PLAYING)
-
+#       #self.sender = gst.parse_launch("dsppcmsrc ! audio/x-raw-int,endianness=(int)1234,width=(int)16,depth=(int)16,signed=(boolean)true,channels=(int)1,rate=(int)8000 ! udpsink host="+str(ip)+" port="+str(port))
+        #self.player = gst.parse_launch("udpsrc port="+self.MYPORT+" ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! dspilbcsink")
+        self.audio_recv = gst.parse_launch("udpsrc port="+str(port)" ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! dspilbcsink")
+        bus1 = self.audio_recv.get_bus()
+        bus1.add_signal_watch()
+        bus1.enable_sync_message_emission()
+        bus1.connect("message", self.on_message)
+        bus1.connect("sync-message::element", self.on_sync_message)
+        self.audio_recv.set_state(gst.STATE_PLAYING)
     
     
     def start_video_send(self, ip):
         print ip
         #Stream to another device
-        self.sender = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+str(ip)+" port=5434")
+        self.video_sender = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+str(ip)+" port=5434")
         
         #Show the incoming video
         #self.player = gst.parse_launch("udpsrc port=5432 caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink")
@@ -134,21 +110,36 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         # Show my webcam
         #self.player = gst.parse_launch ("v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink")
 
-        bus = self.sender.get_bus()
-        bus.add_signal_watch()
-        bus.enable_sync_message_emission()
-        bus.connect("message", self.on_message)
-        bus.connect("sync-message::element", self.on_sync_message)
+        bus2 = self.video_sender.get_bus()
+        bus2.add_signal_watch()
+        bus2.enable_sync_message_emission()
+        bus2.connect("message", self.on_message)
+        bus2.connect("sync-message::element", self.on_sync_message)
+        self.video_sender.set_state(gst.STATE_PLAYING)
+        
+    def start_video_recv(self,port):
+        #Show the incoming video
+        self.video_recv = gst.parse_launch("udpsrc port="+str(port)+ "caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink")
+        
+        #Stream both audio and video
+#        self.player = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=15/1 ! hantro4200enc stream-type=1 profile-and-level=1001 !video/x-h263,framerate=15/1 ! rtph263ppay mtu=1438 ! udpsink host=130.236.219.107 port=5434 dsppcmsrc ! queue ! audio/x-raw-int,channels=1,rate=8000 ! mulawenc ! rtppcmupay mtu=1438 ! udpsink host=130.236.219.107 port=5432")
+            #Even try rate=48000
+        
+        # Show my webcam
+        #self.player = gst.parse_launch ("v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink")
 
-    def start_stop(self, w):
-       if self.button.get_label() == "Start":
-           self.button.set_label("Stop")
-           #self.player.set_state(gst.STATE_PLAYING)
-           self.sender.set_state(gst.STATE_PLAYING)
-       else:
-#           self.player.set_state(gst.STATE_NULL)
-           self.sender.set_state(gst.STATE_NULL)
-           self.button.set_label("Start")
+        bus3 = self.video_recv.get_bus()
+        bus3.add_signal_watch()
+        bus3.enable_sync_message_emission()
+        bus3.connect("message", self.on_message)
+        bus3.connect("sync-message::element", self.on_sync_message)
+        self.video_recv.set_state(gst.STATE_PLAYING)
+
+    def stop(self, w):
+        self.audio_sender.set_state(gst.STATE_NULL)
+        self.video_sender.set_state(gst.STATE_NULL)
+        self.video_recv.set_state(gst.STATE_NULL)
+        self.audio_recv.set_state(gst.STATE_NULL)
 
     def exit(self, widget, data=None):
         gtk.main_quit()
