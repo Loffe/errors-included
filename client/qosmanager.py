@@ -159,24 +159,12 @@ class QoSManager(dbus.service.Object):
                 break
             time.sleep(1)
 
-        # TODO: LIMIT TRIES COUNT?!
-        print "tries:", str(tries)
-        if tries >= 29:
-            (x,y) = (15.572612345, 58.403512345)
         # Stop the GPS
         gpsbt.stop(self.gps_context)
 
         # set gps coordinates
         if not (x,y) == (0,0):
-            print "X:", type(x), x
-            print "Y:", type(y), y
-            print "rounded X:", round(x, 4)
-            print "rounded Y:", round(y, 4)
-            x = str(x)
-            y = str(y)
-            print "string X:", x
-            print "string Y:", y
-            self.gps_coord = (float(x),float(y))
+            self.gps_coord = (x,y)
             self.signal_new_gps_coord(x, y)
 
     def start(self):
@@ -217,13 +205,7 @@ class QoSManager(dbus.service.Object):
                 # Not in N810, got no GPS-device; do nothing...
                 print "gps failure"
                 # @todo: REMOVE, THIS IS ONLY A TEST!
-#                x = 15.51111111145645
-#                y = 58.403599999999999999
-#                x = round(x, 4)
-#                y = round(y, 4)
-#                print x
-#                print y  
-                self.signal_new_gps_coord("15.5726","58.4035")
+                self.signal_new_gps_coord(15.5726,58.4035)
     
     def service_level_updater(self):
         '''
@@ -302,7 +284,7 @@ class QoSManager(dbus.service.Object):
     def dbus_close(self):
         self.close()
 
-    @dbus.service.signal(dbus_interface='included.errors.QoSManager', signature='ss')
+    @dbus.service.signal(dbus_interface='included.errors.QoSManager', signature='dd')
     def signal_new_gps_coord(self, coordx, coordy):
         print "coordinates updated"
 
