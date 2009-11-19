@@ -128,19 +128,19 @@ class ClientGui(hildon.Program):
         self.screens["alarm"] = self.alarm_screen
 
         # adding messages screen
-        self.message_screen = InboxScreen()
+        self.message_screen = InboxScreen(self.db)
         vbox_right.pack_start(self.message_screen, True, True, 0)
         self.screens["message"] = self.message_screen
         
-        self.new_message_screen = NewMessageScreen()
+        self.new_message_screen = NewMessageScreen(self.db)
         vbox_right.pack_start(self.new_message_screen, True, True, 0)
         self.screens["new_message"] = self.new_message_screen
         
-        self.outbox_screen = OutboxScreen()
+        self.outbox_screen = OutboxScreen(self.db)
         vbox_right.pack_start(self.outbox_screen, True, True, 0)
         self.screens["output"] = self.outbox_screen
         
-        self.alarm_inbox_screen = AlarmInboxScreen()               
+        self.alarm_inbox_screen = AlarmInboxScreen(self.db)               
         vbox_right.pack_start(self.alarm_inbox_screen, True, True, 0)
         self.screens["alarms"] = self.alarm_inbox_screen
 

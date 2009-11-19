@@ -11,7 +11,7 @@ class AlarmInboxScreen(gtk.ScrolledWindow, gui.Screen):
     The screen wich shows your messages
     '''
 
-    def __init__(self):
+    def __init__(self, db):
         '''
         Constructor.
         '''

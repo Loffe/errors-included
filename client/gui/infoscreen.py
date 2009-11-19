@@ -37,9 +37,6 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
             label = gtk.Label(labeltext)
             label.set_alignment(0, 0.5)
             #label.modify_font(pango.FontDescription("sans 12"))
-            
-
-
 
             entry = gtk.Label()
             entry.set_alignment(0, 0.5)
