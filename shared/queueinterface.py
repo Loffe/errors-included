@@ -11,14 +11,14 @@ if __name__ == '__main__':
     import data
     from datetime import datetime
     interface = get_interface()
-    login_msg = data.Message("ragnar dahlberg", "server", type=data.MessageType.login,
+    login_msg = data.Message("ragnar", "server", type=data.MessageType.login,
                              unpacked_data={"class": "dict", "password": "prydlig frisyr"})
     interface.enqueue(login_msg.packed_data, 5)
 
     poi_data = data.POIData(12,113, u"goal", datetime.now(), data.POIType.accident)
     alarm = data.Alarm(u"Bilolycka", u"Linköping", poi_data,
                        u"Laban Andersson", u"070-741337", 7)
-    msg = data.Message("ragnar dahlberg", "server", type=data.MessageType.alarm, unpacked_data=alarm)
+    msg = data.Message("ragnar", "server", type=data.MessageType.alarm, unpacked_data=alarm)
     data = msg.packed_data
     print "Sent:", data
     print interface.enqueue(data, msg.prio)
