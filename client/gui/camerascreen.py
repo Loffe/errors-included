@@ -135,15 +135,15 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
     def start_stop(self, w):
         if self.button.get_label() == "Start":
             self.button.set_label("Stop")
-            self.audio_sender.set_state(gst.STATE_PLAYING)
+            #self.audio_sender.set_state(gst.STATE_PLAYING)
             self.video_sender.set_state(gst.STATE_PLAYING)
             self.video_recv.set_state(gst.STATE_PLAYING)
-            self.audio_recv.set_state(gst.STATE_PLAYING)
+            #self.audio_recv.set_state(gst.STATE_PLAYING)
         else:
-            self.audio_sender.set_state(gst.STATE_NULL)
+            #self.audio_sender.set_state(gst.STATE_NULL)
             self.video_sender.set_state(gst.STATE_NULL)
             self.video_recv.set_state(gst.STATE_NULL)
-            self.audio_recv.set_state(gst.STATE_NULL)
+            #self.audio_recv.set_state(gst.STATE_NULL)
             self.button.set_label("Start")
 
 
@@ -153,18 +153,18 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
     def on_message(self, bus, message):
         t = message.type
         if t == gst.MESSAGE_EOS:
-            self.audio_sender.set_state(gst.STATE_NULL)
+            #self.audio_sender.set_state(gst.STATE_NULL)
             self.video_sender.set_state(gst.STATE_NULL)
-            self.audio_recv.set_state(gst.STATE_NULL)
+            #self.audio_recv.set_state(gst.STATE_NULL)
             self.video_recv.set_state(gst.STATE_NULL)
             self.button.set_label("Start")
         elif t == gst.MESSAGE_ERROR:
             err, debug = message.parse_error()
             print "Error: %s" % err, debug
 #            self.player.set_state(gst.STATE_NULL)
-            self.audio_sender.set_state(gst.STATE_NULL)
+            #self.audio_sender.set_state(gst.STATE_NULL)
             self.video_sender.set_state(gst.STATE_NULL)
-            self.audio_recv.set_state(gst.STATE_NULL)
+            #self.audio_recv.set_state(gst.STATE_NULL)
             self.video_recv.set_state(gst.STATE_NULL)
             self.button.set_label("Start")
 
