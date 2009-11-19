@@ -93,10 +93,10 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         bus1.connect("sync-message::element", self.on_sync_message)
     
     
-    def start_video_send(self, ip):
+    def start_video_send(self, ip,port):
         print ip
         #Stream to another device
-        self.video_sender = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+str(ip)+" port=5434")
+        self.video_sender = gst.parse_launch("v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+str(ip)+" port="+str(port))
         
         #Show the incoming video
         #self.player = gst.parse_launch("udpsrc port=5432 caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink")
