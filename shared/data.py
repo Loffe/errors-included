@@ -485,15 +485,15 @@ def create_database():
 if __name__ == '__main__':
     print "Testing db"
     db = create_database()
-    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident)
+#    poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident)
 #    db.add(poi_data)
-    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
+#    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
 #    db.add(unit_data)
-    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
+#    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
 #    print mission_data
 #    alarm = Alarm("räv", "Linköping", poi_data, "Klasse", "11111")
     
-    db.add(mission_data)
+#    db.add(mission_data)
     
 #    for i in range(5):
 #        u = UnitData((0, 15), "Enhet " + str(i), datetime.now(), UnitType.ambulance)
@@ -515,7 +515,7 @@ if __name__ == '__main__':
 #    db.add(alarm3)
 #    
 #    enhet = UnitData(15.56564, 58.4047 ,u"Enhet1",datetime.now(), UnitType.ambulance)
-#    enhet2 = UnitData(15.552864, 58.405549000000001 ,u"Enhet2",datetime.now(), UnitType.ambulance)
+#    enhet2 = UnitData(15.552864, 58.40554901 ,u"Enhet2",datetime.now(), UnitType.ambulance)
 #    enhet3 = UnitData(15.5656475, 58.4047164 ,u"Enhet3",datetime.now(), UnitType.ambulance)
 #    db.add(enhet)
 #    db.add(enhet2)
