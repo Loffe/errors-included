@@ -14,20 +14,36 @@ units_in_missions = Table('UnitsInMissions', Base.metadata,
                     Column('mission_id', Integer, ForeignKey('MissionData.id')),
                     Column('unit_id', Integer, ForeignKey('UnitData.id')))
 
-
 class Packable(object):
     '''
     Extend this class to be able to pack/unpack a message containing it.
     '''
 
+    def to_list(self):
+        '''
+        Returns this object as a list representation of this object with
+        encapsulated objects first and self as last element.
+        '''
+        list = []
+        for var in self.__dict__.keys():
+            v = self.__dict__[var]
+            if isinstance(v, Packable):
+                list.append(v.to_dict())
+        list.append(self.to_dict())
+        return list
+
     def to_dict(self):
+        '''
+        Returns this object as a dictionary representation (no encapsulated 
+        objects included, only their id)
+        '''
         dict = {}
         for var in self.__dict__.keys():
             if not var.startswith("_"):
                 v = self.__dict__[var]
-                try:
-                    dict[var] = self.__dict__[var].to_dict()
-                except AttributeError:
+                if not isinstance(self.__dict__[var], Packable):
+#                    self.__dict__[var].to_dict()
+#                except AttributeError:
                     if type(v) == datetime:
                         dict[var] = v.strftime("%s")
                     else:
@@ -458,12 +474,16 @@ if __name__ == '__main__':
     print "Testing db"
     db = create_database()
     poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident, POISubType.tree)
-    db.add(poi_data)
+#    print poi_data, poi_data.to_dict()
+#    db.add(poi_data)
 #    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
 #    db.add(unit_data)
 #    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
+#    db.add(mission_data)
 #    print mission_data
-#    alarm = Alarm("räv", "Linköping", poi_data, "Klasse", "11111")
+    alarm = Alarm("räv", "Linköping", poi_data, "Klasse", "11111", 7, "nada")
+    db.add(alarm)
+    print alarm.to_list()
     
 #    db.add(mission_data)
     
