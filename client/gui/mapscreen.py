@@ -21,7 +21,9 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         gui.Screen.__init__(self, "Map")
         gtk.DrawingArea.__init__(self)
         self.db = db
-        self.db.connect('mapobject-added', self.update_map)
+        self.db.connect('mapobject-added', self.add_map_object)
+        self.db.connect('mapobject-changed', self.change_map_object)
+        self.db.connect('mapobject-deleted', self.delete_map_object)
         mapxml = map.map_xml_reader.MapXML("map/data/map.xml")
         self.mapdata = map.mapdata.MapData(mapxml.name, mapxml.levels)
         # queue_draw() ärvs från klassen gtk.DrawingArea
@@ -55,26 +57,42 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                         gtk.gdk.POINTER_MOTION_HINT_MASK)
                          #|                        gtk.gdk.KEY_PRESS_MASK)
         # add all current objects in db to map
-        self.update_map(data = "all")
-    
-    def update_map(self, database = None, data = None):
-        # add all units to dict with objects to draw
-        if data == "all":
-            mapobjectdata = self.db.get_all_mapobjects()
-            for data in mapobjectdata:
-                if data.__class__ == shared.data.UnitData:
-                    self.mapdata.objects[data.id] = Unit(data)
-                elif data.__class__ == shared.data.POIData:
-                    self.mapdata.objects[data.id] = POI(data)
-        else:
+        self.add_all_mapobjects()
+        
+    def add_all_mapobjects(self):
+        '''
+        Add all objects from the database to the dict with objects to draw.
+        '''
+        mapobjectdata = self.db.get_all_mapobjects()
+        for data in mapobjectdata:
             if data.__class__ == shared.data.UnitData:
                 self.mapdata.objects[data.id] = Unit(data)
             elif data.__class__ == shared.data.POIData:
-                self.mapdata.objects[data.id] = POI(data)  
-            elif data.__class__ == shared.data.Alarm:
-                self.mapdata.objects[data.poi.id] = POI(data.poi)  
-            elif data.__class__ == shared.data.MissionData:
-                self.mapdata.objects[data.poi.id] = POI(data.poi)
+                self.mapdata.objects[data.id] = POI(data)
+        self.queue_draw()
+
+    def add_map_object(self, database, data):
+        if data.__class__ == shared.data.UnitData:
+            self.mapdata.objects[data.id] = Unit(data)
+        elif data.__class__ == shared.data.POIData:
+            self.mapdata.objects[data.id] = POI(data)  
+        elif data.__class__ == shared.data.Alarm:
+            self.mapdata.objects[data.poi.id] = POI(data.poi)  
+        elif data.__class__ == shared.data.MissionData:
+            self.mapdata.objects[data.poi.id] = POI(data.poi)
+        self.queue_draw()
+        
+    def change_map_object(self, database, data):
+        self.add_map_object(database,data)
+
+    def delete_map_object(self, database, data):
+        if data.__class__ == shared.data.Alarm:
+            del self.mapdata.objects[data.poi.id]  
+        elif data.__class__ == shared.data.MissionData:
+            del self.mapdata.objects[data.poi.id]
+        else:
+            del self.mapdata.objects[data.id]
+
         self.queue_draw()
 
     def zoom(self, change):

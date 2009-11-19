@@ -50,6 +50,28 @@ class Packable(object):
                         dict[var] = v
         dict["class"] = self.__class__.__name__
         return dict
+    
+    def has_changed(self, database):
+        '''
+        Check if this objects state is different than the state of this object 
+        in the database.
+        '''
+        state_in_db = database.query(self.__class__).filter_by(id=self.id).first()
+        
+        
+    def to_changed_list(self):
+        '''
+        Returns a list representation of this object containing only the 
+        encapsulated objects that has changed.
+        '''
+        list = []
+        for var in self.__dict__.keys():
+            v = self.__dict__[var]
+            if isinstance(v, Packable):
+                if v.has_changed():
+                    list.append(v.to_dict())
+        list.append(self.to_dict())
+        return list
 
 class Database(gobject.GObject):
     '''
@@ -72,12 +94,19 @@ class Database(gobject.GObject):
         session.close()
         self.emit("mapobject-added", object)
         
+    def change(self, object):
+        session = self._Session()
+        session.add(object)
+        session.commit()
+        session.close()
+        self.emit("mapobject-changed", object)
+        
     def delete(self, object):
         session = self._Session()
         session.delete(object)
         session.commit()
         session.close()
-        self.emit("mapobject-added", object)
+        self.emit("mapobject-deleted", object)
         
     def get_all_alarms(self):
         session = self._Session()
@@ -213,6 +242,8 @@ class MapObjectData(Base, Packable):
 '''
 gobject.type_register(Database)
 gobject.signal_new("mapobject-added", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
+gobject.signal_new("mapobject-changed", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
+gobject.signal_new("mapobject-deleted", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
 
 class UnitData(MapObjectData):
     '''
@@ -483,7 +514,10 @@ if __name__ == '__main__':
 #    print mission_data
     alarm = Alarm("räv", "Linköping", poi_data, "Klasse", "11111", 7, "nada")
     db.add(alarm)
-    print alarm.to_list()
+
+    alarm.event = "kuk"
+    db.change(alarm)
+
     
 #    db.add(mission_data)
     
