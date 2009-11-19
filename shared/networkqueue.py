@@ -130,11 +130,14 @@ class NetworkInQueue(NetworkQueue):
                 log.debug(ve)
                 return
 
+            # For now don't react on incoming messages directly from queue
+            '''
             if m.type == shared.data.MessageType.login:
                 self._login_client(s, m)
             else:
                 self.message_handler.handle(m)
                 self.message_available(data)
+                '''
         else:
             self.emit("socket-broken")
 
