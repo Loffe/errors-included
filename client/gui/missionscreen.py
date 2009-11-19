@@ -4,6 +4,7 @@ import gobject
 import shared.data
 import gui
 import pango
+import datetime
 from selectunit import SelectUnitButton
 from selectunit import SelectUnitDialog
 
@@ -15,7 +16,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
     def __init__(self, db):
         gtk.ScrolledWindow.__init__(self)
         self.db = db
-        
+
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
@@ -51,43 +52,34 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         hbox.pack_start(type_label, True, True, 0)
         
         # create and pack combobox
-        combo_box = gtk.combo_box_new_text()
-        combo_box.set_size_request(300,50)
-        combo_box.append_text("Välj ett larm här")
-        hbox.pack_start(combo_box, True,True, 0)
+        self.combo_box = gtk.combo_box_new_text()
+        self.combo_box.set_size_request(300,50)
+        self.combo_box.append_text("Välj larm...")
+        hbox.pack_start(self.combo_box, True,True, 0)
         
         new_section("Nytt uppdrag", main_box)
         
         # create entries
         self.event_entry = new_entry("     Händelse:", main_box)
 
-        self.location_entry = new_entry("     Skadeplats:", main_box)
-
+        self.location_entry2 = new_entry("     Skadeplats: lon-Gps", main_box)
+        self.location_entry3 = new_entry("     Skadeplats: lat-Gps", main_box)        
         self.hurted_entry = new_entry("     Antal skadade:", main_box)
-
         new_section("Kontaktperson", main_box)
-
         self.name_entry = new_entry("     Namn:", main_box)
-
         self.number_entry = new_entry("     Nummer:", main_box)
-
         new_section("Övrigt", main_box)
         self.random_entry = new_entry("     Information:", main_box)
         
 
-        select_unit_button = SelectUnitButton(self.db)
-        main_box.add(select_unit_button)
-        
-        # add selectable types
-        for alarm in self.db.get_all_alarms():
-                combo_box.append_text(alarm.event)
-                
+        self.select_unit_button = SelectUnitButton(self.db)
+        main_box.add(self.select_unit_button)        
 
         # add event handler
-        combo_box.connect('changed', self.select_alarm)
+        self.combo_box.connect('changed', self.select_alarm)
 
         # set the first item added as active
-        combo_box.set_active(0)
+        self.combo_box.set_active(0)
 
         # show 'em all! (:
         main_box.show_all()
@@ -101,11 +93,13 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         @param combobox: the changed combobox
         '''
         # set the selected type
-        self.selected_alarm = combobox.get_active_text()
-        for alarm in self.db.get_all_alarms():
+        self.selected_alarm = self.combo_box.get_active_text()
+        alarms = self.db.get_all_alarms()
+        for alarm in alarms:
             if alarm.event == self.selected_alarm:
                 self.event_entry.set_text(alarm.event)
-                self.location_entry.set_text(alarm.location_name)
+                self.location_entry2.set_text(str(alarm.poi.coordx))
+                self.location_entry3.set_text(str(alarm.poi.coordy))                
                 self.name_entry.set_text(alarm.contact_person)
                 self.hurted_entry.set_text(str(alarm.number_of_wounded))
                 self.number_entry.set_text(alarm.contact_number)
@@ -116,5 +110,25 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         for a in self.db.get_all_alarms():
             if a.event == self.selected_alarm:
                 alarm = a
-        mission = shared.data.MissionData(self.event_entry.get_text(), alarm.poi, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text())
-        self.db.add(mission)
+
+        lon = float(self.location_entry2.get_text())
+        lat = float(self.location_entry3.get_text())
+        selected = self.select_unit_button.select_dialog.selected_units
+        units = self.db.get_units(selected)
+
+        
+        if alarm == None or (lon != alarm.poi.coordx and lat != alarm.poi.coordy):
+            # @todo CHANGE POI-TYPE, SHOULDNT BE HARDCODED!
+            poi_data = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.fire)
+        else:
+            poi_data = alarm.poi
+        mission_data = shared.data.MissionData(self.event_entry.get_text(), poi_data, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text(), units)
+        self.db.add(mission_data)
+        self.emit("new-mission", mission_data)
+        self.emit("okbutton-clicked3")
+        
+gobject.type_register(MissionScreen)
+gobject.signal_new("okbutton-clicked3", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
+gobject.signal_new("new-mission", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
+        
+        

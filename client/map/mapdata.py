@@ -124,8 +124,10 @@ class Tiles:
                     self.bounds["min_longitude"]
         gps_height = self.bounds["min_latitude"] - \
                      self.bounds["max_latitude"]
-
-        # Skärmen på N810:an är 800x480.
+                     
+        
+        # Skärmen på N810:an är 800x480. Detta bestämmer hur många tiles som
+        # är synliga och påverkar inte clicked_coords()
         width = (gps_width / self.width) * 400
         height = (gps_height / self.height) * 240
 
@@ -232,8 +234,8 @@ class MapData():
         self.objects = {}
         self.redraw()
 
-    def add_object(self, id, map_object):
-        self.objects[id] = map_object
+    def add_object(self, map_object):
+        self.objects[mapobject.id] = map_object
         self.redraw()
 
     def delete_object(self, object_id):
@@ -296,6 +298,8 @@ class POI(MapObject):
             path = "map/data/icons/fire.png"
         elif poi_data.type == shared.data.POIType.accident:
             path = "map/data/icons/accident.png"
+        elif poi_data.type == shared.data.POIType.flag:
+            path = "map/data/icons/default.png"
         self.picture = Picture(path)
 
 class Mission():

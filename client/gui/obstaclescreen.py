@@ -2,14 +2,22 @@
 import gtk
 import gobject
 import shared.data
+import datetime
 import gui
+import clientgui
+import mapscreen
 
 class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
     
+    db = None
+    parent = None
     selected_type = None
+    location_entry2 = None
+    location_entry = None
     
-    def __init__(self):
+    def __init__(self, db):
         gtk.ScrolledWindow.__init__(self)
+        self.db = db
         
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -43,20 +51,31 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         
         label, self.location_entry = new_entry("Händelse:")
         left_box.add(label)
-        right_box.add(self.location_entry)
-        
-        label, self.location_entry = new_entry("Skadeplats:")
+        right_box.add(self.location_entry)        
+        label, self.location_entry2 = new_entry("Skadeplats GPS-lon:")      
+               
         left_box.add(label)
-        right_box.add(self.location_entry)
+        right_box.add(self.location_entry2)        
+        label, self.location_entry3 = new_entry("Skadeplats GPS-lat:")
+
         
+        left_box.add(label)
+        right_box.add(self.location_entry3)
+        
+        
+
         # add selectable types
+        '''
+        @TODO: find this from POISubType
         types = []
-        for type in shared.data.ObstacleType.__dict__.keys():
+        for type in shared.data.POIType.__dict__.keys():
             if type[0] != "_":
                 types.append(type)
         types.sort()
         for type in types:
             combo_box.append_text(type)
+            
+        '''
 
         # add event handler
         combo_box.connect('changed', self.select_type)
@@ -77,3 +96,25 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         '''
         # set the selected type
         self.selected_type = combobox.get_active()
+        print (self.selected_type)
+        
+        
+        self.type = shared.data.POIType.accident
+        
+    def ok_button_function(self, event):
+
+   
+        lon = float(self.location_entry2.get_text())
+        lat = float(self.location_entry3.get_text())
+        
+        poi_data2 = shared.data.POIData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), shared.data.POIType.accident)
+        
+        self.db.add(poi_data2)
+
+        self.emit("okbutton-clicked")
+        
+gobject.type_register(ObstacleScreen)
+gobject.signal_new("okbutton-clicked", ObstacleScreen, gobject.SIGNAL_RUN_FIRST,
+                   gobject.TYPE_NONE, ())
+
+

@@ -60,7 +60,6 @@ class SelectUnitDialog(gtk.Dialog):
     
     def run(self):
         #loopa listan
-        print "loopa"
         return gtk.Dialog.run(self)
 
     def clear_selected(self):
@@ -84,7 +83,6 @@ class SelectUnitDialog(gtk.Dialog):
                     b.set_active(True)
                 else:
                     b.set_active(False)
-            print "Avbrot"
         self.hide()
 
         return self.db.get_units(self.selected_units)

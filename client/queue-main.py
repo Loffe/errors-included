@@ -1,13 +1,19 @@
 #!/usr/bin/env python
 
-import shared.queue
+import clientnetworkhandler
 import config
+import sys
 
 if __name__ == "__main__":
-    q = shared.queue.Queue(config.server.ip,config.server.port)
+    if "stop" in sys.argv:
+        import dbus
+        print("Stopping client queue")
+        bus = dbus.SessionBus()
+        remote_object = bus.get_object("included.errors.Client", "/Queue")
+        remote_object.dbus_close()
+        sys.exit(0)
 
-    for i in range(10):
-        q.enqueue("hejsan" + str(i))
+    q = clientnetworkhandler.ClientNetworkHandler(config.server.ip,config.server.port)
 
     try:
         q.mainloop()
@@ -15,4 +21,3 @@ if __name__ == "__main__":
         q.running = False
         del q
         print "Aborting"
-

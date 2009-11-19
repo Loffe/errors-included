@@ -5,18 +5,25 @@ import gui
 import shared.data
 import map.map_xml_reader
 import map
+from map.mapdata import *
 from datetime import datetime
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
+    db = None
+    sign = False
+
     bounds = {"min_latitude":0,
                 "max_latitude":0,
                 "min_longitude":0,
                 "max_longitude":0}
 
-    def __init__(self):
+    def __init__(self, db):
         gui.Screen.__init__(self, "Map")
         gtk.DrawingArea.__init__(self)
-
+        self.db = db
+        self.db.connect('mapobject-added', self.add_map_object)
+        self.db.connect('mapobject-changed', self.change_map_object)
+        self.db.connect('mapobject-deleted', self.delete_map_object)
         mapxml = map.map_xml_reader.MapXML("map/data/map.xml")
         self.mapdata = map.mapdata.MapData(mapxml.name, mapxml.levels)
         # queue_draw() ärvs från klassen gtk.DrawingArea
@@ -32,6 +39,9 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.last_movement_timestamp = 0.0
         self.zoom_level = 1
 
+        self.gps_x = self.mapdata.focus["longitude"]
+        self.gps_y = self.mapdata.focus["latitude"]
+
         # events ;O
         self.set_flags(gtk.CAN_FOCUS)
         self.connect("expose_event", self.handle_expose_event)
@@ -46,12 +56,49 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                         gtk.gdk.POINTER_MOTION_MASK |
                         gtk.gdk.POINTER_MOTION_HINT_MASK)
                          #|                        gtk.gdk.KEY_PRESS_MASK)
-    
+        # add all current objects in db to map
+        self.add_all_mapobjects()
+        
+    def add_all_mapobjects(self):
+        '''
+        Add all objects from the database to the dict with objects to draw.
+        '''
+        mapobjectdata = self.db.get_all_mapobjects()
+        for data in mapobjectdata:
+            if data.__class__ == shared.data.UnitData:
+                self.mapdata.objects[data.id] = Unit(data)
+            elif data.__class__ == shared.data.POIData:
+                self.mapdata.objects[data.id] = POI(data)
+        self.queue_draw()
+
+    def add_map_object(self, database, data):
+        if data.__class__ == shared.data.UnitData:
+            self.mapdata.objects[data.id] = Unit(data)
+        elif data.__class__ == shared.data.POIData:
+            self.mapdata.objects[data.id] = POI(data)  
+        elif data.__class__ == shared.data.Alarm:
+            self.mapdata.objects[data.poi.id] = POI(data.poi)  
+        elif data.__class__ == shared.data.MissionData:
+            self.mapdata.objects[data.poi.id] = POI(data.poi)
+        self.queue_draw()
+        
+    def change_map_object(self, database, data):
+        self.add_map_object(database,data)
+
+    def delete_map_object(self, database, data):
+        if data.__class__ == shared.data.Alarm:
+            del self.mapdata.objects[data.poi.id]  
+        elif data.__class__ == shared.data.MissionData:
+            del self.mapdata.objects[data.poi.id]
+        else:
+            del self.mapdata.objects[data.id]
+
+        self.queue_draw()
 
     def zoom(self, change):
         # Frigör minnet genom att ladda ur alla tiles för föregående nivå
-        level = self.mapdata.get_level(self.zoom_level)
-        level.unload_tiles("all")
+#        level = self.mapdata.get_level(self.zoom_level)
+#        level.unload_tiles("all")
       
         if change == "+":
             if self.zoom_level < 3:
@@ -117,10 +164,12 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
 
         return False
 
-    # skicka in skiten här linus, gogo!
-    def set_gps_data(self, gps_data):
-        self.gps_data = gps_data
-        self.queue_draw()
+#    # skicka in skiten här linus, gogo!
+#    def set_gps_data(self, gps_data):
+#        self.gps_data = gps_data
+#        self.queue_draw()
+
+
 
     def draw(self):
         # Hämtar alla tiles för en nivå
@@ -143,7 +192,9 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
             tile.picture.draw(self.context, x, y)
 
         # Ritar ut eventuella objekt
+
         objects = self.mapdata.objects
+            
         for item in objects:
             x, y = self.gps_to_pixel(objects[item].map_object_data.coords[0],
                                      objects[item].map_object_data.coords[1])
@@ -151,7 +202,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
             if x != 0 and y != 0:
                 objects[item].picture.draw(self.context, x, y)
 
-   
+
     def gps_to_pixel(self, lon, lat):
         cols = self.cols
         rows = self.rows
@@ -172,7 +223,9 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         rect = self.get_allocation()
         x = rect.width / 2.0
         y = rect.height / 2.0
-      
+      	
+	
+
         # Räknar ut position:
         x += (where_lon - where_focus_lon) * (cols * 300.0)
         y += (where_lat - where_focus_lat) * (rows * 160.0)
@@ -184,7 +237,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         level = self.mapdata.get_level(self.zoom_level)
         # Plockar ur de tiles vi söker från nivån
         tiles, cols, rows = level.get_tiles(self.mapdata.focus)
-      
+
+	
         # Gps per pixlar
         width = self.bounds["max_longitude"] - self.bounds["min_longitude"]
         height = self.bounds["min_latitude"] - self.bounds["max_latitude"]
@@ -199,23 +253,28 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                 gps_per_pix_height * movement_y]
         
     def get_clicked_coord(self, event):
+        r = self.get_allocation()        
         x, y, state = event.window.get_pointer()
-        (lon,lat) = self.pixel_to_gps(x,y)
-#        rect = self.get_allocation()
-#        dx = 1.0*x/rect.width
-#        dy = 1.0*y/rect.height
-#        
-#        width = self.bounds["max_longitude"] - self.bounds["min_longitude"]
-#        height = self.bounds["max_latitude"] - self.bounds["min_latitude"]
+        (lon,lat) = self.pixel_to_gps(x,y)        
+        (m,n) = self.pixel_to_gps(r.width/2, r.height/2)
+        self.gps_x = self.origin_position["longitude"] - m + lon
+        self.gps_y = self.origin_position["latitude"] + n  - lat
         
-        gps_x = self.bounds["min_longitude"] + lon#dx*width
-        gps_y = self.bounds["min_latitude"] - lat#dy*height
 
-        print gps_x, gps_y
-        return gps_x,gps_y
+    
+    def draw_sign(self):  
+        poi_data = shared.data.POIData(self.gps_x, self.gps_y, "goal", datetime.now(), shared.data.POIType.flag)
+        self.mapdata.objects["add-sign"] = POI(poi_data)
+        self.queue_draw()
         
-    def draw_clicked_pos(self,event):
-        (lon,lat) = self.get_clicked_coord(event)
-#        poi_data = shared.data.POIData((lon, lat), "goal", datetime.now(), shared.data.POIType.pasta_wagon)
-#        self.mapdata.add_object("Shape1", map.mapdata.MapObject(poi_data))
-#        self.draw()
+    def remove_sign(self):
+        try:
+            del self.mapdata.objects["add-sign"]
+            self.queue_draw()  
+        except:
+            pass
+
+    def draw_clicked_pos(self, event):
+        self.get_clicked_coord(event)
+        if self.sign:
+            self.draw_sign()

@@ -1,0 +1,16 @@
+#!/bin/sh
+# Goto script dir
+cd `dirname $0`
+
+if [ X$1 == X"stop" ]; then
+    echo "stop";
+    run-standalone.sh python2.5 queue-main.py stop
+    run-standalone.sh python2.5 qosmanager.py stop
+else
+    echo "Starting queue"
+    run-standalone.sh python2.5 queue-main.py &
+    echo "Starting main"
+    run-standalone.sh python2.5 main.py &
+    echo "Starting QoS-Manager"
+    run-standalone.sh python2.5 qosmanager.py &
+fi
