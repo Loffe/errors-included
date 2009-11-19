@@ -57,8 +57,8 @@ class ClientController(object):
         @param coordx: the x-coordinate to set.
         @param coordy: the y-coordinate to set.
         '''
-        self.unit_data.coordx = coordx
-        self.unit_data.coordy = coordy
+        self.unit_data.coordx = float(coordx)
+        self.unit_data.coordy = float(coordy)
         print "Got coords update", coordx, coordy
         self.unit_data.timestamp = datetime.datetime.now()
         self.db.change(self.unit_data)
