@@ -152,7 +152,8 @@ class QoSManager(dbus.service.Object):
         (x,y) = (0,0)
         tries = 0
         while (x,y) == (0,0):
-            (x,y) = gpsdevice.get_position()
+            coords = gpsdevice.get_position()
+            (x,y) = (coords[1],coords[0])
             tries += 1
             if tries >= self.try_limit:
                 break
