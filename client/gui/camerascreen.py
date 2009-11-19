@@ -29,7 +29,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         vbox.pack_start(hbox, False)
         hbox.set_border_width(10)
         hbox.pack_start(gtk.Label())
-        self.button = gtk.Button("Lägg på")
+        self.button = gtk.Button("Start")
         self.button.connect("clicked", self.start_stop)
         hbox.pack_start(self.button, False)
         #self.button2 = gtk.Button("Quit")
