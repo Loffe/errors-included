@@ -52,7 +52,7 @@ class QoSManager(dbus.service.Object):
         self.battery_level = 0
         
         # gps update interval (every X seconds)
-        self.gps_update_interval = 30
+        self.gps_update_interval = 10
         # try this number of times every time ;P
         self.try_limit = 29
         
@@ -149,10 +149,10 @@ class QoSManager(dbus.service.Object):
         gpsdevice = gpsbt.gps()
         
         # get the gps coordinates
-        x,y = (0,0)
+        (x,y) = (0,0)
         tries = 0
         while (x,y) == (0,0):
-            x, y = gpsdevice.get_position()
+            (x,y) = gpsdevice.get_position()
             tries += 1
             if tries >= self.try_limit:
                 break
@@ -160,8 +160,8 @@ class QoSManager(dbus.service.Object):
 
         # TODO: LIMIT TRIES COUNT?!
         print "tries:", str(tries)
-        if tries >= 29:
-            (x,y) = (15.5726, 58.4035)
+#        if tries >= 29:
+#            (x,y) = (15.5726, 58.4035)
         # Stop the GPS
         gpsbt.stop(self.gps_context)
 
