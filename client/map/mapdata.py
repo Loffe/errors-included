@@ -126,15 +126,10 @@ class Tiles:
                      self.bounds["max_latitude"]
                      
         
-	   #r = self.get_allocation()
-       #(m,n) = self.pixel_to_gps(r.width/2,r.height/2)
-	
-        # Skärmen på N810:an är 800x480.
-#        width = (gps_width / self.width) * 400
-#        height = (gps_height / self.height) * 240
-
-        width = (gps_width / self.width) * 300
-        height = (gps_height / self.height) * 160
+        # Skärmen på N810:an är 800x480. Detta bestämmer hur många tiles som
+        # är synliga och påverkar inte clicked_coords()
+        width = (gps_width / self.width) * 400
+        height = (gps_height / self.height) * 240
 
         bounds = {"min_longitude":(focus["longitude"] - width),
                   "max_longitude":(focus["longitude"] + width),

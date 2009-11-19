@@ -250,12 +250,12 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         (a,b) = self.pixel_to_gps(self.movement_from["x"],self.movement_from["y"])
         r = self.get_allocation()
         #(m,n) = self.pixel_to_gps(r.width/2,r.height/2)
-        (m,n) = self.pixel_to_gps(300, 160)
+        (m,n) = self.pixel_to_gps(r.width/2, r.height/2)
         #print r.width,r.height
         
         #print lon, lat , "-" , a, b
-        self.gps_x = self.origin_position["longitude"] - m + lon - 0.002
-        self.gps_y = self.origin_position["latitude"] + n  - lat + 0.0005
+        self.gps_x = self.origin_position["longitude"] - m + lon
+        self.gps_y = self.origin_position["latitude"] + n  - lat
         
         #print p,q
         #print a,b
