@@ -18,7 +18,7 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
     number_entry = None
     random_entry = None
 
-    def __init__(self):
+    def __init__(self, db):
         '''
         Constructor. Create the alarmscreen and its entries.
         '''

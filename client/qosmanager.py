@@ -52,7 +52,7 @@ class QoSManager(dbus.service.Object):
         self.battery_level = 0
         
         # gps update interval (every X seconds)
-        self.gps_update_interval = 30
+        self.gps_update_interval = 10
         # try this number of times every time ;P
         self.try_limit = 29
         
@@ -149,17 +149,15 @@ class QoSManager(dbus.service.Object):
         gpsdevice = gpsbt.gps()
         
         # get the gps coordinates
-        x,y = (0,0)
+        (x,y) = (0,0)
         tries = 0
         while (x,y) == (0,0):
-            x, y = gpsdevice.get_position()
+            coords = gpsdevice.get_position()
+            (x,y) = (coords[1],coords[0])
             tries += 1
             if tries >= self.try_limit:
                 break
             time.sleep(1)
-
-        # TODO: LIMIT TRIES COUNT?!
-        print "tries:", str(tries)
 
         # Stop the GPS
         gpsbt.stop(self.gps_context)
@@ -167,7 +165,7 @@ class QoSManager(dbus.service.Object):
         # set gps coordinates
         if not (x,y) == (0,0):
             self.gps_coord = (x,y)
-            self.signal_new_gps_coord(x, y)
+            self.signal_new_gps_coord(str(x), str(y))
 
     def start(self):
         '''
@@ -206,8 +204,8 @@ class QoSManager(dbus.service.Object):
             except:
                 # Not in N810, got no GPS-device; do nothing...
                 print "gps failure"
-                # @todo: REMOVE, THIS IS ONLY A TEST! 
-                self.signal_new_gps_coord(15.5726, 58.4035)
+                # @todo: REMOVE, THIS IS ONLY A TEST!
+                self.signal_new_gps_coord("15.5726","58.4035")
     
     def service_level_updater(self):
         '''
@@ -286,7 +284,7 @@ class QoSManager(dbus.service.Object):
     def dbus_close(self):
         self.close()
 
-    @dbus.service.signal(dbus_interface='included.errors.QoSManager', signature='dd')
+    @dbus.service.signal(dbus_interface='included.errors.QoSManager', signature='ss')
     def signal_new_gps_coord(self, coordx, coordy):
         print "coordinates updated"
 

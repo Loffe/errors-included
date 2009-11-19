@@ -29,3 +29,8 @@ class StatusScreen(gtk.ScrolledWindow, gui.Screen):
         '''
         gtk.ScrolledWindow.__init__(self)
         self.db = db 
+
+        self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        
+        
+    

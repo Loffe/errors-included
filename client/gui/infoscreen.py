@@ -30,4 +30,128 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
         gtk.ScrolledWindow.__init__(self)
         self.db = db 
 
+        self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        
+        def new_entry(labeltext, parent):
+            hbox = gtk.HBox(True, 0)
+            label = gtk.Label(labeltext)
+            label.set_alignment(0, 0.5)
+            #label.modify_font(pango.FontDescription("sans 12"))
+
+            entry = gtk.Label()
+            entry.set_alignment(0, 0.5)
+            #entry.modify_font(pango.FontDescription("sans 12"))
+            entry.select_region(0, len(entry.get_text()))
+            hbox.add(label)
+            hbox.add(entry)
+            parent.add(hbox)
+            return entry
+
+        def new_section(title, parent):
+            label = gtk.Label(title)
+            label.modify_font(pango.FontDescription("sans 12"))
+            label.set_alignment(0, 0.5)
+            parent.add(label)
+#        
+        # create layout boxes
+        main_box = gtk.VBox(False,0)
+        self.add_with_viewport(main_box)
+        hbox = gtk.HBox(False,0)
+        main_box.pack_start(hbox,True,True,0)
+#        
+#        # create type label
+#        type_label = gtk.Label("Inkomna larm:")
+#        type_label.set_alignment(0, 0.5)
+#        hbox.pack_start(type_label, True, True, 0)
+        
+        # create and pack combobox
+#        self.combo_box = gtk.combo_box_new_text()
+#        self.combo_box.set_size_request(300,50)
+#        self.combo_box.append_text("Välj larm...")
+#        hbox.pack_start(self.combo_box, True,True, 0)
+#        
+#        new_section("Nytt uppdrag", main_box)
+        
+        # create entries
+        
+        new_section("Mitt uppdarag", main_box)
+        self.event_entry = new_entry("     Händelse:", main_box)
+
+        self.location_entry2 = new_entry("     Skadeplats: lon-Gps", main_box)
+        self.location_entry3 = new_entry("     Skadeplats: lat-Gps", main_box)        
+        self.hurted_entry = new_entry("     Antal skadade:", main_box)
+        new_section("Kontaktperson", main_box)
+        self.name_entry = new_entry("     Namn:", main_box)
+        self.number_entry = new_entry("     Nummer:", main_box)
+        new_section("Övrigt", main_box)
+        self.random_entry = new_entry("     Information:", main_box)
+        
+
+#        self.select_unit_button = SelectUnitButton(self.db)
+#        main_box.add(self.select_unit_button)        
 #
+#        # add event handler
+#        self.combo_box.connect('changed', self.select_alarm)
+#
+#        # set the first item added as active
+#        self.combo_box.set_active(0)
+
+        # show 'em all! (:
+        main_box.show_all()
+
+    '''Handle events
+    '''
+
+    def select_alarm(self, combobox):
+        pass
+        '''
+        Call when combobox changes to switch obstacle type.
+        @param combobox: the changed combobox
+        '''
+        # set the selected type
+#        self.selected_alarm = self.combo_box.get_active_text()
+#        alarms = self.db.get_all_alarms()
+#        for alarm in alarms:
+#            if alarm.event == self.selected_alarm:
+#                self.event_entry.set_text(alarm.event)
+#                self.location_entry2.set_text(str(alarm.poi.coordx))
+#                self.location_entry3.set_text(str(alarm.poi.coordy))                
+#                self.name_entry.set_text(alarm.contact_person)
+#                self.hurted_entry.set_text(str(alarm.number_of_wounded))
+#                self.number_entry.set_text(alarm.contact_number)
+#                self.random_entry.set_text(alarm.other)
+                
+    def ok_button_function(self, event):
+        self.event_entry.set_text("hej")
+        self.location_entry2.set_text(str("hej"))
+        self.location_entry3.set_text(str("hej"))                
+        self.name_entry.set_text("hej")
+        self.hurted_entry.set_text(str("hej"))
+        self.number_entry.set_text("hej")
+        self.random_entry.set_text("hej")
+    
+#        alarm = None
+#        for a in self.db.get_all_alarms():
+#            if a.event == self.selected_alarm:
+#                alarm = a
+#
+#        lon = float(self.location_entry2.get_text())
+#        lat = float(self.location_entry3.get_text())
+#        selected = self.select_unit_button.select_dialog.selected_units
+#        units = self.db.get_units(selected)
+
+#        
+#        if alarm == None or (lon != alarm.poi.coordx and lat != alarm.poi.coordy):
+#            # @todo CHANGE POI-TYPE, SHOULDNT BE HARDCODED!
+#            poi_data = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.fire)
+#        else:
+#            poi_data = alarm.poi
+#        mission_data = shared.data.MissionData(self.event_entry.get_text(), poi_data, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text(), units)
+#        self.db.add(mission_data)
+#        self.emit("new-mission", mission_data)
+#        self.emit("okbutton-clicked3")
+        
+#gobject.type_register(MissionScreen)
+#gobject.signal_new("okbutton-clicked3", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
+#gobject.signal_new("new-mission", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
+#        
