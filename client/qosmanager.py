@@ -207,7 +207,7 @@ class QoSManager(dbus.service.Object):
                 # Not in N810, got no GPS-device; do nothing...
                 print "gps failure"
                 # @todo: REMOVE, THIS IS ONLY A TEST! 
-                self.signal_new_gps_coord(13, 37)
+                self.signal_new_gps_coord(15.5726, 58.4035)
     
     def service_level_updater(self):
         '''
