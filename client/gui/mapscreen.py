@@ -225,9 +225,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         y = rect.height / 2.0
       	
 	
-	#r = self.get_allocation()
-        #(m,n) = self.pixel_to_gps(r.width/2,r.height/2)
-	
+
         # Räknar ut position:
         x += (where_lon - where_focus_lon) * (cols * 300.0)
         y += (where_lat - where_focus_lat) * (rows * 160.0)
@@ -239,10 +237,7 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         level = self.mapdata.get_level(self.zoom_level)
         # Plockar ur de tiles vi söker från nivån
         tiles, cols, rows = level.get_tiles(self.mapdata.focus)
-      	
-	
-	#    r = self.get_allocation()
-        #(m,n) = self.pixel_to_gps(r.width/2,r.height/2)
+
 	
         # Gps per pixlar
         width = self.bounds["max_longitude"] - self.bounds["min_longitude"]
@@ -258,53 +253,14 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                 gps_per_pix_height * movement_y]
         
     def get_clicked_coord(self, event):
+        r = self.get_allocation()        
         x, y, state = event.window.get_pointer()
-        (lon,lat) = self.pixel_to_gps(x,y)
+        (lon,lat) = self.pixel_to_gps(x,y)        
+        (m,n) = self.pixel_to_gps(r.width/2, r.height/2)
+        self.gps_x = self.origin_position["longitude"] - m + lon
+        self.gps_y = self.origin_position["latitude"] + n  - lat
         
-        
-        #self.movement_from["x"] = event.x
-        #self.movement_from["y"] = evData(self.event_entry.get_text(), poi_data, seent.y
-        
-        (a,b) = self.pixel_to_gps(self.movement_from["x"],self.movement_from["y"])
-        r = self.get_allocation()
-        #(m,n) = self.pixel_to_gps(r.width/2,r.height/2)
-        (m,n) = self.pixel_to_gps(300, 160)
-        #print r.width,r.height
-        
-        #print lon, lat , "-" , a, b
-        self.gps_x = self.origin_position["longitude"] - m + lon - 0.002
-        self.gps_y = self.origin_position["latitude"] + n  - lat + 0.0005
-        
-        #print p,q
-        #print a,b
-        
-#        rect = self.get_allocation()
-#        dx = 1.0*x/rect.width
-#        dy = 1.0*y/rect.height
-#        
-#        width = self.bounds["max_longitude"] - self.bounds["min_longitude"]
-#        height = self.bounds["max_latitude"] - self.bounds["min_latitude"]
-        
-        #self.gps_x = self.bounds["min_longitude"] + lon #dx*width
-        #self.gps_y = self.bounds["min_latitude"] - lat - 0.002 #dy*height
-        
-        
-        
-        #print "-------------"
-        
-        #print self.bounds["min_longitude"], self.bounds["min_latitude"]
-        
-        
-       # print "-----------------"
-        
-        #print lon, lat
-        
-        #print "----------------"
 
-        #print self.gps_x, self.gps_y
-        #return self.gps_x, self.gps_y 
-        
-        #print "-------------"
     
     def draw_sign(self):  
         poi_data = shared.data.POIData(self.gps_x, self.gps_y, "goal", datetime.now(), shared.data.POIType.flag)
@@ -322,18 +278,3 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.get_clicked_coord(event)
         if self.sign:
             self.draw_sign()
-        
-        
-        
-#        self.clientgui.draw_sign()
-#        (self.gps_x, self.gps_y) = self.get_clicked_coord(event)
-#        
-#        poi_data = shared.data.POIData(self.gps_x, self.gps_y, "goal", datetime.now(), shared.data.POIType.pasta_wagon)
-#        mapdata.objects["add-sign"] = POI(poi_data)
-        
-        #(lon,lat) = self.get_clicked_coord(event)
-        #print (lon,lat)
-        
-        #poi_data = shared.data.POIData((lon, lat), "goal", datetime.now(), shared.data.POIType.pasta_wagon)
-        #self.db.add(poi_data)
-#        self.mapdata.add_object("Shape1", map.mapdata.MapObject(poi_data))

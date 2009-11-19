@@ -475,7 +475,7 @@ class Message(object):
             else:
                 # the packed data behave as the unpacked data (no need to convert)
                 self.unpacked_data = dict["packed_data"]
-            return self.unpacked_data
+            return self
         except KeyError, ke:
             raise ValueError("Not a valid Message. Missing any keys maybe?")
 
@@ -504,6 +504,9 @@ def create_database(db = Database()):
 if __name__ == '__main__':
     print "Testing db"
     db = create_database()
+
+
+
     poi_data = POIData(12,113, u"goal", datetime.now(), POIType.accident, POISubType.tree)
 #    print poi_data, poi_data.to_dict()
 #    db.add(poi_data)
@@ -554,3 +557,4 @@ if __name__ == '__main__':
 #    print "packed:", m1
 #    m2 = Message(packed_data = m1.packed_data)
 #    print "unpacked:", m2
+

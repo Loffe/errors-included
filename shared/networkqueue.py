@@ -124,17 +124,20 @@ class NetworkInQueue(NetworkQueue):
             self.queue.put(data, 37)
             m = None
             try:
-                m = shared.data.Message(None, None, packed_data=data)
+                m = shared.data.Message.unpack(data)
             except ValueError, ve:
                 log.debug("Crappy data = ! JSON")
                 log.debug(ve)
                 return
 
+            # For now don't react on incoming messages directly from queue
+            '''
             if m.type == shared.data.MessageType.login:
                 self._login_client(s, m)
             else:
                 self.message_handler.handle(m)
                 self.message_available(data)
+                '''
         else:
             self.emit("socket-broken")
 
