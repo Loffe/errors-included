@@ -167,6 +167,8 @@ class QoSManager(dbus.service.Object):
 
         # set gps coordinates
         if not (x,y) == (0,0):
+            x = round(x, 4)
+            y = round(y, 4)
             self.gps_coord = (x,y)
             self.signal_new_gps_coord(x, y)
 
@@ -207,8 +209,14 @@ class QoSManager(dbus.service.Object):
             except:
                 # Not in N810, got no GPS-device; do nothing...
                 print "gps failure"
-                # @todo: REMOVE, THIS IS ONLY A TEST! 
-                self.signal_new_gps_coord(15.5726, 58.4035)
+                # @todo: REMOVE, THIS IS ONLY A TEST!
+#                x = 15.51111111145645
+#                y = 58.403599999999999999
+#                x = round(x, 4)
+#                y = round(y, 4)
+#                print x
+#                print y  
+                self.signal_new_gps_coord(15.5726,58.4035)
     
     def service_level_updater(self):
         '''
