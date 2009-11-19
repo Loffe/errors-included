@@ -107,8 +107,8 @@ class ServerNetworkHandler(dbus.service.Object):
     def _login_client(self, socket, message):
         m = message
         if self.outqueues.has_key(socket):
-            if self.db.is_valid_login(m.sender, m.unpacked_data.password):
-                id = m.sender
+            id = m.sender
+            if self.db.is_valid_login(m.sender, m.unpacked_data["password"]):
                 self.outqueues[id] = self.outqueues[socket]
                 del self.outqueues[socket]
                 log.debug("logged in and now has a named queue")
@@ -121,7 +121,8 @@ class ServerNetworkHandler(dbus.service.Object):
                 nack = shared.data.Message("server", id,
                                            type=shared.data.MessageType.login_ack,
                                            unpacked_data={"result": "no", "class": "dict"})
-                self.enqueue(m.sender, nack.packed_data, 5)
+                # queue is not named because login failed
+                self.enqueue(socket, nack.packed_data, 5)
         else:
             log.debug("no such socket or user already logged in")
 

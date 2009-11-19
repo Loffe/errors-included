@@ -444,7 +444,7 @@ class Message(object):
             else:
                 # the packed data behave as the unpacked data (no need to convert)
                 self.unpacked_data = dict["packed_data"]
-            return self.unpacked_data
+            return self
         except KeyError, ke:
             raise ValueError("Not a valid Message. Missing any keys maybe?")
 
