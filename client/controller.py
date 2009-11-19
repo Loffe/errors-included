@@ -40,10 +40,16 @@ class ClientController(object):
         # My missions
         self.missions = []
         # The unit I am
-        self.unit_data = shared.data.UnitData(0, 0, name, datetime.datetime.now(), 
+        session = self.db._Session()
+        state_in_db = session.query(shared.data.UnitData).filter_by(name=self.name, type=self.unit_type).first()
+        session.close()
+        if state_in_db is None:
+            self.unit_data = shared.data.UnitData(0, 0, name, datetime.datetime.now(), 
                  unit_type)
-        # add myself to the database
-        self.db.add(self.unit_data)
+            # add myself to the database
+            self.db.add(self.unit_data)
+        else:
+            self.unit_data = state_in_db
 
     def update_coords(self, coordx, coordy):
         '''
@@ -54,4 +60,5 @@ class ClientController(object):
         self.unit_data.coordx = coordx
         self.unit_data.coordy = coordy
         self.unit_data.timestamp = datetime.datetime.now()
+        self.db.change(self.unit_data)
         print "Got coords update"
