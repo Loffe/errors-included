@@ -26,11 +26,11 @@ class FAQScreen(gtk.ScrolledWindow, gui.Screen):
         
         #Load texts
         self.diabetes = gtk.TextBuffer()
-        self.diabetes.set_text(open('../FAQ/diabetes.txt', 'r').read().encode('utf-8'))
+        self.diabetes.set_text(open('../shared/FAQ/diabetes.txt', 'r').read().encode('utf-8'))
         self.hemorojder = gtk.TextBuffer()
-        self.hemorojder.set_text(open('../FAQ/hemorojder.txt', 'r').read().encode('utf-8'))
+        self.hemorojder.set_text(open('../shared/FAQ/hemorojder.txt', 'r').read().encode('utf-8'))
         self.svinis = gtk.TextBuffer()
-        self.svinis.set_text(open('../FAQ/svininfluensan.txt', 'r').read().encode('utf-8'))
+        self.svinis.set_text(open('../shared/FAQ/svininfluensan.txt', 'r').read().encode('utf-8'))
         
         
         
