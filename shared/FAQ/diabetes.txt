@@ -1,0 +1,44 @@
+INFO: 
+Diabetes mellitus (sockersjuka) är en sjukdom där blodets innehöll av
+socker (glukos) är förhöjt. Blodets halt av glukos (blodsockernivån) stiger om
+kroppen har brist på eller saknar hormonet insulin, om kroppen har ett större
+insulinbehov än vad bukspottkörteln klarar att producera, eller om kroppens
+känslighet för insulin är nedsatt så att det tillgängliga insulinet inte kan
+tas upp av vävnaderna. Det finns flera olika former av diabetes, varav de två
+vanligaste är typ 1-diabetes och typ 2-diabetes. Därutöver finns
+graviditetsdiabetes och sekundär diabetes.
+
+SYMPTOM:
+Symtomen vid typ 2 diabetes är svaga. Därför kan man ha sjukdomen utan att
+känna av den. De flesta känner inga symtom. Sjukdomen upptäcks ofta vid en
+hälsokontroll eller i samband med annan provtagning.
+Typ 1 diabetes får man mer akut med tydligare symtom.
+Graviditetsdiabetes fastställs genom blodprov på mödravården.
+Klassiska tecken på diabetes är:
+    * ökad trötthet
+    * att du ofta är törstig
+    * att du kissar mycket
+    * att du går ner i vikt
+
+AKUTVÅRD:
+Försök aldrig att ge en medvetslös person något att äta eller dricka. Risken är
+mycket stor att han eller hon kvävs.
+Vid insulinkänning kan den sjuke bli blek, darrig, kallsvettig, förvirrad och
+är ofta omtöcknad. Försäkra dig om att han eller hon kan svälja. Ge då något
+sött att dricka eller äta. Rent druvsocker höjer blodsockret snabbt, men om det
+inte finns ta vad som finns som är sött.
+Om den sjuke är medvetslös får man inte ge något att äta eller dricka.
+Lägg personen på sidan i framstupa sidoläge så att andningsvägarna blir fria.
+Vid syraförgiftning har den sjuke en för hög blodsockernivå och riskerar att bli
+uttorkad och medvetslös på grund av kroppens insulinbrist. Tecken på detta är
+illamående, kräkningar och ofta magont. Personen har också i de flesta fall en
+acetondoft vid utandning.
+Det kan ibland vara svårt att veta om orsaken till att personen med diabetes
+inte mår bra är högt eller lågt blodsocker. Det enklaste är att testa
+blodsockret med en blodsockermätare för att få svaret. Om det inte är möjligt
+att kontrollera blodsockret är det aldrig fel att ge samma behandling som vid
+insulinkänning - även om blodsockret är för högt. Sockret höjer blodsockernivån
+obetydligt om man har för högt blodsocker, men höjer tillräckligt för att
+normalisera blodsockret vid en insulinkänning.
+Insulin får aldrig ges av annan person utan läkarordination.
+
