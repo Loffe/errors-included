@@ -86,7 +86,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
 
 #       #self.sender = gst.parse_launch("dsppcmsrc ! audio/x-raw-int,endianness=(int)1234,width=(int)16,depth=(int)16,signed=(boolean)true,channels=(int)1,rate=(int)8000 ! udpsink host="+str(ip)+" port="+str(port))
         #self.player = gst.parse_launch("udpsrc port="+self.MYPORT+" ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! dspilbcsink")
-        self.audio_recv = gst.parse_launch("udpsrc port="+str(port)" ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! dspilbcsink")
+        self.audio_recv = gst.parse_launch("udpsrc port="+str(port)+" ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! dspilbcsink")
         bus1 = self.audio_recv.get_bus()
         bus1.add_signal_watch()
         bus1.enable_sync_message_emission()
