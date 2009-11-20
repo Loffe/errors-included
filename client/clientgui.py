@@ -244,9 +244,17 @@ class ClientGui(hildon.Program):
         ok_button.set_flags(gtk.CAN_DEFAULT)
         self.buttons_box.pack_start(ok_button)
         
-#
-        
         vbox_right.pack_start(self.buttons_box, False, False, 0)
+        
+        self.back_button_box = gtk.HBox(False, 10)
+        self.back_button_box.set_size_request(0, 60)
+        self.screens["back_button_box"] = self.back_button_box
+        
+        back_button2 = gtk.Button("Bakåt")
+        self.back_button_box.pack_start(back_button2)
+        back_button2.connect("clicked", self.back_button_function)
+        
+        vbox_right.pack_start(self.back_button_box, False, False, 0)
 
         self.window.connect("destroy", lambda event: self.mainloop.quit())
         self.window.connect("key-press-event", self.on_key_press)
@@ -347,7 +355,7 @@ class ClientGui(hildon.Program):
         self.show(["patient_journal", "buttons"])
     
     def show_faq(self, event):
-        self.show(["faq", "buttons"])
+        self.show(["faq", "back_button_box"])
         
     # add object view event handlers
     def show_add_object(self, event):
