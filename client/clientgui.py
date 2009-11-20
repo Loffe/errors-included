@@ -171,7 +171,7 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.contact_menu, False, False, 0)
         self.screens["contact_menu"] = self.contact_menu
         call = gtk.Button("Bröstsamtal")
-        #call.connect("clicked", self.create_new_message)
+        call.connect("clicked", self.show_voice)
         video = gtk.Button("Videosamtal")
         video.connect("clicked", self.show_cam)
         self.contact_menu.add(call)
@@ -384,6 +384,12 @@ class ClientGui(hildon.Program):
         self.screens["camera"].start_audio_send(self.screens["contact"].ip, 5432)
         self.screens["camera"].start_video_send(self.screens["contact"].ip, 5434)
         self.screens["camera"].start_video_recv(5434)
+        self.show(["camera"])
+        
+    def show_voice(self, event):
+#        self.screens["camera"].start_video_send(self.screens["contact"].ip)
+        self.screens["camera"].start_audio_recv(5432)
+        self.screens["camera"].start_audio_send(self.screens["contact"].ip, 5432)
         self.show(["camera"])
         
     def show_outbox(self, event):
