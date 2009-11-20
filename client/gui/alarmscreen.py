@@ -6,7 +6,7 @@ import map.mapdata
 import shared.data
 import datetime
 import gui
-import pango
+
 
 class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
     '''
@@ -35,17 +35,6 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         
         # all entries
         self.entries = []
-        
-        # method used internally to create new entries
-        def new_entry(labeltext):
-            label = gtk.Label(labeltext)
-            label.set_alignment(0, 0.5)
-            entry = gtk.Entry()
-            entry.set_max_length(300)
-            entry.set_text("")
-            entry.select_region(0, len(entry.get_text()))
-            self.entries.append(entry)
-            return (label, entry)
 
         hbox = gtk.HBox(False,0)
         self.add_with_viewport(hbox)
@@ -55,53 +44,27 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         hbox.add(right_box)
 
         # create entries
-        label, self.event_entry = new_entry("Händelse:")
-        left_box.add(label)
-        right_box.add(self.event_entry)
+        self.event_entry = self.new_entry("Händelse:", left_box, right_box)
         
-        label, self.location_entry = new_entry("Skadeplats ort:")
+        self.location_entry = self.new_entry("Skadeplats ort:", left_box, right_box)
         
-        left_box.add(label)
-        right_box.add(self.location_entry)
+        self.location_entry2 = self.new_coordlabel("Skadeplats lon-Gps:", left_box, right_box)
         
-        label, self.location_entry2 = new_entry("Skadeplats lon-Gps:")
+        self.location_entry3 = self.new_coordlabel("Skadeplats lat-Gps:", left_box, right_box)
 
-        left_box.add(label)
-        right_box.add(self.location_entry2)
-        
-        label, self.location_entry3 = new_entry("Skadeplats lat-Gps:")
+        self.hurted_entry = self.new_entry("Antal skadade:", left_box, right_box)
 
-        left_box.add(label)
-        right_box.add(self.location_entry3)
+        contact = self.new_section("Kontaktperson:", left_box, right_box)
+#        contact.set_alignment(0, 0.5)
+#        invisible_label = gtk.Label("")
+#        right_box.add(invisible_label)
+        
+        self.name_entry = self.new_entry("Namn:", left_box, right_box)     
 
-        label, self.hurted_entry = new_entry("Antal skadade:")
-        left_box.add(label)
-        right_box.add(self.hurted_entry)
+        self.number_entry = self.new_entry("Nummer:", left_box, right_box)
 
-        contact = gtk.Label("Kontaktperson:")
-        contact.set_alignment(0, 0.5)
-        invisible_label = gtk.Label("")
-        left_box.add(contact)
-        right_box.add(invisible_label)
-        
-        label, self.name_entry = new_entry("Namn:")     
-        
-        label.set_alignment(0.5, 0.5)
-        label.modify_font(pango.FontDescription("sans 12"))
-        left_box.add(label)
-        right_box.add(self.name_entry)
-        
-        label, self.number_entry = new_entry("Nummer:")
-        
-        label.set_alignment(0.5, 0.5)
-        label.modify_font(pango.FontDescription("sans 12"))
-        left_box.add(label)
-        right_box.add(self.number_entry)
+        self.random_entry = self.new_entry("Övrigt:", left_box, right_box)
 
-        label, self.random_entry = new_entry("Övrigt:")
-        left_box.add(label)
-        right_box.add(self.random_entry)
-        
         self.show_all()
 
     def ok_button_function(self, event):

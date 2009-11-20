@@ -3,7 +3,6 @@ import gtk
 import gobject
 import shared.data
 import gui
-import pango
 import datetime
 from selectunit import SelectUnitButton
 from selectunit import SelectUnitDialog
@@ -20,60 +19,46 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
-        def new_entry(labeltext, parent):
-            hbox = gtk.HBox(True, 0)
-            label = gtk.Label(labeltext)
-            label.set_alignment(0, 0.5)
-            label.modify_font(pango.FontDescription("sans 12"))
-
-            entry = gtk.Entry()
-            entry.set_max_length(300)
-            entry.set_text("")
-            entry.select_region(0, len(entry.get_text()))
-            hbox.add(label)
-            hbox.add(entry)
-            parent.add(hbox)
-            return entry
-
-        def new_section(title, parent):
-            label = gtk.Label(title)
-            label.set_alignment(0, 0.5)
-            parent.add(label)
+        # all entries
+        self.entries = []
         
         # create layout boxes
-        main_box = gtk.VBox(False,0)
-        self.add_with_viewport(main_box)
+        vbox = gtk.VBox(False,0)
         hbox = gtk.HBox(False,0)
-        main_box.pack_start(hbox,True,True,0)
+        self.add_with_viewport(vbox)
+        left_box = gtk.VBox(True,0)
+        right_box = gtk.VBox(True,0)
+        hbox.pack_start(left_box,False,False,0)
+        hbox.add(right_box)
+        vbox.pack_start(hbox)
         
         # create type label
         type_label = gtk.Label("Inkomna larm:")
         type_label.set_alignment(0, 0.5)
-        hbox.pack_start(type_label, True, True, 0)
+        left_box.pack_start(type_label, True, True, 0)
         
         # create and pack combobox
         self.combo_box = gtk.combo_box_new_text()
         self.combo_box.set_size_request(300,50)
         self.combo_box.append_text("Välj larm...")
-        hbox.pack_start(self.combo_box, True,True, 0)
+        right_box.pack_start(self.combo_box, True,True, 0)
         
-        new_section("Nytt uppdrag", main_box)
+        label = self.new_section("Nytt uppdrag", left_box, right_box)
         
         # create entries
-        self.event_entry = new_entry("     Händelse:", main_box)
+        self.event_entry = self.new_entry("     Händelse:", left_box, right_box)
 
-        self.location_entry2 = new_entry("     Skadeplats: lon-Gps", main_box)
-        self.location_entry3 = new_entry("     Skadeplats: lat-Gps", main_box)        
-        self.hurted_entry = new_entry("     Antal skadade:", main_box)
-        new_section("Kontaktperson", main_box)
-        self.name_entry = new_entry("     Namn:", main_box)
-        self.number_entry = new_entry("     Nummer:", main_box)
-        new_section("Övrigt", main_box)
-        self.random_entry = new_entry("     Information:", main_box)
-        
+        self.location_entry2 = self.new_coordlabel("     Skadeplats: lon-Gps", left_box, right_box)
+        self.location_entry3 = self.new_coordlabel("     Skadeplats: lat-Gps", left_box, right_box)        
+        self.hurted_entry = self.new_entry("     Antal skadade:", left_box, right_box)
+        self.new_section("Kontaktperson", left_box, right_box)
+        self.name_entry = self.new_entry("     Namn:", left_box, right_box)
+        self.number_entry = self.new_entry("     Nummer:", left_box, right_box)
+        self.new_section("Övrigt", left_box, right_box)
+        self.random_entry = self.new_entry("     Information:", left_box, right_box)
 
         self.select_unit_button = SelectUnitButton(self.db)
-        main_box.add(self.select_unit_button)        
+        vbox.add(self.select_unit_button)        
 
         # add event handler
         self.combo_box.connect('changed', self.select_alarm)
@@ -82,7 +67,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         self.combo_box.set_active(0)
 
         # show 'em all! (:
-        main_box.show_all()
+        vbox.show_all()
 
     '''Handle events
     '''
