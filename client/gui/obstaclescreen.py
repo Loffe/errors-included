@@ -19,18 +19,21 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         gtk.ScrolledWindow.__init__(self)
         self.db = db
         
+        #all entries
+        self.entries = []
+        
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
-        def new_entry(labeltext):
-            label = gtk.Label(labeltext)
-            label.set_alignment(0, 0.5)
-            entry = gtk.Entry()
-            entry.set_max_length(300)
-            entry.set_text("")
-            entry.select_region(0, len(entry.get_text()))
-            return (label, entry)
-        
+#        def new_entry(labeltext):
+#            label = gtk.Label(labeltext)
+#            label.set_alignment(0, 0.5)
+#            entry = gtk.Entry()
+#            entry.set_max_length(300)
+#            entry.set_text("")
+#            entry.select_region(0, len(entry.get_text()))
+#            return (label, entry)
+#        
         # create layout boxes
         main_box = gtk.HBox(False,0)
         self.add_with_viewport(main_box)
@@ -49,20 +52,11 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         #combo_box.set_size_request(300,50)
         right_box.pack_start(combo_box, True, False, 0)
         
-        label, self.location_entry = new_entry("Händelse:")
-        left_box.add(label)
-        right_box.add(self.location_entry)        
-        label, self.location_entry2 = new_entry("Skadeplats GPS-lon:")      
-               
-        left_box.add(label)
-        right_box.add(self.location_entry2)        
-        label, self.location_entry3 = new_entry("Skadeplats GPS-lat:")
-
+        self.location_entry = self.new_entry("Händelse:", left_box, right_box)
         
-        left_box.add(label)
-        right_box.add(self.location_entry3)
-        
-        
+        self.location_entry2 = self.new_coordlabel("Skadeplats GPS-lon:", left_box, right_box)      
+                
+        self.location_entry3 = self.new_coordlabel("Skadeplats GPS-lat:", left_box, right_box)
 
         # add selectable types
         '''

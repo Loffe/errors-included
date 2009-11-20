@@ -59,7 +59,7 @@ class Packable(object):
         session = database._Session()
         state_in_db = session.query(self.__class__).filter_by(id=self.id).first()
         session.close()
-        print state_in_db, "vs.", self
+#        print state_in_db, "vs.", self
         if state_in_db != None:
             if state_in_db.timestamp == self.timestamp:
                 return False 
@@ -333,15 +333,17 @@ class MissionData(Base, Packable):
     poi = relation(POIData)
     event_type = Column(UnicodeText)
     contact_person = Column(UnicodeText)
+    timestamp = Column(DateTime)
     other = Column(UnicodeText)
 
     def __init__(self, event_type, poi, number_of_wounded, contact_person, 
-                 other = u"", units = None):
+                 other, timestamp = datetime.now(), units = None):
         self.event_type = event_type
         self.poi = poi
         self.number_of_wounded = number_of_wounded
         self.contact_person = contact_person
         self.other = other
+        self.timestamp = timestamp
         self.units = units
         
     def add_unit(self, unit):

@@ -169,8 +169,6 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
 #        self.gps_data = gps_data
 #        self.queue_draw()
 
-
-
     def draw(self):
         # Hämtar alla tiles för en nivå
         level = self.mapdata.get_level(self.zoom_level)
@@ -224,8 +222,6 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         x = rect.width / 2.0
         y = rect.height / 2.0
       	
-	
-
         # Räknar ut position:
         x += (where_lon - where_focus_lon) * (cols * 300.0)
         y += (where_lat - where_focus_lat) * (rows * 160.0)
@@ -238,7 +234,6 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         # Plockar ur de tiles vi söker från nivån
         tiles, cols, rows = level.get_tiles(self.mapdata.focus)
 
-	
         # Gps per pixlar
         width = self.bounds["max_longitude"] - self.bounds["min_longitude"]
         height = self.bounds["min_latitude"] - self.bounds["max_latitude"]
@@ -260,8 +255,6 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.gps_x = self.origin_position["longitude"] - m + lon
         self.gps_y = self.origin_position["latitude"] + n  - lat
         
-
-    
     def draw_sign(self):  
         poi_data = shared.data.POIData(self.gps_x, self.gps_y, "goal", datetime.now(), shared.data.POIType.flag)
         self.mapdata.objects["add-sign"] = POI(poi_data)
