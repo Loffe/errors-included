@@ -385,6 +385,7 @@ class Message(object):
     All messages must be instances of this class.
     Enables packing and unpacking of raw messages.
     '''
+    # Message id is set when queue puts item in db
     message_id = None
     # The id of the message this one is a response to
     response_to = None
@@ -432,6 +433,8 @@ class Message(object):
         dict["sender"] = self.sender
         dict["reciever"] = self.reciever
         dict["response_to"] = self.response_to
+        if self.message_id is not None:
+            dict["message_id"] = self.message_id
         try:
             dict["packed_data"] = self.unpacked_data.to_dict()
         except:
@@ -455,7 +458,8 @@ class Message(object):
             self.reciever = dict["reciever"]
             self.timestamp = datetime.fromtimestamp(float(dict["timestamp"]))
             self.packed_data = dict["packed_data"]
-            self.response_to = dict["response_to"] if dict.has_key("response_to") else None
+            self.response_to = dict.get("response_to", None)
+            self.message_id = dict.get("message_id", None)
 
             # it's data packed to a dict
             if type(self.packed_data) == type({}):

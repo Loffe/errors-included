@@ -6,6 +6,7 @@ import gobject
 import pango
 import threading
 import datetime
+import messagedispatcher
 from shared.data import *
 import shared.queueinterface
 from shared.util import getLogger
@@ -51,7 +52,9 @@ class ClientGui(hildon.Program):
         log.debug("ClientGui started")
 
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-        self.queue = shared.queueinterface.get_interface()
+        bus = dbus.SessionBus()
+        self.queue = shared.queueinterface.get_interface(bus)
+        self.message_dispatcher = messagedispatcher.MessageDispatcher(bus)
         self.mainloop = gobject.MainLoop()
 
         hildon.Program.__init__(self)
@@ -240,6 +243,8 @@ class ClientGui(hildon.Program):
         ok_button.connect("clicked", self.ok_button_function)
         ok_button.set_flags(gtk.CAN_DEFAULT)
         self.buttons_box.pack_start(ok_button)
+        
+#
         
         vbox_right.pack_start(self.buttons_box, False, False, 0)
 
