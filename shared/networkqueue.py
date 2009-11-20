@@ -122,7 +122,7 @@ class NetworkInQueue(NetworkQueue):
         data = self.socket.recv(length)
         if data:
             log.debug("data from server:" + str(data))
-            self.queue.put(data, 37)
+            local_id = self.queue.put(data, 37)
             m = None
             try:
                 m = shared.data.Message.unpack(data)
@@ -131,7 +131,7 @@ class NetworkInQueue(NetworkQueue):
                 log.debug(ve)
                 return
 
-            return m.response_to
+            return local_id, m.response_to
 
             # For now don't react on incoming messages directly from queue
             '''

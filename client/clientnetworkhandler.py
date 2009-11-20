@@ -89,8 +89,8 @@ class ClientNetworkHandler(dbus.service.Object):
         sys.exit(0)
 
     @dbus.service.signal(dbus_interface='included.errors.Client',
-                         signature='')
-    def message_received(self):
+                         signature='ii')
+    def message_received(self, local_id, response_to):
         #msg = self.input.dequeue()
         return
 
@@ -113,8 +113,9 @@ class ClientNetworkHandler(dbus.service.Object):
                         print "got", junk
                 elif s == self.socket:
                     print "gettin' msg"
-                    id = self.input.receive()
-                    print "Just putted a message %s in a queue :D" % id
+                    local_id, response_to = self.input.receive()
+                    self.message_received(local_id, response_to)
+                    print "Just putted a message %s in response to %s" % (local_id, response_to)
         self.close()
 
     def mainloop(self):
