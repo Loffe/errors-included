@@ -99,7 +99,7 @@ class NetworkInQueue(NetworkQueue):
         '''
         if self.socket == None:
             self.emit("socket-broken")
-            return
+            return 0, 0
         length = 0
         hex_length = ""
         try:
@@ -118,7 +118,7 @@ class NetworkInQueue(NetworkQueue):
         if length == 0:
             log.info("Invalid content length: " + hex_length)
             self.emit("socket-broken")
-            return
+            return 0, 0
         data = self.socket.recv(length)
         if data:
             log.debug("data from server:" + str(data))
@@ -129,7 +129,7 @@ class NetworkInQueue(NetworkQueue):
             except ValueError, ve:
                 log.debug("Crappy data = ! JSON")
                 log.debug(ve)
-                return
+                return 0, 0
 
             return local_id, m.response_to
 
@@ -143,6 +143,7 @@ class NetworkInQueue(NetworkQueue):
                 '''
         else:
             self.emit("socket-broken")
+            return 0, 0
 
 
     def dequeue(self):
