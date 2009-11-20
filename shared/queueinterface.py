@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import dbus
 
-def get_interface():
-    bus = dbus.SessionBus()
+def get_interface(bus):
     remote_object = bus.get_object("included.errors.Client", "/Queue")
     interface = dbus.Interface(remote_object, "included.errors.Client")
     return interface

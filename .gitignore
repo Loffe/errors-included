@@ -5,3 +5,6 @@
 .pydevproject
 .metadata
 *.log
+*.db
+client/shared
+server/shared
