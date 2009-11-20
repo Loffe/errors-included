@@ -56,8 +56,14 @@ class Packable(object):
         Check if this objects state is different than the state of this object 
         in the database.
         '''
-        state_in_db = database.query(self.__class__).filter_by(id=self.id).first()
-        
+        session = database._Session()
+        state_in_db = session.query(self.__class__).filter_by(id=self.id).first()
+        session.close()
+        print state_in_db, "vs.", self
+        if state_in_db != None:
+            if state_in_db.timestamp == self.timestamp:
+                return False 
+        return True
         
     def to_changed_list(self):
         '''

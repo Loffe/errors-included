@@ -12,6 +12,7 @@ class ClientDatabase(Database):
     def add(self, object):
         # @TODO: decide order of local commit, network commit and signal emit
         Database.add(self, object)
+        print object.has_changed(self)
         msg = Message(self.name, "server", MessageType.action, ActionType.add,
                       unpacked_data=object)
         self.queue.enqueue(msg.packed_data, msg.prio)
