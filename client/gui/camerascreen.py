@@ -138,28 +138,27 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         self.video_recv.set_state(gst.STATE_PLAYING)
         
         
-    def start_vvoip(self):
+    def start_vvoip(self,ip):
             self.start_audio_recv(5432)
-            self.start_audio_send(self.screens["contact"].ip2, 5432)
+            self.start_audio_send(ip, 5432)
             self.start_video_recv(5434)
-            self.start_video_send(self.screens["contact"].ip2, 5434)
+            self.start_video_send(ip, 5434)
             self.video_started = True            
-    
             
-    def start_voip(self):
+    def start_voip(self, ip):
             self.start_audio_recv(5432)
-            self.start_audio_send(self.screens["contact"].ip2, 5432)          
+            self.start_audio_send(ip, 5432)          
  
     def stop(self):
         if self.video_started:
             self.audio_sender.set_state(gst.STATE_NULL)
             self.video_sender.set_state(gst.STATE_NULL)
             self.video_recv.set_state(gst.STATE_NULL)
-            self.audio_recv.set_state(gst.STATE_NULL)         
+            self.audio_recv.set_state(gst.STATE_NULL)
+            self.video_started = False         
         else:
             self.audio_sender.set_state(gst.STATE_NULL)
             self.audio_recv.set_state(gst.STATE_NULL)
-
 
     def exit(self, widget, data=None):
         gtk.main_quit()
