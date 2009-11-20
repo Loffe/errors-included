@@ -382,9 +382,8 @@ class ClientGui(hildon.Program):
 #        self.screens["camera"].start_video_send(self.screens["contact"].ip)
         self.screens["camera"].start_audio_recv(5432)
         self.screens["camera"].start_audio_send(self.screens["contact"].ip, 5432)
-        
-#        self.screens["camera"].start_video_send(self.screens["contact"].ip2, 5434)
-#        self.screens["camera"].start_video_recv(5434)
+        self.screens["camera"].start_video_send(self.screens["contact"].ip2, 5434)
+        self.screens["camera"].start_video_recv(5434)
         self.show(["camera"])
         
     def show_outbox(self, event):
