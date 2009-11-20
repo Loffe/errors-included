@@ -380,16 +380,12 @@ class ClientGui(hildon.Program):
         
     def show_cam(self, event):
 #        self.screens["camera"].start_video_send(self.screens["contact"].ip)
-        self.screens["camera"].start_audio_recv(5432)
-        self.screens["camera"].start_audio_send(self.screens["contact"].ip2, 5432)
-        self.screens["camera"].start_video_send(self.screens["contact"].ip2, 5434)
-        self.screens["camera"].start_video_recv(5434)
+        self.screens["camera"].start_vvoip()
         self.show(["camera"])
         
     def show_voice(self, event):
 #        self.screens["camera"].start_video_send(self.screens["contact"].ip)
-        self.screens["camera"].start_audio_recv(5432)
-        self.screens["camera"].start_audio_send(self.screens["contact"].ip2, 5432)
+        self.screens["camera"].start_voip()
         self.show(["camera"])
         
     def show_outbox(self, event):

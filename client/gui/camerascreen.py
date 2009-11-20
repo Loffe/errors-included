@@ -73,6 +73,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         bus.enable_sync_message_emission()
         bus.connect("message", self.on_message)
         bus.connect("sync-message::element", self.on_sync_message)
+        self.audio_sender.set_state(gst.STATE_PLAYING)
 
 
     def start_audio_recv(self,port):
@@ -90,6 +91,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         bus1.enable_sync_message_emission()
         bus1.connect("message", self.on_message)
         bus1.connect("sync-message::element", self.on_sync_message)
+        self.audio_recv.set_state(gst.STATE_PLAYING)
     
     
     def start_video_send(self, ip,port):
@@ -112,6 +114,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         bus2.enable_sync_message_emission()
         bus2.connect("message", self.on_message)
         bus2.connect("sync-message::element", self.on_sync_message)
+        self.video_sender.set_state(gst.STATE_PLAYING)
         
     def start_video_recv(self,port):
         #Show the incoming video
@@ -129,19 +132,30 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         bus3.enable_sync_message_emission()
         bus3.connect("message", self.on_message)
         bus3.connect("sync-message::element", self.on_sync_message)
+        self.video_recv.set_state(gst.STATE_PLAYING)
         
         
-    def start_stop(self, w):
+    def start_vvoip(self):
         if self.button.get_label() == "Start":
             self.button.set_label("Stop")
-            self.audio_sender.set_state(gst.STATE_PLAYING)
-            self.video_sender.set_state(gst.STATE_PLAYING)
-            self.video_recv.set_state(gst.STATE_PLAYING)
-            self.audio_recv.set_state(gst.STATE_PLAYING)
+            self.start_audio_recv(5432)
+            self.start_audio_send(self.screens["contact"].ip2, 5432)
+            self.start_video_recv(5434)
+            self.start_video_send(self.screens["contact"].ip2, 5434)            
         else:
             self.audio_sender.set_state(gst.STATE_NULL)
             self.video_sender.set_state(gst.STATE_NULL)
             self.video_recv.set_state(gst.STATE_NULL)
+            self.audio_recv.set_state(gst.STATE_NULL)
+            self.button.set_label("Start")
+            
+    def start_voip(self):
+        if self.button.get_label() == "Start":
+            self.button.set_label("Stop")
+            self.start_audio_recv(5432)
+            self.start_audio_send(self.screens["contact"].ip2, 5432)          
+        else:
+            self.audio_sender.set_state(gst.STATE_NULL)
             self.audio_recv.set_state(gst.STATE_NULL)
             self.button.set_label("Start")
 
