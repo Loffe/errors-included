@@ -25,15 +25,6 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
-#        def new_entry(labeltext):
-#            label = gtk.Label(labeltext)
-#            label.set_alignment(0, 0.5)
-#            entry = gtk.Entry()
-#            entry.set_max_length(300)
-#            entry.set_text("")
-#            entry.select_region(0, len(entry.get_text()))
-#            return (label, entry)
-#        
         # create layout boxes
         main_box = gtk.HBox(False,0)
         self.add_with_viewport(main_box)

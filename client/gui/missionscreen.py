@@ -43,7 +43,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         self.combo_box.append_text("Välj larm...")
         right_box.pack_start(self.combo_box, True,True, 0)
         
-        label = self.new_section("Nytt uppdrag", left_box)
+        label = self.new_section("Nytt uppdrag", left_box, right_box)
         
         # create entries
         self.event_entry = self.new_entry("     Händelse:", left_box, right_box)
@@ -51,10 +51,10 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         self.location_entry2 = self.new_coordlabel("     Skadeplats: lon-Gps", left_box, right_box)
         self.location_entry3 = self.new_coordlabel("     Skadeplats: lat-Gps", left_box, right_box)        
         self.hurted_entry = self.new_entry("     Antal skadade:", left_box, right_box)
-        self.new_section("Kontaktperson", left_box)
+        self.new_section("Kontaktperson", left_box, right_box)
         self.name_entry = self.new_entry("     Namn:", left_box, right_box)
         self.number_entry = self.new_entry("     Nummer:", left_box, right_box)
-        self.new_section("Övrigt", left_box)
+        self.new_section("Övrigt", left_box, right_box)
         self.random_entry = self.new_entry("     Information:", left_box, right_box)
 
         self.select_unit_button = SelectUnitButton(self.db)

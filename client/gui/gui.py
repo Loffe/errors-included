@@ -34,7 +34,9 @@ class Screen(gtk.Widget):
         self.entries.append(rightlabel)
         return rightlabel
 
-    def new_section(self, title, parent):
+    def new_section(self, title, left_box, right_box):
         label = gtk.Label(title)
         label.set_alignment(0, 0.5)
-        parent.pack_start(label)
+        left_box.pack_start(label)
+        invisible = gtk.Label()
+        right_box.pack_start(invisible)

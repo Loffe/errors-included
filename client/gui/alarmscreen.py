@@ -54,7 +54,7 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
 
         self.hurted_entry = self.new_entry("Antal skadade:", left_box, right_box)
 
-        contact = self.new_section("Kontaktperson:", left_box)
+        contact = self.new_section("Kontaktperson:", left_box, right_box)
 #        contact.set_alignment(0, 0.5)
 #        invisible_label = gtk.Label("")
 #        right_box.add(invisible_label)
