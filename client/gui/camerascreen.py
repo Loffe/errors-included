@@ -149,7 +149,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
             self.start_audio_recv(5432)
             self.start_audio_send(ip, 5432)          
  
-    def stop(self):
+    def stop(self,w):
         if self.video_started:
             self.audio_sender.set_state(gst.STATE_NULL)
             self.video_sender.set_state(gst.STATE_NULL)
