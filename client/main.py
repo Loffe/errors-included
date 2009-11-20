@@ -6,7 +6,6 @@ log = getLogger("client.log")
 log.debug("main imported log")
 import clientgui
 
-# Start up the client!
 if __name__ == "__main__":
     log.debug("__main__")
 
