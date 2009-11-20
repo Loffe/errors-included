@@ -12,6 +12,8 @@ import clientgui
 
 class CamScreen(gtk.ScrolledWindow, gui.Screen):
 
+    video_started = False
+
     def __init__(self,db):
         gtk.ScrolledWindow.__init__(self)
         # set automatic horizontal and vertical scrolling
@@ -29,8 +31,8 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         vbox.pack_start(hbox, False)
         hbox.set_border_width(10)
         hbox.pack_start(gtk.Label())
-        self.button = gtk.Button("Start")
-        self.button.connect("clicked", self.start_stop)
+        self.button = gtk.Button("Stop")
+        self.button.connect("clicked", self.stop)
         hbox.pack_start(self.button, False)
         #self.button2 = gtk.Button("Quit")
         #self.button2.connect("clicked", self.exit)
@@ -116,6 +118,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         bus2.connect("sync-message::element", self.on_sync_message)
         self.video_sender.set_state(gst.STATE_PLAYING)
         
+        
     def start_video_recv(self,port):
         #Show the incoming video
         self.video_recv = gst.parse_launch("udpsrc port="+str(port)+ " caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink")
@@ -141,13 +144,15 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
             self.start_audio_recv(5432)
             self.start_audio_send(self.screens["contact"].ip, 5432)
             self.start_video_recv(5434)
-            self.start_video_send(self.screens["contact"].ip, 5434)            
+            self.start_video_send(self.screens["contact"].ip, 5434)
+            self.video_started = True            
         else:
             self.audio_sender.set_state(gst.STATE_NULL)
             self.video_sender.set_state(gst.STATE_NULL)
             self.video_recv.set_state(gst.STATE_NULL)
             self.audio_recv.set_state(gst.STATE_NULL)
             self.button.set_label("Start")
+            self.video_started = False
             
     def start_voip(self):
         if self.button.get_label() == "Start":
@@ -158,6 +163,16 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
             self.audio_sender.set_state(gst.STATE_NULL)
             self.audio_recv.set_state(gst.STATE_NULL)
             self.button.set_label("Start")
+            
+    def stop(self):
+        if self.video_started:
+            self.audio_sender.set_state(gst.STATE_NULL)
+            self.video_sender.set_state(gst.STATE_NULL)
+            self.video_recv.set_state(gst.STATE_NULL)
+            self.audio_recv.set_state(gst.STATE_NULL)         
+        else:
+            self.audio_sender.set_state(gst.STATE_NULL)
+            self.audio_recv.set_state(gst.STATE_NULL)
 
 
     def exit(self, widget, data=None):
