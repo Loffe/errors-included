@@ -139,9 +139,9 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         if self.button.get_label() == "Start":
             self.button.set_label("Stop")
             self.start_audio_recv(5432)
-            self.start_audio_send(self.screens["contact"].ip2, 5432)
+            self.start_audio_send(self.screens["contact"].ip, 5432)
             self.start_video_recv(5434)
-            self.start_video_send(self.screens["contact"].ip2, 5434)            
+            self.start_video_send(self.screens["contact"].ip, 5434)            
         else:
             self.audio_sender.set_state(gst.STATE_NULL)
             self.video_sender.set_state(gst.STATE_NULL)
@@ -153,7 +153,7 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         if self.button.get_label() == "Start":
             self.button.set_label("Stop")
             self.start_audio_recv(5432)
-            self.start_audio_send(self.screens["contact"].ip2, 5432)          
+            self.start_audio_send(self.screens["contact"].ip, 5432)          
         else:
             self.audio_sender.set_state(gst.STATE_NULL)
             self.audio_recv.set_state(gst.STATE_NULL)
