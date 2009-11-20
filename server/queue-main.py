@@ -124,7 +124,7 @@ class ServerNetworkHandler(dbus.service.Object):
                 # queue is not named because login failed
                 self.enqueue(socket, nack.packed_data, 5)
                 print "Login failed"
-                self._disconnect_client(socket)
+                #self._disconnect_client(socket)
         else:
             log.debug("no such socket or user already logged in")
 

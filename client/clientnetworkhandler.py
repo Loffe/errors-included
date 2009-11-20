@@ -70,6 +70,7 @@ class ClientNetworkHandler(dbus.service.Object):
             self.connected = True
             self.closing = False
             self.inputs.append(self.socket)
+            self._login()
             log.info("Connected :D")
             return True
         except socket.error, (errno, errmsg):
@@ -91,7 +92,8 @@ class ClientNetworkHandler(dbus.service.Object):
     @dbus.service.signal(dbus_interface='included.errors.Client',
                          signature='ii')
     def message_received(self, local_id, response_to):
-        #msg = self.input.dequeue()
+        if response_to == self.login_msg_id:
+            print "got a login ack"
         return
 
     def run(self):
@@ -114,8 +116,8 @@ class ClientNetworkHandler(dbus.service.Object):
                 elif s == self.socket:
                     print "gettin' msg"
                     local_id, response_to = self.input.receive()
-                    self.message_received(local_id, response_to)
                     print "Just putted a message %s in response to %s" % (local_id, response_to)
+                    self.message_received(local_id, response_to)
         self.close()
 
     def mainloop(self):
@@ -167,3 +169,11 @@ class ClientNetworkHandler(dbus.service.Object):
 #            print "Connection refused"
         else:
             print errno, errmsg
+
+    def _login(self):
+        login_msg = shared.data.Message("ragnar", "server",
+                                        type=shared.data.MessageType.login,
+                                        unpacked_data={"class": "dict",
+                                            "password": "prydlig frisyr"})
+        self.login_msg_id = self.enqueue(login_msg.packed_data, 5)
+
