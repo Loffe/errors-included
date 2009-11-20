@@ -58,7 +58,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         self.random_entry = self.new_entry("     Information:", left_box, right_box)
 
         self.select_unit_button = SelectUnitButton(self.db)
-        vbox.add(self.select_unit_button)        
+        vbox.add(self.select_unit_button)
 
         # add event handler
         self.combo_box.connect('changed', self.select_alarm)

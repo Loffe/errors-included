@@ -15,3 +15,15 @@ class ClientDatabase(Database):
         msg = Message(self.name, "server", MessageType.action, ActionType.add,
                       unpacked_data=object)
         self.queue.enqueue(msg.packed_data, msg.prio)
+        
+    def change(self, object):
+        Database.change(self, object)
+        msg = Message(self.name, "server", MessageType.action, ActionType.change,
+                      unpacked_data=object)
+        self.queue.enqueue(msg.packed_data, msg.prio)
+        
+    def delete(self, object):
+        Database.delete(self, object)
+        msg = Message(self.name, "server", MessageType.action, ActionType.delete,
+                      unpacked_data=object)
+        self.queue.enqueue(msg.packed_data, msg.prio)

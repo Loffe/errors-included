@@ -4,6 +4,7 @@ from datetime import datetime
 import gobject
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker, relation, scoped_session
+from sqlalchemy.orm.collections import InstrumentedList 
 from sqlalchemy.ext.declarative import declarative_base
 
 # Create a base class to extend in order to be able to save to the database. 
@@ -42,15 +43,18 @@ class Packable(object):
             if not var.startswith("_"):
                 v = self.__dict__[var]
                 if not isinstance(self.__dict__[var], Packable):
-#                    self.__dict__[var].to_dict()
-#                except AttributeError:
                     if type(v) == datetime:
                         dict[var] = v.strftime("%s")
+                    elif type(v) == InstrumentedList:
+                        list = []
+                        for unit in v:
+                            list.append(unit.id)
+                        dict[var] = list
                     else:
                         dict[var] = v
         dict["class"] = self.__class__.__name__
         return dict
-    
+
     def has_changed(self, database):
         '''
         Check if this objects state is different than the state of this object 
@@ -59,13 +63,12 @@ class Packable(object):
         session = database._Session()
         state_in_db = session.query(self.__class__).filter_by(id=self.id).first()
         session.close()
-#        print state_in_db, "vs.", self
         if state_in_db != None:
             if state_in_db.timestamp == self.timestamp:
                 return False 
         return True
         
-    def to_changed_list(self):
+    def to_changed_list(self, db):
         '''
         Returns a list representation of this object containing only the 
         encapsulated objects that has changed.
@@ -74,7 +77,7 @@ class Packable(object):
         for var in self.__dict__.keys():
             v = self.__dict__[var]
             if isinstance(v, Packable):
-                if v.has_changed():
+                if v.has_changed(db):
                     list.append(v.to_dict())
         list.append(self.to_dict())
         return list
@@ -527,16 +530,24 @@ if __name__ == '__main__':
 
     poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.accident, POISubType.tree)
 #    print poi_data, poi_data.to_dict()
-#    db.add(poi_data)
-#    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
-#    db.add(unit_data)
-#    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data])
-#    db.add(mission_data)
-#    print mission_data
-    alarm = Alarm("räv", "Linköping", poi_data, "Klasse", "11111", 7, "nada")
-    db.add(alarm)
+    db.add(poi_data)
+    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
+    db.add(unit_data)
+    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", units = [unit_data])
+#    print mission_data.to_dict()
+    db.add(mission_data)
+#    print mission_data.to_changed_list(db)
+    unit_data2 = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
+    db.add(unit_data2)
+    mission_data.add_unit(unit_data2)
+#    print mission_data.to_changed_list(db)
+    
+    msg = Message("ragnar", "server", MessageType.action, ActionType.add,
+                  unpacked_data=unit_data)
+    print msg.packed_data
+    print Message.unpack(msg.packed_data)
+#    alarm = Alarm("räv", "Linköping", poi_data, "Klasse", "11111", 7, "nada")
+#    db.add(alarm)
 
-    alarm.event = "kuk"
-    db.change(alarm)
-
-
+#    alarm.event = "kuk"
+#    db.change(alarm)
