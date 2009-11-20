@@ -139,31 +139,17 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         
         
     def start_vvoip(self):
-        if self.button.get_label() == "Start":
-            self.button.set_label("Stop")
             self.start_audio_recv(5432)
             self.start_audio_send(self.screens["contact"].ip2, 5432)
             self.start_video_recv(5434)
             self.start_video_send(self.screens["contact"].ip2, 5434)
             self.video_started = True            
-        else:
-            self.audio_sender.set_state(gst.STATE_NULL)
-            self.video_sender.set_state(gst.STATE_NULL)
-            self.video_recv.set_state(gst.STATE_NULL)
-            self.audio_recv.set_state(gst.STATE_NULL)
-            self.button.set_label("Start")
-            self.video_started = False
+    
             
     def start_voip(self):
-        if self.button.get_label() == "Start":
-            self.button.set_label("Stop")
             self.start_audio_recv(5432)
             self.start_audio_send(self.screens["contact"].ip2, 5432)          
-        else:
-            self.audio_sender.set_state(gst.STATE_NULL)
-            self.audio_recv.set_state(gst.STATE_NULL)
-            self.button.set_label("Start")
-            
+ 
     def stop(self):
         if self.video_started:
             self.audio_sender.set_state(gst.STATE_NULL)
@@ -181,20 +167,26 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
     def on_message(self, bus, message):
         t = message.type
         if t == gst.MESSAGE_EOS:
-            self.audio_sender.set_state(gst.STATE_NULL)
-            self.video_sender.set_state(gst.STATE_NULL)
-            self.audio_recv.set_state(gst.STATE_NULL)
-            self.video_recv.set_state(gst.STATE_NULL)
-            self.button.set_label("Start")
+            if self.video_started:
+                self.audio_sender.set_state(gst.STATE_NULL)
+                self.video_sender.set_state(gst.STATE_NULL)
+                self.video_recv.set_state(gst.STATE_NULL)
+                self.audio_recv.set_state(gst.STATE_NULL)         
+            else:
+                self.audio_sender.set_state(gst.STATE_NULL)
+                self.audio_recv.set_state(gst.STATE_NULL)
         elif t == gst.MESSAGE_ERROR:
             err, debug = message.parse_error()
             print "Error: %s" % err, debug
 #            self.player.set_state(gst.STATE_NULL)
-            self.audio_sender.set_state(gst.STATE_NULL)
-            self.video_sender.set_state(gst.STATE_NULL)
-            self.audio_recv.set_state(gst.STATE_NULL)
-            self.video_recv.set_state(gst.STATE_NULL)
-            self.button.set_label("Start")
+            if self.video_started:
+                self.audio_sender.set_state(gst.STATE_NULL)
+                self.video_sender.set_state(gst.STATE_NULL)
+                self.video_recv.set_state(gst.STATE_NULL)
+                self.audio_recv.set_state(gst.STATE_NULL)         
+            else:
+                self.audio_sender.set_state(gst.STATE_NULL)
+                self.audio_recv.set_state(gst.STATE_NULL)
 
     def on_sync_message(self, bus, message):
         if message.structure is None:
