@@ -67,6 +67,13 @@ class SelectUnitDialog(gtk.Dialog):
             b.set_active(False)
            
     def select_units(self):
+        units = self.db.get_all_units()
+
+        for u in units:
+            unit_button = gtk.ToggleButton("%s (%d)" % (u.name, u.id))
+            unit_button.show()
+            self.vbox.pack_start(unit_button)
+            self.buttons[u.id] = unit_button
         result = self.run()
         if result == 77:
             self.selected_units = []
