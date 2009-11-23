@@ -15,6 +15,12 @@ units_in_missions = Table('UnitsInMissions', Base.metadata,
                     Column('mission_id', Integer, ForeignKey('MissionData.id')),
                     Column('unit_id', Integer, ForeignKey('UnitData.id')))
 
+units_in_text = Table('UnitsInText', Base.metadata,
+                    Column('textmessage_id', Integer, ForeignKey('TextMessage.id')),
+                    Column('unit_id', Integer, ForeignKey('UnitData.id')))
+
+
+
 class Packable(object):
     '''
     Extend this class to be able to pack/unpack a message containing it.
@@ -282,13 +288,55 @@ class POIData(MapObjectData):
     
     type = Column(Integer)
     subtype = Column(Integer)
+    
 
     def __init__(self, coordx, coordy, name, timestamp, 
                  type = POIType.pasta_wagon, subtype = None, id = None):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
         self.subtype = subtype
-
+        
+        
+        
+class TextMessage(Base, Packable):
+    __tablename__ = 'TextMessage'
+    id = Column(Integer, primary_key = True)
+    
+    units = relation('UnitData', secondary=units_in_text)
+    
+    subject = Column(UnicodeText)
+    message_content = Column(UnicodeText)
+    timestamp = Column(DateTime)
+    
+    def __init__(self, subject, message_content, units, timestamp = datetime.now()):
+        self.subject = subject
+        self.message_content = message_content
+        self.timestamp = timestamp
+        self.units = units
+        
+    def add_unit(self, unit):
+        self.units.append(unit)
+        
+    def add_units(self, units):
+        for unit in units:
+            self.add_unit(unit)
+    
+    def remove_unit(self, unit):
+        self.units.remove(unit)
+        
+    def remove_units(self, units):
+        for unit in units:
+            self.remove_unit(unit)
+        
+    def __repr__(self):
+            
+        repr = ("<%s: %s, %s, %s >" % 
+                (self.__class__.__name__, self.subject, self.message_content, self.timestamp , self.id))
+        try:
+            return repr.encode('utf-8')
+        except:
+            return repr
+        
 class Alarm(Base, Packable):
     __tablename__ = 'Alarm'
     id = Column(Integer, primary_key = True)
@@ -567,8 +615,11 @@ def create_database(db = Database()):
 if __name__ == '__main__':
     print "Testing db"
     db = create_database()
+    
+     
 
     poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.accident, POISubType.tree)
+    
 #    print poi_data, poi_data.to_dict()
     db.add(poi_data)
     unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
@@ -579,10 +630,12 @@ if __name__ == '__main__':
 #    print mission_data.to_dict()
     db.add(mission_data)
 #    print mission_data.to_changed_list(db)
-#    unit_data2 = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
-#    db.add(unit_data2)
-#    mission_data.add_unit(unit_data2)
-#    db.change(mission_data)
+    
+    units = []
+    units.append(unit_data)
+    text = TextMessage("hej", "hej", units)
+    db.add(text)
+
 #    print mission_data.to_changed_list(db)
     alarm = Alarm(u"räv", u"Linköping", poi_data, u"Klasse", u"11111", 7, u"nada")
     db.add(alarm)

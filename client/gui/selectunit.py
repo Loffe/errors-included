@@ -98,3 +98,5 @@ class SelectUnitDialog(gtk.Dialog):
 
         return self.db.get_units(self.selected_units), self.selected_units
 
+#
+
