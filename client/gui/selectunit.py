@@ -75,11 +75,8 @@ class SelectUnitDialog(gtk.Dialog):
             self.buttons[u.id] = unit_button
             
         # select the active ones
-        print selected
         for b in self.buttons.keys():
-            print b
             if b in selected:
-                print "yay", b
                 self.buttons[b].set_active(True)
 
         result = self.run()
