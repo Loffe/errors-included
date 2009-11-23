@@ -3,9 +3,13 @@
 
 import sys, os
 import pygtk, gtk, gobject
-import pygst
-pygst.require("0.10")
-import gst
+try:
+    import pygst
+    pygst.require("0.10")
+    import gst
+except:
+    class gst(object):
+        pass
 import shared.data
 import gui
 import clientgui
