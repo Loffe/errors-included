@@ -94,6 +94,8 @@ class ClientNetworkHandler(dbus.service.Object):
     def message_received(self, local_id, response_to):
         if response_to == self.login_msg_id:
             print "got a login ack"
+            data = self.input.get(local_id)
+            print data
         return
 
     def run(self):
