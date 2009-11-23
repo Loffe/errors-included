@@ -5,6 +5,8 @@ import map.mapdata
 import shared.data
 import gui
 import pango
+from selectunit import SelectUnitButton
+from selectunit import SelectUnitDialog
 
 class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
     '''
@@ -14,6 +16,7 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
     to_entry = None
     subject_entry = None
     message_entry = None
+    db = None
 
 
     def __init__(self, db):
@@ -21,6 +24,7 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         Constructor. Create the alarmscreen and its entries.
         '''
         gtk.ScrolledWindow.__init__(self)
+        self.db = db
 
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
@@ -43,11 +47,12 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         self.add_with_viewport(vbox)
 
         # create entries
-        label, self.to_entry = new_entry("Till",vbox)
+        #label, self.to_entry = new_entry("Till",vbox)
 
         label, self.subject_entry = new_entry("Ämne",vbox)
 
         msg_label = gtk.Label("Meddelande")
+        
         msg_label.set_alignment(0, 0.5)
         textbox = gtk.TextView()
         textbox.set_editable(True)
@@ -58,5 +63,8 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         msgbox.pack_start(msg_label)
         msgbox.pack_start(textbox)
         vbox.add(msgbox)
+        
+        self.select_unit_button = SelectUnitButton(self.db)
+        vbox.add(self.select_unit_button)
 
         self.show_all()
