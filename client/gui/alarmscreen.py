@@ -81,8 +81,8 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         # clear all entries
         for entry in self.entries:
             entry.set_text("")
-        
-        self.emit("okbutton_clicked_alarm")
+
+        self.emit("okbutton-alarm-clicked")
         
 gobject.type_register(AlarmScreen)
-gobject.signal_new("okbutton_clicked_alarm", AlarmScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
+gobject.signal_new("okbutton-alarm-clicked", AlarmScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())

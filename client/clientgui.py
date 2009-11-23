@@ -6,7 +6,7 @@ import gobject
 import pango
 import threading
 import datetime
-import messagedispatcher
+import shared.messagedispatcher
 from shared.data import *
 import shared.queueinterface
 from shared.util import getLogger
@@ -57,7 +57,7 @@ class ClientGui(hildon.Program):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         bus = dbus.SessionBus()
         self.queue = shared.queueinterface.get_interface(bus)
-        self.message_dispatcher = messagedispatcher.MessageDispatcher(bus)
+        self.message_dispatcher = shared.messagedispatcher.MessageDispatcher(bus)
         self.mainloop = gobject.MainLoop()
 
         hildon.Program.__init__(self)
@@ -129,7 +129,7 @@ class ClientGui(hildon.Program):
 
         # add the alarm screen
         self.alarm_screen = AlarmScreen(self.db)
-        self.alarm_screen.connect("okbutton_clicked_alarm", self.back_button_function) 
+        self.alarm_screen.connect("okbutton-alarm-clicked", self.back_button_function) 
         vbox_right.pack_start(self.alarm_screen, True, True, 0)
         self.screens["alarm"] = self.alarm_screen
 
@@ -153,16 +153,15 @@ class ClientGui(hildon.Program):
 
         # add the obstacle screen
         self.obstacle_screen = ObstacleScreen(self.db)
-        self.obstacle_screen.connect("okbutton_clicked_obstacle", self.back_button_function)
+        self.obstacle_screen.connect("okbutton-obstacle-clicked", self.back_button_function)
         vbox_right.pack_start(self.obstacle_screen, True, True, 0)
         self.screens["obstacle"] = self.obstacle_screen
         
         # add the create_mission screen
         self.mission_screen = MissionScreen(self.db)
-        self.mission_screen.connect("okbutton_clicked_mission", self.back_button_function) 
+        self.mission_screen.connect("okbutton-mission-clicked", self.back_button_function)
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
-        
 
         self.faq_screen = FAQScreen(self.db)               
         vbox_right.pack_start(self.faq_screen, True, True, 0)

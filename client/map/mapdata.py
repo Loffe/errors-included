@@ -6,6 +6,8 @@ import shared.data
 class Picture(object):
     path = None
     pixbuf = None
+    offset = (0, 0)
+    center = False
     
     def __init__(self, path):
         if path == None:
@@ -25,7 +27,12 @@ class Picture(object):
     def draw(self, context, x, y):
         if not self.pixbuf:
             self.load()
-        context.set_source_pixbuf(self.pixbuf, x, y)
+        if self.center:
+            dx = -self.pixbuf.get_width()/2 + self.offset[0]
+            dy = -self.pixbuf.get_height()/2 + self.offset[1]
+        else:
+            dx, dy = (0, 0)
+        context.set_source_pixbuf(self.pixbuf, x+dx, y+dy)
         context.paint()
         
     def load(self):
@@ -290,9 +297,14 @@ class POI(MapObject):
     
     def __init__(self, poi_data):
         MapObject.__init__(self, poi_data)
+        offset = (0, 0)
         # default  icon can be changed here
         path = "map/data/icons/default.png"
-        if poi_data.type == shared.data.POIType.pasta_wagon:
+        if poi_data.type == shared.data.POIType.obstacle:
+            sub = poi_data.subtype
+            if sub == shared.data.POISubType.tree:
+                path = "map/data/icons/tree.png" 
+        elif poi_data.type == shared.data.POIType.pasta_wagon:
             path = "map/data/icons/pastawagon.png"
         elif poi_data.type == shared.data.POIType.fire:
             path = "map/data/icons/fire.png"
@@ -300,7 +312,10 @@ class POI(MapObject):
             path = "map/data/icons/accident.png"
         elif poi_data.type == shared.data.POIType.flag:
             path = "map/data/icons/default.png"
+            offset = (8, -13)
         self.picture = Picture(path)
+        self.picture.offset = offset
+        self.picture.center = True
 
 class Mission():
     POIs = []

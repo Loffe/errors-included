@@ -4,6 +4,7 @@ import gobject
 import shared.data
 import gui
 import datetime
+import pango
 from selectunit import SelectUnitButton
 from selectunit import SelectUnitDialog
 
@@ -34,6 +35,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         
         # create type label
         type_label = gtk.Label("Inkomna larm:")
+        type_label.modify_font(pango.FontDescription("sans 12"))
         type_label.set_alignment(0, 0.5)
         left_box.pack_start(type_label, True, True, 0)
         
@@ -110,8 +112,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         self.select_unit_button.clear_selected()
         self.select_unit_button.unit_label.set_text("Inga valda enheter...")
         self.db.add(mission_data)
-        self.emit("okbutton_clicked_mission")
+        self.emit("okbutton-mission-clicked")
         
 gobject.type_register(MissionScreen)
-gobject.signal_new("okbutton_clicked_mission", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
-
+gobject.signal_new("okbutton-mission-clicked", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
