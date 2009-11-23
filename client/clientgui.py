@@ -156,7 +156,6 @@ class ClientGui(hildon.Program):
         # add the create_mission screen
         self.mission_screen = MissionScreen(self.db)
         self.mission_screen.connect("okbutton-clicked3", self.back_button_function) 
-        self.mission_screen.connect("new-mission", self.set_mission)
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
         
@@ -298,7 +297,11 @@ class ClientGui(hildon.Program):
             if screen.props.visible and isinstance(screen, Screen):
                 screen.ok_button_function(event)
     
-    def set_mission(self, event, data):
+    def set_mission(self, data):
+        '''
+        Append a mission to own missions.
+        @param data: the mission to append.
+        '''
         self.controller.missions.append(data)
         print "got new mission:", type(data), data
     
