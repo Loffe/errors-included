@@ -49,14 +49,6 @@ class SelectUnitDialog(gtk.Dialog):
         self.set_size_request(400,400)
 
         self.db = db
-
-        units = self.db.get_all_units()
-
-        for u in units:
-            unit_button = gtk.ToggleButton("%s (%d)" % (u.name, u.id))
-            unit_button.show()
-            self.vbox.pack_start(unit_button)
-            self.buttons[u.id] = unit_button
     
     def run(self):
         #loopa listan
@@ -67,13 +59,17 @@ class SelectUnitDialog(gtk.Dialog):
             b.set_active(False)
            
     def select_units(self):
+        # remove all current buttons
+        for button in self.buttons.values():
+            self.vbox.remove(button)
+        # add all units from database to dialog
         units = self.db.get_all_units()
-
         for u in units:
             unit_button = gtk.ToggleButton("%s (%d)" % (u.name, u.id))
             unit_button.show()
             self.vbox.pack_start(unit_button)
             self.buttons[u.id] = unit_button
+
         result = self.run()
         if result == 77:
             self.selected_units = []
@@ -82,7 +78,6 @@ class SelectUnitDialog(gtk.Dialog):
                 if b.get_active():
                     self.selected_units.append(key)
             self.hide()
-            print "Skapade uppdrag till", self.selected_units
         elif result == 666:
             for key in self.buttons.keys():
                 b = self.buttons[key]
