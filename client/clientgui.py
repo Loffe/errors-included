@@ -6,7 +6,7 @@ import gobject
 import pango
 import threading
 import datetime
-import messagedispatcher
+import shared.messagedispatcher
 from shared.data import *
 import shared.queueinterface
 from shared.util import getLogger
@@ -57,7 +57,7 @@ class ClientGui(hildon.Program):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         bus = dbus.SessionBus()
         self.queue = shared.queueinterface.get_interface(bus)
-        self.message_dispatcher = messagedispatcher.MessageDispatcher(bus)
+        self.message_dispatcher = shared.messagedispatcher.MessageDispatcher(bus)
         self.mainloop = gobject.MainLoop()
 
         hildon.Program.__init__(self)

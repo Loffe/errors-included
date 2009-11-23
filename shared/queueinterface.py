@@ -9,7 +9,7 @@ def get_interface(bus):
 if __name__ == '__main__':
     import data
     from datetime import datetime
-    interface = get_interface()
+    interface = get_interface(dbus.SessionBus())
     login_msg = data.Message("ragnar", "server", type=data.MessageType.login,
                              unpacked_data={"class": "dict", "password": "prydlig frisyr"})
     local_id = interface.enqueue(login_msg.packed_data, 5)
