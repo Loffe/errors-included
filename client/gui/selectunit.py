@@ -19,20 +19,24 @@ class SelectUnitButton(gtk.HBox):
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("blue"))
         self.select_dialog = SelectUnitDialog(self.db)
         choose_units_button.connect("clicked", self.select_units)
-        self.unit_label = gtk.Label("Valda enheter")
+        self.unit_label = gtk.Label("Inga valda enheter...")
         self.add(choose_units_button)
         self.add(self.unit_label)
+        self.selected_ids = []
 
     def clear_selected(self):
         self.select_dialog.clear_selected()
 
     def select_units(self, event):
-        selected_units = self.select_dialog.select_units()
+        selected_units, self.selected_ids = self.select_dialog.select_units(self.selected_ids)
         names = [u.name for u in selected_units][:3]
         text = ", ".join(names)
         if len(selected_units) > 3:
             text += "..."
-        self.unit_label.set_text(text)
+        if text == "":
+            self.unit_label.set_text("Inga valda enheter...")
+        else:
+            self.unit_label.set_text(text)
 
     
 class SelectUnitDialog(gtk.Dialog):
@@ -58,7 +62,7 @@ class SelectUnitDialog(gtk.Dialog):
         for b in self.buttons.values():
             b.set_active(False)
            
-    def select_units(self):
+    def select_units(self, selected):
         # remove all current buttons
         for button in self.buttons.values():
             self.vbox.remove(button)
@@ -69,6 +73,14 @@ class SelectUnitDialog(gtk.Dialog):
             unit_button.show()
             self.vbox.pack_start(unit_button)
             self.buttons[u.id] = unit_button
+            
+        # select the active ones
+        print selected
+        for b in self.buttons.keys():
+            print b
+            if b in selected:
+                print "yay", b
+                self.buttons[b].set_active(True)
 
         result = self.run()
         if result == 77:
@@ -87,5 +99,5 @@ class SelectUnitDialog(gtk.Dialog):
                     b.set_active(False)
         self.hide()
 
-        return self.db.get_units(self.selected_units)
+        return self.db.get_units(self.selected_units), self.selected_units
 

@@ -26,6 +26,7 @@ class Screen(gtk.Widget):
     def new_coordlabel(self, labeltext, left_box, right_box):
         label = gtk.Label(labeltext)
         label.set_alignment(0, 0.5)
+        label.modify_font(pango.FontDescription("sans 12"))
 #        rightlabel.select_region(0, len(rightlabel.get_text()))
         rightlabel = gtk.Label()
         rightlabel.modify_font(pango.FontDescription("sans 12"))
@@ -36,6 +37,7 @@ class Screen(gtk.Widget):
 
     def new_section(self, title, left_box, right_box):
         label = gtk.Label(title)
+        label.modify_font(pango.FontDescription("sans 14"))
         label.set_alignment(0, 0.5)
         left_box.pack_start(label)
         invisible = gtk.Label()
