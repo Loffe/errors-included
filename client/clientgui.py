@@ -28,6 +28,7 @@ from gui.faqscreen import FAQScreen
 from gui.infoscreen import InfoScreen
 from gui.statusscreen import StatusScreen
 from gui.patientjournalscreen import PatientJournalScreen
+from gui.activities import Activities
 
 try:
     import hildon
@@ -255,14 +256,29 @@ class ClientGui(hildon.Program):
         back_button2.connect("clicked", self.back_button_function)
         
         vbox_right.pack_start(self.back_button_box, False, False, 0)
+        
+        #Istället för popup så kopper en panel upp vid sidan.         
+        #vbox2 = gtk.HBox(False,0)
+        #panels.pack_start(vbox2, False, False, 0)
+        #vbox2.set_size_request(150,0)        
+        #self.ac = Activities(self.db)
+        #vbox2.add(ac)  
+        #type_label = gtk.Label("Inkomna larm:")
+        #vbox2.add(type_label)
+        
+
 
         self.window.connect("destroy", lambda event: self.mainloop.quit())
         self.window.connect("key-press-event", self.on_key_press)
         self.window.connect("window-state-event", self.on_window_state_change)
-
+        
+     
+        
         # Change to default True?
         self.window_in_fullscreen = False
         log.info("ClientGui created")
+        
+        
 
     def run(self):
         '''
