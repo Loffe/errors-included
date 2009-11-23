@@ -13,6 +13,7 @@ from database import ServerDatabase
 log = getLogger("server.log")
 import shared.data
 import handler
+import data
 
 class ServerNetworkHandler(dbus.service.Object):
     input = [sys.stdin]
@@ -111,6 +112,8 @@ class ServerNetworkHandler(dbus.service.Object):
             if self.db.is_valid_login(m.sender, m.unpacked_data["password"]):
                 self.outqueues[id] = self.outqueues[socket]
                 del self.outqueues[socket]
+                
+                self.set_ip(m.sender, socket.getpeername()[0])
                 log.debug("logged in and now has a named queue")
                 ack = shared.data.Message("server", id, response_to=m.message_id,
                                           type=shared.data.MessageType.login_ack,
@@ -127,7 +130,13 @@ class ServerNetworkHandler(dbus.service.Object):
                 #self._disconnect_client(socket)
         else:
             log.debug("no such socket or user already logged in")
-
+            
+    def set_ip(self, username, ip):
+        session = self.db._Session()
+        user = session.query(data.User).filter_by(name=username).first()
+        user.ip = ip
+        session.commit()
+        print user
 
     def run(self):
         running = True
