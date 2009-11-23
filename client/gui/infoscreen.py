@@ -103,11 +103,11 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
     '''
 
     def select_alarm(self, combobox):
-        pass
         '''
         Call when combobox changes to switch obstacle type.
         @param combobox: the changed combobox
         '''
+        pass
         # set the selected type
 #        self.selected_alarm = self.combo_box.get_active_text()
 #        alarms = self.db.get_all_alarms()
@@ -129,29 +129,4 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
         self.hurted_entry.set_text(str("hej"))
         self.number_entry.set_text("hej")
         self.random_entry.set_text("hej")
-    
-#        alarm = None
-#        for a in self.db.get_all_alarms():
-#            if a.event == self.selected_alarm:
-#                alarm = a
-#
-#        lon = float(self.location_entry2.get_text())
-#        lat = float(self.location_entry3.get_text())
-#        selected = self.select_unit_button.select_dialog.selected_units
-#        units = self.db.get_units(selected)
-
-#        
-#        if alarm == None or (lon != alarm.poi.coordx and lat != alarm.poi.coordy):
-#            # @todo CHANGE POI-TYPE, SHOULDNT BE HARDCODED!
-#            poi_data = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.fire)
-#        else:
-#            poi_data = alarm.poi
-#        mission_data = shared.data.MissionData(self.event_entry.get_text(), poi_data, self.hurted_entry.get_text(), self.name_entry.get_text(), self.random_entry.get_text(), units)
-#        self.db.add(mission_data)
-#        self.emit("new-mission", mission_data)
-#        self.emit("okbutton-clicked3")
-        
-#gobject.type_register(MissionScreen)
-#gobject.signal_new("okbutton-clicked3", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
-#gobject.signal_new("new-mission", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
-#        
+ 

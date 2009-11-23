@@ -426,7 +426,7 @@ class MessageType(object):
     journal_transfer, alarm_ack, vvoip_request, vvoip_response, login, login_ack, action) = range(18)
 
 class ActionType(object):
-    add, update, remove = range(3)
+    add, change, delete = range(3)
 
 class JournalType(object):
     request, confirmation_response, confirmation_request, transfer = range(4)
