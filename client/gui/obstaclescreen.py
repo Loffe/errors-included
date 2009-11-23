@@ -5,6 +5,7 @@ import shared.data
 import datetime
 import gui
 import clientgui
+import pango
 import mapscreen
 
 class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
@@ -35,6 +36,7 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         
         # create type label
         type_label = gtk.Label("Typ:")
+        type_label.modify_font(pango.FontDescription("sans 12"))
         type_label.set_alignment(0, 0.5)
         left_box.pack_start(type_label, True, True, 0)
         
