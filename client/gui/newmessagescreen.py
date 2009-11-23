@@ -5,6 +5,7 @@ import map.mapdata
 import shared.data
 import gui
 import pango
+import gobject
 from selectunit import SelectUnitButton
 from selectunit import SelectUnitDialog
 
@@ -57,8 +58,8 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         textbox = gtk.TextView()
         textbox.set_editable(True)
         textbox.set_size_request(200,200)
-        buffer = textbox.get_buffer()
-        buffer.set_text("Skriv ditt meddelande här")
+        self.buffer = textbox.get_buffer()
+        self.buffer.set_text("Skriv ditt meddelande här")
         msgbox = gtk.HBox(True,0)
         msgbox.pack_start(msg_label)
         msgbox.pack_start(textbox)
@@ -68,3 +69,21 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         vbox.add(self.select_unit_button)
 
         self.show_all()
+        
+        
+    def ok_button_function(self, event):
+        print "hejlkk"
+    
+        #lon = float(self.location_entry2.get_text())
+        #lat = float(self.location_entry3.get_text())
+        selected = self.select_unit_button.select_dialog.selected_units
+        units = self.db.get_units(selected)
+    
+        #datetime
+        #text = shared.data.TextMessage(self.subject_entry.get_text(), self.textbox.get_text(), units)
+        #self.db.add(text)
+        self.emit("okbutton_clicked_new_message")
+        
+gobject.type_register(NewMessageScreen)
+gobject.signal_new("okbutton_clicked_new_message", NewMessageScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
+        

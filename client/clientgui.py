@@ -129,7 +129,7 @@ class ClientGui(hildon.Program):
 
         # add the alarm screen
         self.alarm_screen = AlarmScreen(self.db)
-        self.alarm_screen.connect("okbutton-clicked2", self.back_button_function) 
+        self.alarm_screen.connect("okbutton_clicked_alarm", self.back_button_function) 
         vbox_right.pack_start(self.alarm_screen, True, True, 0)
         self.screens["alarm"] = self.alarm_screen
 
@@ -139,6 +139,7 @@ class ClientGui(hildon.Program):
         self.screens["message"] = self.message_screen
         
         self.new_message_screen = NewMessageScreen(self.db)
+        self.new_message_screen.connect("okbutton_clicked_new_message", self.back_button_function) 
         vbox_right.pack_start(self.new_message_screen, True, True, 0)
         self.screens["new_message"] = self.new_message_screen
         
@@ -152,13 +153,13 @@ class ClientGui(hildon.Program):
 
         # add the obstacle screen
         self.obstacle_screen = ObstacleScreen(self.db)
-        self.obstacle_screen.connect("okbutton-clicked", self.back_button_function)
+        self.obstacle_screen.connect("okbutton_clicked_obstacle", self.back_button_function)
         vbox_right.pack_start(self.obstacle_screen, True, True, 0)
         self.screens["obstacle"] = self.obstacle_screen
         
         # add the create_mission screen
         self.mission_screen = MissionScreen(self.db)
-        self.mission_screen.connect("okbutton-clicked3", self.back_button_function) 
+        self.mission_screen.connect("okbutton_clicked_mission", self.back_button_function) 
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
         

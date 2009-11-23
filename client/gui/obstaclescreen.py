@@ -92,14 +92,14 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
         
-        poi_data2 = shared.data.POIData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), shared.data.POIType.accident)
+        obstacle = shared.data.POIData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), shared.data.POIType.accident)
         
-        self.db.add(poi_data2)
+        self.db.add(obstacle)
 
-        self.emit("okbutton-clicked")
+        self.emit("okbutton_clicked_obstacle")
         
 gobject.type_register(ObstacleScreen)
-gobject.signal_new("okbutton-clicked", ObstacleScreen, gobject.SIGNAL_RUN_FIRST,
+gobject.signal_new("okbutton_clicked_obstacle", ObstacleScreen, gobject.SIGNAL_RUN_FIRST,
                    gobject.TYPE_NONE, ())
 
 
