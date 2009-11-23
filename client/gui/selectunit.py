@@ -25,6 +25,7 @@ class SelectUnitButton(gtk.HBox):
         self.selected_ids = []
 
     def clear_selected(self):
+        self.selected_ids = []
         self.select_dialog.clear_selected()
 
     def select_units(self, event):
