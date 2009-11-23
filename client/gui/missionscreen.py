@@ -112,4 +112,3 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         
 gobject.type_register(MissionScreen)
 gobject.signal_new("okbutton-clicked3", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
-        

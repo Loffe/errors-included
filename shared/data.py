@@ -42,7 +42,7 @@ class Packable(object):
         for var in self.__dict__.keys():
             if not var.startswith("_"):
                 v = self.__dict__[var]
-                if not isinstance(self.__dict__[var], Packable):
+                if not isinstance(v, Packable):
                     if type(v) == datetime:
                         dict[var] = v.strftime("%s")
                     elif type(v) == InstrumentedList:
@@ -50,6 +50,8 @@ class Packable(object):
                         for unit in v:
                             list.append(unit.id)
                         dict[var] = list
+                    elif var == "poi_id":
+                        dict["poi"] = v
                     else:
                         dict[var] = v
         dict["class"] = self.__class__.__name__
@@ -302,7 +304,8 @@ class Alarm(Base, Packable):
     number_of_wounded = Column(Integer)
 
     def __init__(self, event, location_name, poi, contact_person, 
-                 contact_number, number_of_wounded, other, timestamp = datetime.now()):
+                 contact_number, number_of_wounded, other, 
+                 timestamp = datetime.now(), id = None):
         self.event = event
         self.location_name = location_name
         self.poi = poi
@@ -311,6 +314,7 @@ class Alarm(Base, Packable):
         self.contact_number = contact_number
         self.other = other
         self.number_of_wounded = number_of_wounded
+        self.id = id
         
     def __repr__(self):
         repr = ("<%s: %s, %s, %s, %s, %s, %s, %s, %s, %s>" % 
@@ -328,9 +332,7 @@ class MissionData(Base, Packable):
     '''
     __tablename__ = 'MissionData'
     id = Column(Integer, primary_key=True)
-    
     units = relation('UnitData', secondary=units_in_missions)
-
     number_of_wounded = Column(Integer)
     poi_id = Column(Integer, ForeignKey('POIData.id'))
     poi = relation(POIData)
@@ -340,7 +342,7 @@ class MissionData(Base, Packable):
     other = Column(UnicodeText)
 
     def __init__(self, event_type, poi, number_of_wounded, contact_person, 
-                 other, timestamp = datetime.now(), units = None):
+                 other, units, timestamp = datetime.now(), id = None):
         self.event_type = event_type
         self.poi = poi
         self.number_of_wounded = number_of_wounded
@@ -348,6 +350,7 @@ class MissionData(Base, Packable):
         self.other = other
         self.timestamp = timestamp
         self.units = units
+        self.id = id
         
     def add_unit(self, unit):
         self.units.append(unit)
@@ -362,6 +365,18 @@ class MissionData(Base, Packable):
     def remove_units(self, units):
         for unit in units:
             self.remove_unit(unit)
+
+    def get_units(self, db):
+        '''
+        Returns a list of all UnitData-objects.
+        @param db: The database to get them from.
+        '''
+        list = []
+        for u in units:
+            session = db._Session()
+            data = session.query(UnitData).filter_by(id = u).first()
+            list.append(data)
+        return list
     
     def __repr__(self):
         repr = ("<%s: %s, %s, %s, %s, %s>" % 
@@ -445,7 +460,7 @@ class Message(object):
         self.packed_data = json.dumps(dict)
         return self.packed_data
 
-    def unpack(cls, raw_message):
+    def unpack(cls, raw_message, database):
         '''
         Unpack a simplejson string to an object.
         @param raw_message: the simplejson string
@@ -480,12 +495,37 @@ class Message(object):
                         dict["timestamp"] = datetime.fromtimestamp(float(dict["timestamp"]))
                     except:
                         pass
+                    try:
+                        # replace timestamp string with a real datetime
+                        unit_ids = dict["units"]
+                        units = []
+                        s = database._Session()
+                        for uid in unit_ids:
+                            data = s.query(UnitData).filter_by(id=uid).first()
+                            units.append(data)
+                        dict["units"] = units
+                    except:
+                        # object doesn't contain a list of units
+                        pass
+                    try:
+                        # replace timestamp string with a real datetime
+                        poi_id = dict["poi"]
+                        s = database._Session()
+                        poi = s.query(POIData).filter_by(id=poi_id).first()
+                        dict["poi"] = poi
+                    except:
+                        # object doesn't contain a poi 
+                        pass
                     # create and return an instance of the object
                     if classname == "dict":
                         return dict
                     else:
                         try:
-                            return globals()[classname](**dict)
+                            # ensure utf-8
+                            encodeddict = {}
+                            for k in dict.keys():
+                                 encodeddict[k.encode('utf-8')] = dict[k]
+                            return globals()[classname](**encodeddict)
                         except Exception, e:
                             raise ValueError("Failed with class: %s, dict: %s"
                                     % (classname, str(dict)))
@@ -533,21 +573,24 @@ if __name__ == '__main__':
     db.add(poi_data)
     unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
     db.add(unit_data)
-    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", units = [unit_data])
+    unit_data2 = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
+    db.add(unit_data2)
+    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data, unit_data2])
 #    print mission_data.to_dict()
     db.add(mission_data)
 #    print mission_data.to_changed_list(db)
-    unit_data2 = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
-    db.add(unit_data2)
-    mission_data.add_unit(unit_data2)
+#    unit_data2 = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
+#    db.add(unit_data2)
+#    mission_data.add_unit(unit_data2)
+#    db.change(mission_data)
 #    print mission_data.to_changed_list(db)
-    
+    alarm = Alarm(u"räv", u"Linköping", poi_data, u"Klasse", u"11111", 7, u"nada")
+    db.add(alarm)
     msg = Message("ragnar", "server", MessageType.action, ActionType.add,
-                  unpacked_data=unit_data)
+                  unpacked_data=poi_data)
     print msg.packed_data
-    print Message.unpack(msg.packed_data)
-#    alarm = Alarm("räv", "Linköping", poi_data, "Klasse", "11111", 7, "nada")
-#    db.add(alarm)
+    print Message.unpack(msg.packed_data, db)
+
 
 #    alarm.event = "kuk"
 #    db.change(alarm)
