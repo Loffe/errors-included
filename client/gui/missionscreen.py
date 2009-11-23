@@ -110,7 +110,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         self.select_unit_button.clear_selected()
         self.select_unit_button.unit_label.set_text("Inga valda enheter...")
         self.db.add(mission_data)
-        self.emit("okbutton-clicked3")
+        self.emit("okbutton-mission-clicked")
         
 gobject.type_register(MissionScreen)
-gobject.signal_new("okbutton-clicked3", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
+gobject.signal_new("okbutton-mission-clicked", MissionScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())

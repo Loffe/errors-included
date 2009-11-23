@@ -96,10 +96,10 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         
         self.db.add(poi_data2)
 
-        self.emit("okbutton-clicked")
+        self.emit("okbutton-obstacle-clicked")
         
 gobject.type_register(ObstacleScreen)
-gobject.signal_new("okbutton-clicked", ObstacleScreen, gobject.SIGNAL_RUN_FIRST,
+gobject.signal_new("okbutton-obstacle-clicked", ObstacleScreen, gobject.SIGNAL_RUN_FIRST,
                    gobject.TYPE_NONE, ())
 
 
