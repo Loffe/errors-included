@@ -52,17 +52,15 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         self.location_entry3 = self.new_coordlabel("Skadeplats GPS-lat:", left_box, right_box)
 
         # add selectable types
-        '''
-        @TODO: find this from POISubType
-        types = []
-        for type in shared.data.POIType.__dict__.keys():
+
+        types = {}
+        i = 0
+        for type in shared.data.POISubType.__dict__.keys():
             if type[0] != "_":
-                types.append(type)
-        types.sort()
-        for type in types:
-            combo_box.append_text(type)
-            
-        '''
+                types[shared.data.POISubType.__dict__[type]] = type
+        for type in types.keys():
+            combo_box.remove_text(type)
+            combo_box.insert_text(type, types[type])
 
         # add event handler
         combo_box.connect('changed', self.select_type)
@@ -83,25 +81,16 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         '''
         # set the selected type
         self.selected_type = combobox.get_active()
-        print (self.selected_type)
-        
-        
-        self.type = shared.data.POIType.accident
         
     def ok_button_function(self, event):
-
-   
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
-        
-        poi_data2 = shared.data.POIData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), shared.data.POIType.accident)
-        
-        self.db.add(poi_data2)
+
+        poi_data = shared.data.POIData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), type=shared.data.POIType.obstacle, subtype=self.selected_type)
+        self.db.add(poi_data)
 
         self.emit("okbutton-obstacle-clicked")
-        
+
 gobject.type_register(ObstacleScreen)
 gobject.signal_new("okbutton-obstacle-clicked", ObstacleScreen, gobject.SIGNAL_RUN_FIRST,
                    gobject.TYPE_NONE, ())
-
-

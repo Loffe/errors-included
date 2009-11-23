@@ -184,7 +184,7 @@ class POIType(object):
     accident, fire, pasta_wagon, obstacle, flag = range(5)
 
 class POISubType(object):
-    tree, broken_brigde, broken_nuclear_power_plant = range(3)
+    broken_brigde, broken_nuclear_power_plant, tree = range(3)
 
 class NetworkInQueueItem(Base):
     __tablename__ = 'InQueue'

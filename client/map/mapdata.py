@@ -292,7 +292,11 @@ class POI(MapObject):
         MapObject.__init__(self, poi_data)
         # default  icon can be changed here
         path = "map/data/icons/default.png"
-        if poi_data.type == shared.data.POIType.pasta_wagon:
+        if poi_data.type == shared.data.POIType.obstacle:
+            sub = poi_data.subtype
+            if sub == shared.data.POISubType.tree:
+                path = "map/data/icons/tree.png" 
+        elif poi_data.type == shared.data.POIType.pasta_wagon:
             path = "map/data/icons/pastawagon.png"
         elif poi_data.type == shared.data.POIType.fire:
             path = "map/data/icons/fire.png"
