@@ -79,6 +79,26 @@ class DatabaseQueue(Queue.Queue):
         session.commit()
         session.close()
 
+class DatabaseInQueue(DatabaseQueue):
+    def __init__(self, database):
+        DatabaseQueue.__init__(self, database, DatabaseQueue.direction_in)
+
+    def _empty(self):
+        session = self.db._Session()
+        result = session.query(data.NetworkInQueueItem).filter(data.NetworkInQueueItem.sent == 0).count() == 0
+        session.close()
+        return result
+
+    def peek(self, message_id):
+        session = self.db._Session()
+        item = session.query(data.NetworkInQueueItem).filter(data.NetworkInQueueItem.id == message_id).first()
+        session.close()
+        return item.data
+
+
+class DatabaseOutQueue(DatabaseQueue):
+    def __init__(self, database):
+        DatabaseQueue.__init__(self, database, DatabaseQueue.direction_out)
 
 if __name__ == "__main__":
     import data

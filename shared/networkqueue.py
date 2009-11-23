@@ -4,7 +4,7 @@ import threading
 import Queue
 
 import shared.data
-from shared.dbqueue import DatabaseQueue
+from shared.dbqueue import DatabaseInQueue, DatabaseOutQueue
 
 from shared.util import getLogger
 log = getLogger("nw-queue.log")
@@ -13,10 +13,10 @@ class NetworkQueue(gobject.GObject):
     queue = None
     socket = None
 
-    def __init__(self, socket, db, direction):
+    def __init__(self, socket, databasequeue):
         self.__gobject_init__()
         self.socket = socket
-        self.queue = DatabaseQueue(db, direction)
+        self.queue = databasequeue
 
     def replace_socket(self, socket):
         print self.__class__.__name__, "got a new socket"
@@ -31,7 +31,7 @@ class NetworkOutQueue(NetworkQueue):
     need_connection = True
 
     def __init__(self, socket, db):
-        NetworkQueue.__init__(self, socket, db, DatabaseQueue.direction_out)
+        NetworkQueue.__init__(self, socket, DatabaseOutQueue(db))
         if self.socket:
             self.need_connection = False
 
@@ -90,7 +90,7 @@ class NetworkOutQueue(NetworkQueue):
 
 class NetworkInQueue(NetworkQueue):
     def __init__(self, socket, db):
-        NetworkQueue.__init__(self, socket, db, DatabaseQueue.direction_in)
+        NetworkQueue.__init__(self, socket, DatabaseInQueue(db))
 
     def receive(self):
         ''' Receives data from network and puts it in a DatabaseQueue.
@@ -99,7 +99,7 @@ class NetworkInQueue(NetworkQueue):
         '''
         if self.socket == None:
             self.emit("socket-broken")
-            return
+            return 0, 0
         length = 0
         hex_length = ""
         try:
@@ -118,7 +118,7 @@ class NetworkInQueue(NetworkQueue):
         if length == 0:
             log.info("Invalid content length: " + hex_length)
             self.emit("socket-broken")
-            return
+            return 0, 0
         data = self.socket.recv(length)
         if data:
             log.debug("data from server:" + str(data))
@@ -129,7 +129,7 @@ class NetworkInQueue(NetworkQueue):
             except ValueError, ve:
                 log.debug("Crappy data = ! JSON")
                 log.debug(ve)
-                return
+                return 0, 0
 
             return local_id, m.response_to
 
@@ -143,6 +143,7 @@ class NetworkInQueue(NetworkQueue):
                 '''
         else:
             self.emit("socket-broken")
+            return 0, 0
 
 
     def dequeue(self):
@@ -151,3 +152,6 @@ class NetworkInQueue(NetworkQueue):
         '''
         return self.queue.get(block=False)
         
+    def get(self, message_id):
+        queueItem = self.queue.peek(message_id)
+        return queueItem
