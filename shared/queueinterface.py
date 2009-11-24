@@ -14,6 +14,10 @@ if __name__ == '__main__':
                              unpacked_data={"class": "dict", "password": "prydlig frisyr"})
     local_id = interface.enqueue(login_msg.packed_data, 5)
     print "sent login with id:", local_id
+    req_ids = data.Message("ragnar", "server", type=data.MessageType.id,
+                           subtype=data.IDType.request)
+    local_id = interface.enqueue(req_ids.packed_data, 9)
+    print "sent request with id:", local_id
 
     '''
     poi_data = data.POIData(12,113, u"goal", datetime.now(), data.POIType.accident)
