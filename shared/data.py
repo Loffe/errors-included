@@ -102,6 +102,7 @@ class Database(gobject.GObject):
         gobject.GObject.__init__(self)
         self.engine = create_engine('sqlite:///database.db', echo=False)
         self._Session = scoped_session(sessionmaker(bind=self.engine))
+        self.ids = []
 #        self.session = self._Session()
         
     def add(self, object):
@@ -111,6 +112,14 @@ class Database(gobject.GObject):
         '''
         session = self._Session()
         session.add(object)
+        if object.id == None:
+            try:
+                object.id = self.ids.pop()
+            except:
+                self.request_ids()
+                # @todo: connect to some sort of signal, 
+                #        and do action below when IDs recieved
+#                object.id = self.ids.pop()
         session.commit()
         session.close()
         self.emit("mapobject-added", object)
@@ -137,6 +146,12 @@ class Database(gobject.GObject):
         session.commit()
         session.close()
         self.emit("mapobject-deleted", object)
+    
+    def request_ids(self):
+        '''
+        Override when queue available.
+        '''
+        pass
         
     def get_all_alarms(self):
         session = self._Session()
@@ -437,12 +452,15 @@ class MissionData(Base, Packable):
             return repr
 
 class MessageType(object):
-    (mission, map, text, alarm, control, low_battery, status_update, mission_response, 
-    journal_request, journal_confirmationresponse, journal_confirmationrequest, 
-    journal_transfer, alarm_ack, vvoip_request, vvoip_response, login, login_ack, action) = range(18)
+    (mission, map, text, alarm, control, low_battery, status_update, 
+     mission_response, journal, alarm_ack, vvoip_request, 
+     vvoip_response, login, login_ack, action, id) = range(16)
 
 class ActionType(object):
     add, change, delete = range(3)
+    
+class IDType(object):
+    request, response = range(2)
 
 class JournalType(object):
     request, confirmation_response, confirmation_request, transfer = range(4)
@@ -509,10 +527,11 @@ class Message(object):
         self.packed_data = json.dumps(dict)
         return self.packed_data
 
-    def unpack(cls, raw_message, database):
+    def unpack(cls, raw_message, database=None):
         '''
         Unpack a simplejson string to an object.
         @param raw_message: the simplejson string
+        @param database: a Database to reconnect FK:s to SA Objects
         '''
         # raw_message contains sender and reciever
         self = cls(None, None)
@@ -576,9 +595,9 @@ class Message(object):
                                  encodeddict[k.encode('utf-8')] = dict[k]
                             return globals()[classname](**encodeddict)
                         except Exception, e:
+                            print e
                             raise ValueError("Failed with class: %s, dict: %s"
                                     % (classname, str(dict)))
-                            print e
 
                 # create and set data
                 self.unpacked_data = create(self.packed_data)
@@ -616,34 +635,40 @@ def create_database(db = Database()):
 if __name__ == '__main__':
     print "Testing db"
     db = create_database()
-    
-     
-
     poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.accident, POISubType.tree)
-    
-#    print poi_data, poi_data.to_dict()
-    db.add(poi_data)
-    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
-    db.add(unit_data)
-    unit_data2 = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
-    db.add(unit_data2)
-    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data, unit_data2])
-#    print mission_data.to_dict()
-    db.add(mission_data)
-#    print mission_data.to_changed_list(db)
-    
-    units = []
-    units.append(unit_data)
-    text = TextMessage("hej", "hej", units)
-    db.add(text)
+    poi_data.id = 5
+    s = db._Session()
+    print poi_data.id
+    s.add(poi_data)
+    print poi_data.id
+    s.commit()
+    print poi_data.id
 
-#    print mission_data.to_changed_list(db)
-    alarm = Alarm(u"räv", u"Linköping", poi_data, u"Klasse", u"11111", 7, u"nada")
-    db.add(alarm)
-    msg = Message("ragnar", "server", MessageType.action, ActionType.add,
-                  unpacked_data=poi_data)
-    print msg.packed_data
-    print Message.unpack(msg.packed_data, db)
+#    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.accident, POISubType.tree)
+#    
+##    print poi_data, poi_data.to_dict()
+#    db.add(poi_data)
+#    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
+#    db.add(unit_data)
+#    unit_data2 = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
+#    db.add(unit_data2)
+#    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data, unit_data2])
+##    print mission_data.to_dict()
+#    db.add(mission_data)
+##    print mission_data.to_changed_list(db)
+#    
+#    units = []
+#    units.append(unit_data)
+#    text = TextMessage("hej", "hej", units)
+#    db.add(text)
+#
+##    print mission_data.to_changed_list(db)
+#    alarm = Alarm(u"räv", u"Linköping", poi_data, u"Klasse", u"11111", 7, u"nada")
+#    db.add(alarm)
+#    msg = Message("ragnar", "server", MessageType.action, ActionType.add,
+#                  unpacked_data=poi_data)
+#    print msg.packed_data
+#    print Message.unpack(msg.packed_data, db)
 
 
 #    alarm.event = "kuk"

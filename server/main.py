@@ -4,6 +4,7 @@ import dbus.mainloop.glib
 
 import threading
 import shared.data
+import shared.messagedispatcher
 
 
 class ServerManager(object):
@@ -13,10 +14,8 @@ class ServerManager(object):
     def __init__(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         bus = dbus.SessionBus()
-        remote_object = bus.get_object("included.errors.Server", "/Queue")
-        self.queueinterface = dbus.Interface(remote_object, "included.errors.Server")
-
-        self.queueinterface.connect_to_signal("message_available", self._message_available)
+        self.message_dispatcher = shared.messagedispatcher.MessageDispatcher(bus,
+                path="included.errors.Server")
 
     def _message_available(self, packed_data):
         print "_message_available"
