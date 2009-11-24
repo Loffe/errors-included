@@ -17,3 +17,6 @@ class MessageDispatcher(object):
 
     def dispatch(self, local_id, response_to):
         print local_id, response_to
+        if self.connections.has_key(response_to):
+            # execute the callback
+            self.connections[response_to]()
