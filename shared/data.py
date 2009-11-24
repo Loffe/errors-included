@@ -508,10 +508,11 @@ class Message(object):
         self.packed_data = json.dumps(dict)
         return self.packed_data
 
-    def unpack(cls, raw_message, database):
+    def unpack(cls, raw_message, database=None):
         '''
         Unpack a simplejson string to an object.
         @param raw_message: the simplejson string
+        @param database: a Database to reconnect FK:s to SA Objects
         '''
         # raw_message contains sender and reciever
         self = cls(None, None)
@@ -575,9 +576,9 @@ class Message(object):
                                  encodeddict[k.encode('utf-8')] = dict[k]
                             return globals()[classname](**encodeddict)
                         except Exception, e:
+                            print e
                             raise ValueError("Failed with class: %s, dict: %s"
                                     % (classname, str(dict)))
-                            print e
 
                 # create and set data
                 self.unpacked_data = create(self.packed_data)
