@@ -238,7 +238,8 @@ class ClientGui(hildon.Program):
         self.message_menu.add(new_mess)
         self.message_menu.add(inbox)
         self.message_menu.add(outbox)
-        self.message_menu.add(in_alarms)
+        #fyller ingen funktion
+        #self.message_menu.add(in_alarms)
 
         # Add object buttons and their menu
         self.add_object_menu = gtk.HBox(False, 0)
@@ -430,6 +431,11 @@ class ClientGui(hildon.Program):
         
     def show_outbox(self, event):
         self.show(["output", "message_menu"])
+        
+        combo = self.screens["output"].combo_box
+        for textmessages in self.db.textmessages():
+            combo.remove_text(textmessages.id)
+            combo.insert_text(textmessages.id, textmessages.subject)
         
     def show_inbox(self, event):
         self.show(["message", "message_menu"])
