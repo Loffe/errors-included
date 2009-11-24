@@ -57,7 +57,6 @@ class ClientGui(hildon.Program):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         bus = dbus.SessionBus()
         self.queue = shared.queueinterface.get_interface(bus)
-        self.message_dispatcher = shared.messagedispatcher.MessageDispatcher(bus)
         self.mainloop = gobject.MainLoop()
 
         hildon.Program.__init__(self)
@@ -72,6 +71,7 @@ class ClientGui(hildon.Program):
         # create the database
         db = ClientDatabase(self.queue)
         self.db = shared.data.create_database(db)
+        self.message_dispatcher = shared.messagedispatcher.MessageDispatcher(bus, db)
 
         # A dict containing all the containers (used for hiding/showing) 
         self.screens = {}

@@ -173,7 +173,7 @@ class ServerNetworkHandler(dbus.service.Object):
                     data = s.recv(length)
                     if data:
                         log.debug("data from client:" + str(data))
-                        self.inqueue.put(data)
+                        local_id = self.inqueue.put(data)
                         m = None
                         try:
                             m = shared.data.Message.unpack(data)
@@ -185,7 +185,7 @@ class ServerNetworkHandler(dbus.service.Object):
                         if m.type == shared.data.MessageType.login:
                             self._login_client(s, m)
                         else:
-                            self.message_received(m.message_id, m.response_to)
+                            self.message_received(local_id, m.response_to)
                     else:
                         self._disconnect_client(s)
         
