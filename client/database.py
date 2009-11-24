@@ -1,4 +1,4 @@
-from shared.data import Database, Message, MessageType, ActionType
+from shared.data import Database, Message, MessageType, ActionType, IDType
 
 class ClientDatabase(Database):
     ''' Handles database querys and syncronizes with server '''
@@ -8,6 +8,11 @@ class ClientDatabase(Database):
         Database.__init__(self)
         self.queue = queue
         self.name = "Anonymous"
+        
+    def request_ids(self):
+        msg = Message(self.name, "server", MessageType.id, IDType.request,
+                      unpacked_data=None)
+        self.queue.enqueue(msg.packed_data, msg.prio)
 
     def add(self, object):
         # @TODO: decide order of local commit, network commit and signal emit
