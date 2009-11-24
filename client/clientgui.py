@@ -310,9 +310,9 @@ class ClientGui(hildon.Program):
         '''
         Create and start ClientController
         '''
-        name = "Ragnar Dahlberg"
+        name = u"Ragnar Dahlberg"
         unit_type = shared.data.UnitType.commander
-        status = "Available"
+        status = u"Available"
         self.controller = controller.ClientController(name,unit_type,status, self.db)
 
     ''' Handle events
