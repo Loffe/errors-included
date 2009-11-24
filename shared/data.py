@@ -73,14 +73,11 @@ class Database(gobject.GObject):
         gobject.GObject.__init__(self)
         self.engine = create_engine('sqlite:///database.db', echo=False)
         self._Session = scoped_session(sessionmaker(bind=self.engine))
-#        session = self._Session()
-#        session.query(ObjectID)
-        self.id_stop = 1000
-        self.id = 0
-        self.id_nextstart = None
-        self.id_nextstop = None
-        self.requesting = False
-#        self.session = self._Session()
+        self.id_stop = ObjectID("id_stop", None)
+        self.id_current = ObjectID("id_current", None)
+        self.id_nextstart = ObjectID("id_nextstart", None)
+        self.id_nextstop = ObjectID("id_nextstop", None)
+        self.requested = False
         
     def add(self, object):
         '''
@@ -90,14 +87,21 @@ class Database(gobject.GObject):
         session = self._Session()
         session.add(object)
         if object.id == None:
-            object.id = self.id
-            self.id += 1
-            if self.id > float(self.id_stop)/2 and not self.requesting:
+            object.id = self.id_current.value
+            self.id_current.value += 1
+            if self.id_current.value > float(self.id_stop.value)/2 and not self.requested:
                 self.request_ids()
-                self.requesting = True
-            elif self.id >= self.id_stop:
-                self.id = self.id_next_start
-                self.id_stop = self.id_nextstop
+                self.requested = True
+            elif self.id_current.value >= self.id_stop.value:
+                self.id_current.value = self.id_next_start.value
+                session.add(self.id_current)
+                self.id_nextstart.value = None
+                session.add(self.id_nextstart)
+                self.id_stop.value = self.id_nextstop.value
+                session.add(self.id_stop)
+                self.id_nextstop.value = None
+                session.add(self.id_nextstop)
+                self.requested = False
         session.commit()
         session.close()
         self.emit("mapobject-added", object)
@@ -263,6 +267,7 @@ class MapObjectData(Base, Packable):
             return repr
 
 gobject.type_register(Database)
+gobject.signal_new("ready", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ())
 gobject.signal_new("mapobject-added", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
 gobject.signal_new("mapobject-changed", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
 gobject.signal_new("mapobject-deleted", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
@@ -299,8 +304,6 @@ class POIData(MapObjectData):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
         self.subtype = subtype
-        
-        
         
 class TextMessage(Base, Packable):
     __tablename__ = 'TextMessage'

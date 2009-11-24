@@ -73,7 +73,9 @@ class ClientGui(hildon.Program):
         self.db = shared.data.create_database(db)
         self.message_dispatcher = shared.messagedispatcher.MessageDispatcher(bus, db)
         self.db.dispatcher = self.message_dispatcher
-
+        self.create_gui()
+    
+    def create_gui(self):
         # A dict containing all the containers (used for hiding/showing) 
         self.screens = {}
 
@@ -289,16 +291,23 @@ class ClientGui(hildon.Program):
         # Change to default True?
         self.window_in_fullscreen = False
         log.info("ClientGui created")
+        
+    def start(self):
+        # show gui
+        self.window.show_all()
+        self.show_default()
+        # start controller
+        self.start_controller()
+        # only do start method once
+        self.db.disconnect(self.ready_handler_id)
 
     def run(self):
         '''
         Main GUI loop
         '''
-        self.window.show_all()
-        self.show_default()
         gobject.threads_init()
-        # start gtk main (gui) thread
-        self.start_controller()
+        db.ensure_ids()
+        self.ready_handler_id = self.db.connect("ready", self.start)
         while self.mainloop.is_running():
             try:
                 self.mainloop.run()
