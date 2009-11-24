@@ -72,6 +72,7 @@ class ClientGui(hildon.Program):
         db = ClientDatabase(self.queue)
         self.db = shared.data.create_database(db)
         self.message_dispatcher = shared.messagedispatcher.MessageDispatcher(bus, db)
+        self.db.dispatcher = self.message_dispatcher
 
         # A dict containing all the containers (used for hiding/showing) 
         self.screens = {}
@@ -201,8 +202,6 @@ class ClientGui(hildon.Program):
         self.contact_menu.add(call)
         self.contact_menu.add(video)
 
-
-        
         # Mission buttons and their menu
         self.mission_menu = gtk.HBox(False, 0)
         self.mission_menu.set_size_request(0, 60)
@@ -313,7 +312,7 @@ class ClientGui(hildon.Program):
         name = u"Ragnar Dahlberg"
         unit_type = shared.data.UnitType.commander
         status = u"Available"
-        self.controller = controller.ClientController(name,unit_type,status, self.db)
+        self.controller = controller.ClientController(name, unit_type,status, self.db)
 
     ''' Handle events
     ''' 

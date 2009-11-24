@@ -19,8 +19,6 @@ units_in_text = Table('UnitsInText', Base.metadata,
                     Column('textmessage_id', Integer, ForeignKey('TextMessage.id')),
                     Column('unit_id', Integer, ForeignKey('UnitData.id')))
 
-
-
 class Packable(object):
     '''
     Extend this class to be able to pack/unpack a message containing it.
@@ -62,33 +60,6 @@ class Packable(object):
                         dict[var] = v
         dict["class"] = self.__class__.__name__
         return dict
-
-    def has_changed(self, database):
-        '''
-        Check if this objects state is different than the state of this object 
-        in the database.
-        '''
-        session = database._Session()
-        state_in_db = session.query(self.__class__).filter_by(id=self.id).first()
-        session.close()
-        if state_in_db != None:
-            if state_in_db.timestamp == self.timestamp:
-                return False 
-        return True
-        
-    def to_changed_list(self, db):
-        '''
-        Returns a list representation of this object containing only the 
-        encapsulated objects that has changed.
-        '''
-        list = []
-        for var in self.__dict__.keys():
-            v = self.__dict__[var]
-            if isinstance(v, Packable):
-                if v.has_changed(db):
-                    list.append(v.to_dict())
-        list.append(self.to_dict())
-        return list
 
 class Database(gobject.GObject):
     '''
