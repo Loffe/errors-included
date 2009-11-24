@@ -102,7 +102,14 @@ class Database(gobject.GObject):
         gobject.GObject.__init__(self)
         self.engine = create_engine('sqlite:///database.db', echo=False)
         self._Session = scoped_session(sessionmaker(bind=self.engine))
-        self.ids = []
+#        session = self._Session()
+#        session.query(ObjectID)
+        self.id_start = None
+        self.id_stop = None
+        self.id = None
+        self.id_nextstart = None
+        self.id_nextstop = None
+        self.requesting = False
 #        self.session = self._Session()
         
     def add(self, object):
@@ -113,13 +120,11 @@ class Database(gobject.GObject):
         session = self._Session()
         session.add(object)
         if object.id == None:
-            try:
-                object.id = self.ids.pop()
-            except:
+            object.id = self.id
+            self.id += 1
+            if self.id > float(self.id_stop)/2 and not self.requesting:
                 self.request_ids()
-                # @todo: connect to some sort of signal, 
-                #        and do action below when IDs recieved
-#                object.id = self.ids.pop()
+                self.requesting = True
         session.commit()
         session.close()
         self.emit("mapobject-added", object)
@@ -150,6 +155,13 @@ class Database(gobject.GObject):
     def request_ids(self):
         '''
         Override when queue available.
+        '''
+        pass
+    
+    def wait_and_add(self):
+        '''
+        Override when message dispatcher available.
+        Should wait for ID response and then add the object to the database.
         '''
         pass
         
@@ -187,6 +199,16 @@ class Database(gobject.GObject):
             list.append(u)
         session.close()
         return list
+    
+class ObjectID(Base):
+    __tablename__ = 'ObjectID'
+    id = Column(Integer, primary_key = True)
+    name = Column(UnicodeText)
+    value = Column(Integer)
+    
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
 
 class UnitType(object):
     (ambulance, # Regular unit
