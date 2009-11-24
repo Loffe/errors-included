@@ -93,7 +93,10 @@ class DatabaseInQueue(DatabaseQueue):
         session = self.db._Session()
         item = session.query(data.NetworkInQueueItem).filter(data.NetworkInQueueItem.id == message_id).first()
         session.close()
-        return item.data
+        if item is not None:
+            return item.data
+        else:
+            return None
 
 
 class DatabaseOutQueue(DatabaseQueue):

@@ -8,6 +8,7 @@ import Queue
 import dbus
 import dbus.service
 import shared.networkqueue
+from shared.dbqueue import DatabaseInQueue
 from shared.util import getLogger
 from database import ServerDatabase
 log = getLogger("server.log")
@@ -33,7 +34,7 @@ class ServerNetworkHandler(dbus.service.Object):
         self.backlog = 5
         self.size = 1024
         self.server = None
-        self.inqueue = Queue.Queue()
+        self.inqueue = DatabaseInQueue(self.db)
         self.outqueues = {}
         self.mainloop = None
         self.message_handler = handler.MessageHandler(self)
@@ -172,7 +173,7 @@ class ServerNetworkHandler(dbus.service.Object):
                     data = s.recv(length)
                     if data:
                         log.debug("data from client:" + str(data))
-                        self.inqueue.put(data, False)
+                        local_id = self.inqueue.put(data)
                         m = None
                         try:
                             m = shared.data.Message.unpack(data)
@@ -184,7 +185,7 @@ class ServerNetworkHandler(dbus.service.Object):
                         if m.type == shared.data.MessageType.login:
                             self._login_client(s, m)
                         else:
-                            self.message_received(m.message_id, m.response_to)
+                            self.message_received(local_id, m.response_to)
                     else:
                         self._disconnect_client(s)
         

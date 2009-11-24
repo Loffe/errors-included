@@ -7,12 +7,8 @@ class ClientDatabase(Database):
     def __init__(self, queue):
         Database.__init__(self)
         self.queue = queue
+        self.dispatcher = None
         self.name = "Anonymous"
-        
-    def request_ids(self):
-        msg = Message(self.name, "server", MessageType.id, IDType.request,
-                      unpacked_data=None)
-        self.queue.enqueue(msg.packed_data, msg.prio)
 
     def add(self, object):
         # @TODO: decide order of local commit, network commit and signal emit
@@ -32,3 +28,14 @@ class ClientDatabase(Database):
         msg = Message(self.name, "server", MessageType.action, ActionType.delete,
                       unpacked_data=object)
         self.queue.enqueue(msg.packed_data, msg.prio)
+
+    def request_ids(self):
+        msg = Message(self.name, "server", MessageType.id, IDType.request,
+                      unpacked_data=None)
+        self.queue.enqueue(msg.packed_data, msg.prio)
+        self.dispatcher.connect_to_id(msg.message_id, self.set_ids)
+        
+    def set_ids(self, msg):
+        data = msg.unpacked_data
+        self.id_nextstart = data["id_nextstart"]
+        self.id_nextstop = data["id_nextstop"] 
