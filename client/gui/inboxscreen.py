@@ -35,88 +35,75 @@ class InboxScreen(gtk.ScrolledWindow, gui.Screen):
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
         def new_entry(labeltext, parent):
-            hbox = gtk.HBox(True, 0)
+            hbox = gtk.HBox(True,0)
             label = gtk.Label(labeltext)
             label.set_alignment(0, 0.5)
-            #label.modify_font(pango.FontDescription("sans 12"))
-
-            entry = gtk.Label()
-            entry.set_alignment(0, 0.5)
-            #entry.modify_font(pango.FontDescription("sans 12"))
+            entry = gtk.Entry()
+            entry.set_max_length(300)
+            entry.set_text("")
             entry.select_region(0, len(entry.get_text()))
             hbox.add(label)
             hbox.add(entry)
             parent.add(hbox)
-            return entry
+            return (label, entry)
 
-        def new_section(title, parent):
-            label = gtk.Label(title)
-            label.modify_font(pango.FontDescription("sans 12"))
-            label.set_alignment(0, 0.5)
-            parent.add(label)
-#        
-        # create layout boxes
-        main_box = gtk.VBox(False,0)
-        self.add_with_viewport(main_box)
-        hbox = gtk.HBox(False,0)
-        main_box.pack_start(hbox,True,True,0)
-#        
-#        # create type label
-#        type_label = gtk.Label("Inkomna larm:")
-#        type_label.set_alignment(0, 0.5)
-#        hbox.pack_start(type_label, True, True, 0)
-        
-        # create and pack combobox
-#        self.combo_box = gtk.combo_box_new_text()
-#        self.combo_box.set_size_request(300,50)
-#        self.combo_box.append_text("Välj larm...")
-#        hbox.pack_start(self.combo_box, True,True, 0)
-#        
-#        new_section("Nytt uppdrag", main_box)
-        
+        vbox = gtk.VBox(False,0)
+        self.add_with_viewport(vbox)
+
         # create entries
+        #label, self.to_entry = new_entry("Till",vbox)
         
+        self.combo_box = gtk.combo_box_new_text()
+        self.combo_box.set_size_request(300,50)
+        self.combo_box.append_text("Välj larm...")
+        vbox.pack_start(self.combo_box, True,True, 0)
+
+        label, self.subject_entry = new_entry("Ämne",vbox)
+
+        msg_label = gtk.Label("Meddelande")
+        
+        msg_label.set_alignment(0, 0.5)
+        textbox = gtk.TextView()
+        textbox.set_editable(False)
+        textbox.set_size_request(200,200)
+        self.buffer = textbox.get_buffer()
+        self.buffer.set_text("Skriv ditt meddelande här")
+        msgbox = gtk.HBox(True,0)
+        msgbox.pack_start(msg_label)
+        msgbox.pack_start(textbox)
+        vbox.add(msgbox)  
+        
+        
+        
+
        
-        self.event_entry = new_entry("Från:", main_box)
-
-        self.location_entry2 = new_entry("amne", main_box)
-        self.location_entry3 = new_entry("Innehall", main_box)        
-        
-        
-
-#        self.select_unit_button = SelectUnitButton(self.db)
-#        main_box.add(self.select_unit_button)        
 #
 #        # add event handler
-#        self.combo_box.connect('changed', self.select_alarm)
+        self.combo_box.connect('changed', self.select_m)
 #
 #        # set the first item added as active
-#        self.combo_box.set_active(0)
+        self.combo_box.set_active(0)
 
         # show 'em all! (:
-        main_box.show_all()
+        self.show_all()
 
     '''Handle events
     '''
 
-    def select_alarm(self, combobox):
-        pass
+    def select_m(self, combobox):
+        
         '''
         Call when combobox changes to switch obstacle type.
         @param combobox: the changed combobox
         '''
         # set the selected type
-#        self.selected_alarm = self.combo_box.get_active_text()
-#        alarms = self.db.get_all_alarms()
-#        for alarm in alarms:
-#            if alarm.event == self.selected_alarm:
-#                self.event_entry.set_text(alarm.event)
-#                self.location_entry2.set_text(str(alarm.poi.coordx))
-#                self.location_entry3.set_text(str(alarm.poi.coordy))                
-#                self.name_entry.set_text(alarm.contact_person)
-#                self.hurted_entry.set_text(str(alarm.number_of_wounded))
-#                self.number_entry.set_text(alarm.contact_number)
-#                self.random_entry.set_text(alarm.other)
+        self.selected_m = self.combo_box.get_active_text()
+        messages = self.db.textmessages()
+        for message in messages:
+            if message.subject == self.selected_m:
+                self.subject_entry.set_text(message.subject)
+                self.buffer.set_text(message.message_content)
+
                 
 
-#    
+    

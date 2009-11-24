@@ -442,7 +442,11 @@ class ClientGui(hildon.Program):
         
     def show_inbox(self, event):
         self.show(["message", "message_menu"])
-        
+        combo = self.screens["message"].combo_box
+        for textmessages in self.db.textmessages():
+            combo.remove_text(textmessages.id)
+            combo.insert_text(textmessages.id, textmessages.subject)
+
     def show_alarms(self, event):
         self.show(["alarms", "message_menu"])
         
@@ -453,6 +457,11 @@ class ClientGui(hildon.Program):
     # messages view event handlers
     def show_messages(self, event):
         self.toggle_show("messages", ["notifications", "message","message_menu"], "Här visas dina meddelanden")
+        
+        combo = self.screens["message"].combo_box
+        for textmessages in self.db.textmessages():
+            combo.remove_text(textmessages.id)
+            combo.insert_text(textmessages.id, textmessages.subject)
 
     # show certain screen methods
     def toggle_show(self, button_key, screen_keys, notification_text = ""):

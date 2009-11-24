@@ -146,6 +146,16 @@ class Database(gobject.GObject):
         session.close()
         return alarms
 
+    
+    def textmessages(self):
+        session = self._Session()
+        textmessages = []
+        for t in session.query(TextMessage):
+            textmessages.append(t)
+        session.close()
+        return textmessages
+    
+    
     def get_all_units(self):
         session = self._Session()
         list = []
