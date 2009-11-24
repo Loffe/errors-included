@@ -31,7 +31,7 @@ class MessageDispatcher(object):
         # execute the callbacks
         if self.connected_ids.has_key(response_to):
             print "execute on id", type
-            self.connected_ids[response_to]()
+            self.connected_ids[response_to](msg)
         if self.connected_types.has_key(type):
             print "execute on type", type
-            self.connected_types[type]()
+            self.connected_types[type](msg)
