@@ -79,9 +79,10 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         selected = self.select_unit_button.select_dialog.selected_units
         units = self.db.get_units(selected)
     
-        #datetime
-        #text = shared.data.TextMessage(self.subject_entry.get_text(), self.textbox.get_text(), units)
-        #self.db.add(text)
+        #datetime 
+        print self.buffer#.get_text()
+        text = shared.data.TextMessage(self.subject_entry.get_text(), "hej", units)
+        self.db.add(text)
         self.emit("okbutton_clicked_new_message")
         
 gobject.type_register(NewMessageScreen)

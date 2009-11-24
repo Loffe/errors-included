@@ -308,6 +308,7 @@ class TextMessage(Base, Packable):
     message_content = Column(UnicodeText)
     timestamp = Column(DateTime)
     
+    
     def __init__(self, subject, message_content, units, timestamp = datetime.now()):
         self.subject = subject
         self.message_content = message_content
