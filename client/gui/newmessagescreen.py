@@ -80,7 +80,7 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         units = self.db.get_units(selected)
     
         #datetime 
-        print self.buffer#.get_text()
+        #print self.buffer#.get_text()
         text = shared.data.TextMessage(self.subject_entry.get_text(), "hej", units)
         self.db.add(text)
         self.emit("okbutton_clicked_new_message")
