@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import dbus
 
-def get_interface(bus):
-    remote_object = bus.get_object("included.errors.Client", "/Queue")
-    interface = dbus.Interface(remote_object, "included.errors.Client")
+def get_interface(bus, path="included.errors.Client"):
+    remote_object = bus.get_object(path, "/Queue")
+    interface = dbus.Interface(remote_object, path)
     return interface
 
 if __name__ == '__main__':
