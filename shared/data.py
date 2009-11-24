@@ -104,9 +104,8 @@ class Database(gobject.GObject):
         self._Session = scoped_session(sessionmaker(bind=self.engine))
 #        session = self._Session()
 #        session.query(ObjectID)
-        self.id_start = None
-        self.id_stop = None
-        self.id = None
+        self.id_stop = 1000
+        self.id = 0
         self.id_nextstart = None
         self.id_nextstop = None
         self.requesting = False
@@ -125,6 +124,9 @@ class Database(gobject.GObject):
             if self.id > float(self.id_stop)/2 and not self.requesting:
                 self.request_ids()
                 self.requesting = True
+            elif self.id >= self.id_stop:
+                self.id = self.id_next_start
+                self.id_stop = self.id_nextstop
         session.commit()
         session.close()
         self.emit("mapobject-added", object)
@@ -154,14 +156,8 @@ class Database(gobject.GObject):
     
     def request_ids(self):
         '''
-        Override when queue available.
-        '''
-        pass
-    
-    def wait_and_add(self):
-        '''
-        Override when message dispatcher available.
-        Should wait for ID response and then add the object to the database.
+        Override when queue available. 
+        Don't forget to set id_nextstart and id_nextstop to returned values!
         '''
         pass
         
