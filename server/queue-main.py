@@ -134,10 +134,10 @@ class ServerNetworkHandler(dbus.service.Object):
             
     def set_ip(self, username, ip):
         session = self.db._Session()
-        user = session.query(data.User).filter_by(name=username).first()
+        user = session.query(shared.data.UnitData).filter_by(name=username).first()
         user.ip = ip
         session.commit()
-        print user
+        print user, ip
 
     def run(self):
         running = True
