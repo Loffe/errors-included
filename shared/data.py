@@ -171,17 +171,23 @@ class ObjectID(Base):
             return repr
 
 class UnitType(object):
-    (ambulance, # Regular unit
-     army, # short for Swedish Armed Forces
-     commander, # Nana nana nana nana LEADER! leader..
-     srsa, # Swedish Rescue Services Agency (SRSA) 
-     other) = range(5)
+    ambulance = "ambulance", # Regular unit
+    army = "army" # short for Swedish Armed Forces
+    commander = "commander" # Nana nana nana nana LEADER! leader..
+    srsa = "srsa" # Swedish Rescue Services Agency (SRSA)
+    other = "other"
 
 class POIType(object):
-    accident, fire, pasta_wagon, obstacle, flag = range(5)
+    accident = "accident"
+    fire = "fire"
+    pasta_wagon = "pasta_wagon"
+    obstacle = "obstacle"
+    flag = "flag"
 
 class POISubType(object):
-    broken_brigde, broken_nuclear_power_plant, tree = range(3)
+    broken_brigde = "broken_brigde"
+    broken_nuclear_power_plant = "broken_nuclear_power_plant"
+    tree = "tree"
 
 class NetworkInQueueItem(Base):
     __tablename__ = 'InQueue'
@@ -269,7 +275,7 @@ class UnitData(MapObjectData):
     __mapper_args__ = {'polymorphic_identity': 'UnitData'}
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
 
-    type = Column(Integer)
+    type = Column(UnicodeText)
 
     def __init__(self, coordx, coordy, name, timestamp, 
                  type = UnitType.ambulance, id = None):
@@ -284,8 +290,8 @@ class POIData(MapObjectData):
     __mapper_args__ = {'polymorphic_identity': 'POIData'}
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
     
-    type = Column(Integer)
-    subtype = Column(Integer)
+    type = Column(UnicodeText)
+    subtype = Column(UnicodeText)
     
 
     def __init__(self, coordx, coordy, name, timestamp, 
