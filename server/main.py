@@ -60,7 +60,7 @@ if __name__ == "__main__":
         session = db._Session()
 
         # Create users
-        u = User(u"Ragnar", u"prydlig frisyr")
+        u = User(u"ragnar", u"prydlig frisyr")
         session.add(u)
         u = User(u"Slanggurka", u"smakar som nors")
         session.add(u)

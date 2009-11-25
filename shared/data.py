@@ -73,10 +73,6 @@ class Database(gobject.GObject):
         gobject.GObject.__init__(self)
         self.engine = create_engine('sqlite:///database.db', echo=False)
         self._Session = scoped_session(sessionmaker(bind=self.engine))
-        self.id_stop = ObjectID("id_stop", None)
-        self.id_current = ObjectID("id_current", None)
-        self.id_nextstart = ObjectID("id_nextstart", None)
-        self.id_nextstop = ObjectID("id_nextstop", None)
         self.requested = False
         
     def add(self, object):
@@ -88,20 +84,17 @@ class Database(gobject.GObject):
         session.add(object)
         if object.id == None:
             object.id = self.id_current.value
-            self.id_current.value += 1
+            self.id_current.value += 10
             if self.id_current.value > float(self.id_stop.value)/2 and not self.requested:
                 self.request_ids()
                 self.requested = True
             elif self.id_current.value >= self.id_stop.value:
                 self.id_current.value = self.id_next_start.value
-                session.add(self.id_current)
                 self.id_nextstart.value = None
-                session.add(self.id_nextstart)
                 self.id_stop.value = self.id_nextstop.value
-                session.add(self.id_stop)
                 self.id_nextstop.value = None
-                session.add(self.id_nextstop)
                 self.requested = False
+        self.save_ids()
         session.commit()
         session.close()
         self.emit("mapobject-added", object)
@@ -135,6 +128,31 @@ class Database(gobject.GObject):
         Don't forget to set id_nextstart and id_nextstop to returned values!
         '''
         pass
+    
+    def save_ids(self):
+        session = self._Session()
+        session.add(self.id_current)
+        session.add(self.id_stop)
+        session.add(self.id_nextstart)
+        session.add(self.id_nextstop)
+        session.commit()
+        session.close()
+        
+    def get_ids(self):
+        session = self._Session()
+        current = session.query(ObjectID).filter_by(name=u"id_current").first()
+        if current != None:
+            self.id_current = current  
+        stop = session.query(ObjectID).filter_by(name=u"id_stop").first()
+        if stop != None:
+            self.id_stop = stop
+        nextstart = session.query(ObjectID).filter_by(name=u"id_nextstart").first()
+        if nextstart != None:
+            self.id_nextstart = nextstart
+        nextstop = session.query(ObjectID).filter_by(name=u"id_nextstop").first()
+        if nextstop != None:
+            self.id_nextstop = nextstop
+        session.close()
         
     def get_all_alarms(self):
         session = self._Session()
@@ -190,6 +208,14 @@ class ObjectID(Base):
     def __init__(self, name, value):
         self.name = name
         self.value = value
+        
+    def __repr__(self):
+        repr = "<%s: name=%s, value=%s>" % (self.__class__.__name__,
+                                            self.name, self.value)
+        try:
+            return repr.encode('utf-8')
+        except:
+            return repr
 
 class UnitType(object):
     (ambulance, # Regular unit

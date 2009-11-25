@@ -292,7 +292,7 @@ class ClientGui(hildon.Program):
         self.window_in_fullscreen = False
         log.info("ClientGui created")
         
-    def start(self):
+    def start(self, event):
         # show gui
         self.window.show_all()
         self.show_default()
@@ -306,7 +306,7 @@ class ClientGui(hildon.Program):
         Main GUI loop
         '''
         gobject.threads_init()
-        db.ensure_ids()
+        self.db.ensure_ids()
         self.ready_handler_id = self.db.connect("ready", self.start)
         while self.mainloop.is_running():
             try:

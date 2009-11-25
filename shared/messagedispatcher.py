@@ -11,7 +11,7 @@ class MessageDispatcher(object):
         self.queue = DatabaseInQueue(database)
 
     def connect_to_id(self, id, callback):
-        self.connected_ids[id] = callback;
+        self.connected_ids[id] = callback
 
     def connect_to_type(self, type, callback):
         self.connected_types[type] = callback
@@ -25,8 +25,8 @@ class MessageDispatcher(object):
     def dispatch(self, local_id, response_to):
         print local_id, response_to
         data = self.queue.peek(local_id)
+        print data
         msg = Message.unpack(data)
-        print msg
         type = msg.type
         # execute the callbacks
         if self.connected_ids.has_key(response_to):
