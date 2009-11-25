@@ -171,23 +171,23 @@ class ObjectID(Base):
             return repr
 
 class UnitType(object):
-    ambulance = "ambulance", # Regular unit
-    army = "army" # short for Swedish Armed Forces
-    commander = "commander" # Nana nana nana nana LEADER! leader..
-    srsa = "srsa" # Swedish Rescue Services Agency (SRSA)
-    other = "other"
+    ambulance = u"ambulance", # Regular unit
+    army = u"army" # short for Swedish Armed Forces
+    commander = u"commander" # Nana nana nana nana LEADER! leader..
+    srsa = u"srsa" # Swedish Rescue Services Agency (SRSA)
+    other = u"other"
 
 class POIType(object):
-    accident = "accident"
-    fire = "fire"
-    pasta_wagon = "pasta_wagon"
-    obstacle = "obstacle"
-    flag = "flag"
+    accident = u"accident"
+    fire = u"fire"
+    pasta_wagon = u"pasta_wagon"
+    obstacle = u"obstacle"
+    flag = u"flag"
 
 class POISubType(object):
-    broken_brigde = "broken_brigde"
-    broken_nuclear_power_plant = "broken_nuclear_power_plant"
-    tree = "tree"
+    broken_brigde = u"broken_brigde"
+    broken_nuclear_power_plant = u"broken_nuclear_power_plant"
+    tree = u"tree"
 
 class NetworkInQueueItem(Base):
     __tablename__ = 'InQueue'

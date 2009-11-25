@@ -53,6 +53,7 @@ class ClientDatabase(Database):
         msg = Message(self.name, "server", MessageType.action, ActionType.add,
                       unpacked_data=object)
         self.queue.enqueue(msg.packed_data, msg.prio)
+        self.emit("mapobject-added", object)
 
     def change(self, object):
         Database.change(self, object)
