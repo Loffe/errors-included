@@ -178,16 +178,20 @@ class UnitType(object):
     other = u"other"
 
 class POIType(object):
+    structure = u"structure"
+    event = u"event"
+    obstacle = u"obstacle"
+    flag = u"flag" # Remove?
+
+class POISubType(object):
+    brigde = u"brigde"
+    tree = u"tree"
     accident = u"accident"
     fire = u"fire"
     pasta_wagon = u"pasta_wagon"
-    obstacle = u"obstacle"
-    flag = u"flag"
-
-class POISubType(object):
-    broken_brigde = u"broken_brigde"
-    broken_nuclear_power_plant = u"broken_nuclear_power_plant"
-    tree = u"tree"
+    hospital = u"hospital"
+    base = u"base"
+    other = u"other"
 
 class NetworkInQueueItem(Base):
     __tablename__ = 'InQueue'
@@ -295,7 +299,7 @@ class POIData(MapObjectData):
     
 
     def __init__(self, coordx, coordy, name, timestamp, 
-                 type = POIType.pasta_wagon, subtype = None, id = None):
+                 type = POIType.obstacle, subtype = None, id = None):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
         self.subtype = subtype

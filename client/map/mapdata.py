@@ -283,16 +283,6 @@ class Unit(MapObject):
             path = "map/data/icons/firetruck.png"
         self.picture = Picture(path)    
 
-class Obstacle(MapObject):
-    
-    def __init__(self, obstacle_data):
-        MapObject.__init__(self, obstacle_data)
-        # default  icon can be changed here
-        path = "map/data/icons/default.png"
-        if obstacle_data.type == shared.data.ObstacleType.tree:
-            path = "map/data/icons/tree.png"
-        self.picture = Picture(path)
-        
 class POI(MapObject):
     
     def __init__(self, poi_data):
@@ -300,15 +290,14 @@ class POI(MapObject):
         offset = (0, 0)
         # default  icon can be changed here
         path = "map/data/icons/default.png"
-        if poi_data.type == shared.data.POIType.obstacle:
-            sub = poi_data.subtype
-            if sub == shared.data.POISubType.tree:
-                path = "map/data/icons/tree.png" 
-        elif poi_data.type == shared.data.POIType.pasta_wagon:
+        sub = poi_data.subtype
+        if sub == shared.data.POISubType.tree:
+            path = "map/data/icons/tree.png" 
+        elif poi_data.type == shared.data.POISubType.pasta_wagon:
             path = "map/data/icons/pastawagon.png"
-        elif poi_data.type == shared.data.POIType.fire:
+        elif poi_data.type == shared.data.POISubType.fire:
             path = "map/data/icons/fire.png"
-        elif poi_data.type == shared.data.POIType.accident:
+        elif poi_data.type == shared.data.POISubType.accident:
             path = "map/data/icons/accident.png"
         elif poi_data.type == shared.data.POIType.flag:
             path = "map/data/icons/default.png"
