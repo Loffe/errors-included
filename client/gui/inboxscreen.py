@@ -65,7 +65,7 @@ class InboxScreen(gtk.ScrolledWindow, gui.Screen):
         msg_label.set_alignment(0, 0.5)
         textbox = gtk.TextView()
         textbox.set_editable(False)
-        textbox.set_size_request(200,200)
+        textbox.set_size_request(250,250)
         self.buffer = textbox.get_buffer()
         self.buffer.set_text("Skriv ditt meddelande här")
         msgbox = gtk.HBox(True,0)
@@ -73,11 +73,6 @@ class InboxScreen(gtk.ScrolledWindow, gui.Screen):
         msgbox.pack_start(textbox)
         vbox.add(msgbox)  
         
-        
-        
-
-       
-#
 #        # add event handler
         self.combo_box.connect('changed', self.select_m)
 #

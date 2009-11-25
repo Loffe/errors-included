@@ -62,7 +62,7 @@ if __name__ == "__main__":
         # Create users
         u = User(u"ragnar", u"prydlig frisyr")
         session.add(u)
-        u = User(u"Slanggurka", u"smakar som nors")
+        u = User(u"slanggurka", u"smakar som nors")
         session.add(u)
 
         # Create units

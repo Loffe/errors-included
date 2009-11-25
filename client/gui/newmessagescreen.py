@@ -57,7 +57,7 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         msg_label.set_alignment(0, 0.5)
         textbox = gtk.TextView()
         textbox.set_editable(True)
-        textbox.set_size_request(200,200)
+        textbox.set_size_request(250,250)
         self.buffer = textbox.get_buffer()
         self.buffer.set_text("Skriv ditt meddelande här")
         msgbox = gtk.HBox(True,0)
