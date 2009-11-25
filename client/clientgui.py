@@ -299,6 +299,8 @@ class ClientGui(hildon.Program):
         self.show_default()
         # start controller
         self.start_controller()
+        # connect service level signal from controller
+        self.controller.interface.connect_to_signal("signal_changed_service_level", self.update_service_level)
         # only do start method once
         self.db.disconnect(self.ready_handler_id)
 
@@ -323,6 +325,9 @@ class ClientGui(hildon.Program):
         unit_type = shared.data.UnitType.commander
         status = u"Available"
         self.controller = controller.ClientController(name, unit_type,status, self.db)
+
+    def update_service_level(self):
+        print "new service level"
 
     ''' Handle events
     ''' 

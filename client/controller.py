@@ -22,10 +22,10 @@ class ClientController(object):
         # create dbus session
         bus = dbus.SessionBus()
         remote_object = bus.get_object("included.errors.QoSManager", "/QoSManager")
-        interface = dbus.Interface(remote_object, "included.errors.QoSManager")
+        self.interface = dbus.Interface(remote_object, "included.errors.QoSManager")
         # listen to QoSManagers signaling of new GPS-coordinates
-        interface.connect_to_signal("signal_new_gps_coord", self.update_coords)
-
+        self.interface.connect_to_signal("signal_new_gps_coord", self.update_coords)
+        
         # the database to save to
         self.db = db
         # set sender name in db
