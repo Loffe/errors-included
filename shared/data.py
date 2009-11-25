@@ -443,22 +443,27 @@ class MissionData(Base, Packable):
             return repr
 
 class MessageType(object):
+    object = u"object"
+    voip = u"voip"
+    vvoip = u"vvoip"
+    login = u"login"
+    journal = u"journal"
+    ack = u"ack"
+    text = u"text"
+    id = u"id"
+
+    # @TODO: Remove?
     mission = "mission"
     map = "map"
-    text = "text"
     alarm = "alarm"
     control = "control"
     low_battery = "low_battery"
     status_update = "status_update"
     mission_response = "mission_response"
-    journal = "journal"
     alarm_ack = "alarm_ack"
     vvoip_request = "vvoip_request"
     vvoip_response = "vvoip_response"
-    login = "login"
-    login_ack = "login_ack"
     action = "action"
-    id = "id"
 
 class ActionType(object):
     add = "add"
