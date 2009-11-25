@@ -433,18 +433,37 @@ class MissionData(Base, Packable):
             return repr
 
 class MessageType(object):
-    (mission, map, text, alarm, control, low_battery, status_update, 
-     mission_response, journal, alarm_ack, vvoip_request, 
-     vvoip_response, login, login_ack, action, id) = range(16)
+    mission = "mission"
+    map = "map"
+    text = "text"
+    alarm = "alarm"
+    control = "control"
+    low_battery = "low_battery"
+    status_update = "status_update"
+    mission_response = "mission_response"
+    journal = "journal"
+    alarm_ack = "alarm_ack"
+    vvoip_request = "vvoip_request"
+    vvoip_response = "vvoip_response"
+    login = "login"
+    login_ack = "login_ack"
+    action = "action"
+    id = "id"
 
 class ActionType(object):
-    add, change, delete = range(3)
+    add = "add"
+    change = "change"
+    delete = "delete"
     
 class IDType(object):
-    request, response = range(2)
+    request = "request"
+    response = "response"
 
 class JournalType(object):
-    request, confirmation_response, confirmation_request, transfer = range(4)
+    request = "request"
+    confirmation_response = "confirmation_response"
+    confirmation_request = "confirmation_request"
+    transfer = "transfer"
 
 class Message(object):
     '''
