@@ -132,12 +132,12 @@ class ServerNetworkHandler(dbus.service.Object):
         else:
             log.debug("no such socket or user already logged in")
             
-    def set_ip(self, username, ip):
+    def set_ip(self, name, ip):
         session = self.db._Session()
-        user = session.query(shared.data.UnitData).filter_by(name=username).first()
-        user.ip = ip
+        unit = session.query(shared.data.UnitData).filter_by(name=name).first()
+        print name,unit, ip
+        unit.ip = ip
         session.commit()
-        print user, ip
 
     def run(self):
         running = True
