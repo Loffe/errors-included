@@ -30,7 +30,7 @@ class ServerManager(object):
                 path="included.errors.Server")
 
         self.messagedispatcher.connect_to_type(shared.data.MessageType.id, self.idprovider.provide)
-        self.messagedispatcher.connect_to_type(MessageType.action, self.mapobjecthandler.handle)
+        self.messagedispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
 
     def _message_available(self, packed_data):
         print "_message_available"
