@@ -171,17 +171,27 @@ class ObjectID(Base):
             return repr
 
 class UnitType(object):
-    (ambulance, # Regular unit
-     army, # short for Swedish Armed Forces
-     commander, # Nana nana nana nana LEADER! leader..
-     srsa, # Swedish Rescue Services Agency (SRSA) 
-     other) = range(5)
+    ambulance = u"ambulance", # Regular unit
+    army = u"army" # short for Swedish Armed Forces
+    commander = u"commander" # Nana nana nana nana LEADER! leader..
+    srsa = u"srsa" # Swedish Rescue Services Agency (SRSA)
+    other = u"other"
 
 class POIType(object):
-    accident, fire, pasta_wagon, obstacle, flag = range(5)
+    structure = u"structure"
+    event = u"event"
+    obstacle = u"obstacle"
+    flag = u"flag" # Remove?
 
 class POISubType(object):
-    broken_brigde, broken_nuclear_power_plant, tree = range(3)
+    brigde = u"brigde"
+    tree = u"tree"
+    accident = u"accident"
+    fire = u"fire"
+    pasta_wagon = u"pasta_wagon"
+    hospital = u"hospital"
+    base = u"base"
+    other = u"other"
 
 class NetworkInQueueItem(Base):
     __tablename__ = 'InQueue'
@@ -269,7 +279,7 @@ class UnitData(MapObjectData):
     __mapper_args__ = {'polymorphic_identity': 'UnitData'}
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
 
-    type = Column(Integer)
+    type = Column(UnicodeText)
 
     def __init__(self, coordx, coordy, name, timestamp, 
                  type = UnitType.ambulance, id = None):
@@ -284,12 +294,12 @@ class POIData(MapObjectData):
     __mapper_args__ = {'polymorphic_identity': 'POIData'}
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
     
-    type = Column(Integer)
-    subtype = Column(Integer)
+    type = Column(UnicodeText)
+    subtype = Column(UnicodeText)
     
 
     def __init__(self, coordx, coordy, name, timestamp, 
-                 type = POIType.pasta_wagon, subtype = None, id = None):
+                 type = POIType.obstacle, subtype = None, id = None):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
         self.subtype = subtype
@@ -433,18 +443,37 @@ class MissionData(Base, Packable):
             return repr
 
 class MessageType(object):
-    (mission, map, text, alarm, control, low_battery, status_update, 
-     mission_response, journal, alarm_ack, vvoip_request, 
-     vvoip_response, login, login_ack, action, id) = range(16)
+    mission = "mission"
+    map = "map"
+    text = "text"
+    alarm = "alarm"
+    control = "control"
+    low_battery = "low_battery"
+    status_update = "status_update"
+    mission_response = "mission_response"
+    journal = "journal"
+    alarm_ack = "alarm_ack"
+    vvoip_request = "vvoip_request"
+    vvoip_response = "vvoip_response"
+    login = "login"
+    login_ack = "login_ack"
+    action = "action"
+    id = "id"
 
 class ActionType(object):
-    add, change, delete = range(3)
+    add = "add"
+    change = "change"
+    delete = "delete"
     
 class IDType(object):
-    request, response = range(2)
+    request = "request"
+    response = "response"
 
 class JournalType(object):
-    request, confirmation_response, confirmation_request, transfer = range(4)
+    request = "request"
+    confirmation_response = "confirmation_response"
+    confirmation_request = "confirmation_request"
+    transfer = "transfer"
 
 class Message(object):
     '''
