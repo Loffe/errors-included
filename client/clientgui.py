@@ -294,7 +294,7 @@ class ClientGui(hildon.Program):
     def sending_vvoip(self, event):
         msg = shared.data.Message(self.controller.name, "server",
                                   type=shared.data.MessageType.vvoip_request,
-                                  unpacked_data={"reciever": self.screens["contact"].name, "type": "voice",
+                                  unpacked_data={"reciever": self.screens["contact"].name, "type": "voice", "myip": "ip",
                                                  "class": "dict"})
         id = self.queue.enqueue(msg.packed_data, msg.prio)
         self.message_dispatcher.connect_to_id(id, self.check_if_ok)
@@ -435,12 +435,12 @@ class ClientGui(hildon.Program):
         
     def show_cam(self, event):
 #        self.screens["camera"].start_video_send(self.screens["contact"].ip)
-        self.screens["camera"].start_vvoip(self.screens["contact"].ip)
+        self.screens["camera"].start_vvoip("HÄR SKA DET IN ETT IP!!!!!!!!!!!!")
         self.show(["camera"])
         
     def show_voice(self, event):
 #        self.screens["camera"].start_video_send(self.screens["contact"].ip)
-        self.screens["camera"].start_voip(self.screens["contact"].ip)
+        self.screens["camera"].start_voip("HÄR SKA DET IN ETT IP!!!!!!!!!!!!")
         self.show(["camera"])
         
     def show_outbox(self, event):
