@@ -307,8 +307,8 @@ class ClientGui(hildon.Program):
         Main GUI loop
         '''
         gobject.threads_init()
-        self.db.ensure_ids()
         self.ready_handler_id = self.db.connect("ready", self.start)
+        self.db.ensure_ids()
         while self.mainloop.is_running():
             try:
                 self.mainloop.run()

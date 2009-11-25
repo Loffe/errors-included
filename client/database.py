@@ -139,42 +139,7 @@ class ClientDatabase(Database):
         '''
         Ensure database has a range of ids to be able to add objects. 
         '''
-#        current = None
-#        stop = None
-#        nextstart = None
-#        nextstop = None
-#
-#        try:
-#            current = self.id_current.value
-#        except:
-#            pass
-#        try:
-#            stop = self.id_stop.value
-#        except:
-#            pass
-#        try:
-#            nextstart = self.id_nextstart.value
-#        except:
-#            pass
-#        try:
-#            nextstop = self.id_nextstop.value
-#        except:
-#            pass
-
-#        if nextstart != None and nextstop != None:
-#            self.id_nextstart.value = nextstart
-#            self.id_nextstop.value = nextstop
-#        if current == None or stop == None:
-#            if self.id_nextstart.value != None and self.id_nextstop.value != None:
-#                self.id_current.value = self.id_nextstart.value
-#                self.id_stop.value = self.id_nextstop.value
-#                self.save_ids()
-#                self.emit("ready")
-#            else:
-#                self.request_ids()
-#        else:
-#            self.id_current.value = current
-#            self.id_stop.value = stop
-#            self.save_ids()
-#            self.emit("ready")
-        self.request_ids()
+        if self.id_current.value == None:
+            self.request_ids()
+        else:
+            self.emit("ready")
