@@ -55,7 +55,7 @@ class OutboxScreen(gtk.ScrolledWindow, gui.Screen):
         
         self.combo_box = gtk.combo_box_new_text()
         self.combo_box.set_size_request(300,50)
-        self.combo_box.append_text("Välj larm...")
+        self.combo_box.append_text("Välj Meddelande...")
         vbox.pack_start(self.combo_box, True,True, 0)
 
         label, self.subject_entry = new_entry("Ämne",vbox)
