@@ -8,6 +8,7 @@ import shared.messagedispatcher
 import shared.queueinterface
 
 from idprovider import IDProvider
+from voiphandler import VoipHandler
 from database import ServerDatabase
 
 
@@ -15,6 +16,7 @@ class ServerManager(object):
     queue = None
     database = None
     idprovider = None
+    voiphandler = None
 
     def __init__(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -22,11 +24,13 @@ class ServerManager(object):
         bus = dbus.SessionBus()
         self.queue = shared.queueinterface.get_interface(bus, "included.errors.Server")
         self.idprovider = IDProvider(self.database, self.queue)
+        self.voiphandler = VoipHandler(self.database, self.queue)
         self.messagedispatcher = shared.messagedispatcher.MessageDispatcher(bus,
                 self.database,
                 path="included.errors.Server")
 
         self.messagedispatcher.connect_to_type(shared.data.MessageType.id, self.idprovider.provide)
+        self.messagedispatcher.connect_to_type(shared.data.MessageType.vvoip_request, self.voiphandler.handler)
 
     def _message_available(self, packed_data):
         print "_message_available"

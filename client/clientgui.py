@@ -196,9 +196,9 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.contact_menu, False, False, 0)
         self.screens["contact_menu"] = self.contact_menu
         call = gtk.Button("Bröstsamtal")
-        call.connect("clicked", self.show_voice)
+        call.connect("clicked", self.sending_vvoip)
         video = gtk.Button("Videosamtal")
-        video.connect("clicked", self.show_cam)
+        video.connect("clicked", self.sending_vvoip)
         self.contact_menu.add(call)
         self.contact_menu.add(video)
 
@@ -290,6 +290,20 @@ class ClientGui(hildon.Program):
         # Change to default True?
         self.window_in_fullscreen = False
         log.info("ClientGui created")
+        
+    def sending_vvoip(self, event):
+        msg = shared.data.Message(self.controller.name, "server",
+                                  type=shared.data.MessageType.vvoip_request,
+                                  unpacked_data={"reciever": self.screens["contact"].name, "type": "voice",
+                                                 "class": "dict"})
+        id = self.queue.enqueue(msg.packed_data, msg.prio)
+        self.message_dispatcher.connect_to_id(id, self.check_if_ok)
+    
+    def check_if_ok(self, msg):
+        pass
+    
+    def incoming_vvoip(self):
+        pass
 
     def run(self):
         '''
@@ -421,12 +435,12 @@ class ClientGui(hildon.Program):
         
     def show_cam(self, event):
 #        self.screens["camera"].start_video_send(self.screens["contact"].ip)
-        self.screens["camera"].start_vvoip(self.screens["contact"].ip2)
+        self.screens["camera"].start_vvoip(self.screens["contact"].ip)
         self.show(["camera"])
         
     def show_voice(self, event):
 #        self.screens["camera"].start_video_send(self.screens["contact"].ip)
-        self.screens["camera"].start_voip(self.screens["contact"].ip2)
+        self.screens["camera"].start_voip(self.screens["contact"].ip)
         self.show(["camera"])
         
     def show_outbox(self, event):
