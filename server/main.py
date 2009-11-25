@@ -66,8 +66,8 @@ if __name__ == "__main__":
         session.add(u)
 
         # Create units
-        u = UnitData(13, 37, "RD1337", datetime.now())
-        session.add(u)
+#        u = UnitData(13, 37, "RD1337", datetime.now())
+#        session.add(u)
 
         session.commit()
     else:

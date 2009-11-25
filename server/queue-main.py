@@ -114,7 +114,7 @@ class ServerNetworkHandler(dbus.service.Object):
                 self.outqueues[id] = self.outqueues[socket]
                 del self.outqueues[socket]
                 
-                self.set_ip(m.sender, socket.getpeername()[0])
+#                self.set_ip(m.sender, socket.getpeername()[0])
                 log.debug("logged in and now has a named queue")
                 ack = shared.data.Message("server", id, response_to=m.message_id,
                                           type=shared.data.MessageType.login_ack,
