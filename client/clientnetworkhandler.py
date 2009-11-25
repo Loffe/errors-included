@@ -56,17 +56,20 @@ class ClientNetworkHandler(dbus.service.Object):
         if not self.server:
             raise Exception("No server is set. Cannot connect")
         log.info("Connecting...")
+        host, port = self.server
 
         if config.server.ssh == True:
-            subprocess.call(["ssh",
+            ssh_options = ["ssh",
                              "-C", "-f",
                              "-L", str(config.server.localport)+":127.0.0.1:"+str(port),
-                             host, "sleep", "10"])
+                             host, "sleep", "10"]
+            print " ".join(ssh_options)
+            subprocess.call(ssh_options)
             host = "127.0.0.1"
             port = config.server.localport
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            self.socket.connect(self.server)
+            self.socket.connect((host, port))
             self.connected = True
             self.closing = False
             self.inputs.append(self.socket)
