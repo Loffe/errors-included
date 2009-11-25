@@ -268,7 +268,6 @@ class UnitData(MapObjectData):
     __tablename__ = 'UnitData'
     __mapper_args__ = {'polymorphic_identity': 'UnitData'}
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
-    ip = Column(UnicodeText)
 
     type = Column(Integer)
 
