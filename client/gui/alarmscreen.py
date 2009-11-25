@@ -72,8 +72,20 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         lat = float(self.location_entry3.get_text())
 
         if lon != None and lat != None:
-            poi_data = shared.data.POIData(lon,lat, self.event_entry.get_text(), datetime.datetime.now(), shared.data.POIType.pasta_wagon)
-            alarm = shared.data.Alarm(self.event_entry.get_text(), self.location_entry.get_text(), poi_data, self.name_entry.get_text(), self.number_entry.get_text(), self.hurted_entry.get_text(), self.random_entry.get_text())
+            poi_data = shared.data.POIData(
+                    lon,lat,
+                    unicode(self.event_entry.get_text()),
+                    datetime.datetime.now(),
+                    shared.data.POIType.flag)
+
+            alarm = shared.data.Alarm(
+                    unicode(self.event_entry.get_text()),
+                    unicode(self.location_entry.get_text()),
+                    poi_data,
+                    unicode(self.name_entry.get_text()),
+                    unicode(self.number_entry.get_text()),
+                    self.hurted_entry.get_text(),
+                    unicode(self.random_entry.get_text()))
             self.db.add(alarm)
         else:
             print "No alarm created due to no lon- or lat-coordinate."

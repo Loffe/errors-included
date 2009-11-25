@@ -55,7 +55,7 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
 
         types = {}
         i = 0
-        types = [t for t in shared.data.POISubType.__dict__.keys() if t[0] != "_"]
+        types = ["tree", "brige", "other"]
         for type in types:
             combo_box.append_text(type)
 
