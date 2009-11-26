@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+import config
 import gtk
 import dbus.mainloop.glib
 import gobject
@@ -325,7 +326,7 @@ class ClientGui(hildon.Program):
         '''
         Create and start ClientController
         '''
-        name = u"Ragnar Dahlberg"
+        name = config.client.name
         unit_type = shared.data.UnitType.commander
         status = u"Available"
         self.controller = controller.ClientController(name, 
