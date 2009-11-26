@@ -56,17 +56,20 @@ class ClientNetworkHandler(dbus.service.Object):
         if not self.server:
             raise Exception("No server is set. Cannot connect")
         log.info("Connecting...")
+        host, port = self.server
 
         if config.server.ssh == True:
-            subprocess.call(["ssh",
+            ssh_options = ["ssh",
                              "-C", "-f",
                              "-L", str(config.server.localport)+":127.0.0.1:"+str(port),
-                             host, "sleep", "10"])
+                             host, "sleep", "10"]
+            print " ".join(ssh_options)
+            subprocess.call(ssh_options)
             host = "127.0.0.1"
             port = config.server.localport
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            self.socket.connect(self.server)
+            self.socket.connect((host, port))
             self.connected = True
             self.closing = False
             self.inputs.append(self.socket)
@@ -95,7 +98,7 @@ class ClientNetworkHandler(dbus.service.Object):
         if response_to == self.login_msg_id:
             print "got a login ack"
             data = self.input.get(local_id)
-            ack = shared.data.Message.unpack(data)
+            ack = shared.data.Message.unpack(data, self.db)
             if ack.unpacked_data["result"] == "no":
                 print "Couldn't login. Please check username/password"
                 self.close()
@@ -113,7 +116,7 @@ class ClientNetworkHandler(dbus.service.Object):
                     junk = sys.stdin.readline()
                     if junk == '':
                         self.inputs.remove(s)
-                    if junk.startswith("quit"):
+                    if junk.startswith("q"):
                         print "got quit"
                         running = False
                     else:

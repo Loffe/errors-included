@@ -11,7 +11,7 @@ class ClientController(object):
     '''
     Self. This is me. Holds my name, unit_type, status and gps-coordinates.
     '''
-    def __init__(self, name, unit_type, status, db):
+    def __init__(self, name, unit_type, status, db, dispatcher):
         '''
         Constructor. Creates a client controller.
         @param name: my name.
@@ -22,14 +22,19 @@ class ClientController(object):
         # create dbus session
         bus = dbus.SessionBus()
         remote_object = bus.get_object("included.errors.QoSManager", "/QoSManager")
-        interface = dbus.Interface(remote_object, "included.errors.QoSManager")
+        self.interface = dbus.Interface(remote_object, "included.errors.QoSManager")
         # listen to QoSManagers signaling of new GPS-coordinates
-        interface.connect_to_signal("signal_new_gps_coord", self.update_coords)
-
+        self.interface.connect_to_signal("signal_new_gps_coord", self.update_coords)
+        
         # the database to save to
         self.db = db
         # set sender name in db
         self.db.name = name
+
+        # the dispatcher to recieve messages from
+        self.dispatcher = dispatcher
+        self.dispatcher.connect_to_type(shared.data.MessageType.object, 
+                                        self.set_mission)
 
         # My name
         self.name = name
@@ -62,3 +67,14 @@ class ClientController(object):
         print "Got coords update", coordx, coordy
         self.unit_data.timestamp = datetime.datetime.now()
         self.db.change(self.unit_data)
+    
+    def set_mission(self, data):
+#        '''
+#        Append a mission to own missions.
+#        @param msg: a message containing a possible mission to append.
+#        '''
+#        data = msg.unpacked_data
+#        if data.__class__ == "MissionData":
+#            if data.units
+        self.missions.append(data)
+        print "got new mission:", type(data), data

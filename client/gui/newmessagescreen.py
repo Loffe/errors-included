@@ -5,6 +5,7 @@ import map.mapdata
 import shared.data
 import gui
 import pango
+import datetime
 import gobject
 from selectunit import SelectUnitButton
 from selectunit import SelectUnitDialog
@@ -46,14 +47,8 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
 
         vbox = gtk.VBox(False,0)
         self.add_with_viewport(vbox)
-
-        # create entries
-        #label, self.to_entry = new_entry("Till",vbox)
-
         label, self.subject_entry = new_entry("Ämne",vbox)
-
         msg_label = gtk.Label("Meddelande")
-        
         msg_label.set_alignment(0, 0.5)
         textbox = gtk.TextView()
         textbox.set_editable(True)
@@ -73,17 +68,12 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         
         
     def ok_button_function(self, event):
-        print "hejlkk"
-    
-        #lon = float(self.location_entry2.get_text())
-        #lat = float(self.location_entry3.get_text())
+
+
         selected = self.select_unit_button.select_dialog.selected_units
         units = self.db.get_units(selected)
-    
-        #datetime start, end, include_hidden_chars=True
-        print self.buffer.get_text(self.buffer.get_start_iter(), self.buffer.get_end_iter(), True)  
         
-        text = shared.data.TextMessage(self.subject_entry.get_text(), self.buffer.get_text(self.buffer.get_start_iter(), self.buffer.get_end_iter(), True), units)
+        text = shared.data.TextMessage(self.subject_entry.get_text(), self.buffer.get_text(self.buffer.get_start_iter(), self.buffer.get_end_iter(), True), units, datetime.datetime.now())
         self.db.add(text)
         self.emit("okbutton_clicked_new_message")
         

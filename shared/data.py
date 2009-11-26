@@ -73,14 +73,6 @@ class Database(gobject.GObject):
         gobject.GObject.__init__(self)
         self.engine = create_engine('sqlite:///database.db', echo=False)
         self._Session = scoped_session(sessionmaker(bind=self.engine))
-#        session = self._Session()
-#        session.query(ObjectID)
-        self.id_stop = 1000
-        self.id = 0
-        self.id_nextstart = None
-        self.id_nextstop = None
-        self.requesting = False
-#        self.session = self._Session()
         
     def add(self, object):
         '''
@@ -89,15 +81,6 @@ class Database(gobject.GObject):
         '''
         session = self._Session()
         session.add(object)
-        if object.id == None:
-            object.id = self.id
-            self.id += 1
-            if self.id > float(self.id_stop)/2 and not self.requesting:
-                self.request_ids()
-                self.requesting = True
-            elif self.id >= self.id_stop:
-                self.id = self.id_next_start
-                self.id_stop = self.id_nextstop
         session.commit()
         session.close()
         self.emit("mapobject-added", object)
@@ -124,13 +107,6 @@ class Database(gobject.GObject):
         session.commit()
         session.close()
         self.emit("mapobject-deleted", object)
-    
-    def request_ids(self):
-        '''
-        Override when queue available. 
-        Don't forget to set id_nextstart and id_nextstop to returned values!
-        '''
-        pass
         
     def get_all_alarms(self):
         session = self._Session()
@@ -141,7 +117,6 @@ class Database(gobject.GObject):
             alarms.append(a)
         session.close()
         return alarms
-
     
     def textmessages(self):
         session = self._Session()
@@ -186,19 +161,37 @@ class ObjectID(Base):
     def __init__(self, name, value):
         self.name = name
         self.value = value
+        
+    def __repr__(self):
+        repr = "<%s: name=%s, value=%s>" % (self.__class__.__name__,
+                                            self.name, self.value)
+        try:
+            return repr.encode('utf-8')
+        except:
+            return repr
 
 class UnitType(object):
-    (ambulance, # Regular unit
-     army, # short for Swedish Armed Forces
-     commander, # Nana nana nana nana LEADER! leader..
-     srsa, # Swedish Rescue Services Agency (SRSA) 
-     other) = range(5)
+    ambulance = u"ambulance", # Regular unit
+    army = u"army" # short for Swedish Armed Forces
+    commander = u"commander" # Nana nana nana nana LEADER! leader..
+    srsa = u"srsa" # Swedish Rescue Services Agency (SRSA)
+    other = u"other"
 
 class POIType(object):
-    accident, fire, pasta_wagon, obstacle, flag = range(5)
+    structure = u"structure"
+    event = u"event"
+    obstacle = u"obstacle"
+    flag = u"flag" # Remove?
 
 class POISubType(object):
-    broken_brigde, broken_nuclear_power_plant, tree = range(3)
+    brigde = u"brigde"
+    tree = u"tree"
+    accident = u"accident"
+    fire = u"fire"
+    pasta_wagon = u"pasta_wagon"
+    hospital = u"hospital"
+    base = u"base"
+    other = u"other"
 
 class NetworkInQueueItem(Base):
     __tablename__ = 'InQueue'
@@ -273,6 +266,7 @@ class MapObjectData(Base, Packable):
             return repr
 
 gobject.type_register(Database)
+gobject.signal_new("ready", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ())
 gobject.signal_new("mapobject-added", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
 gobject.signal_new("mapobject-changed", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
 gobject.signal_new("mapobject-deleted", Database, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
@@ -285,7 +279,7 @@ class UnitData(MapObjectData):
     __mapper_args__ = {'polymorphic_identity': 'UnitData'}
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
 
-    type = Column(Integer)
+    type = Column(UnicodeText)
 
     def __init__(self, coordx, coordy, name, timestamp, 
                  type = UnitType.ambulance, id = None):
@@ -300,17 +294,15 @@ class POIData(MapObjectData):
     __mapper_args__ = {'polymorphic_identity': 'POIData'}
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
     
-    type = Column(Integer)
-    subtype = Column(Integer)
+    type = Column(UnicodeText)
+    subtype = Column(UnicodeText)
     
 
     def __init__(self, coordx, coordy, name, timestamp, 
-                 type = POIType.pasta_wagon, subtype = None, id = None):
+                 type = POIType.obstacle, subtype = None, id = None):
         MapObjectData.__init__(self, coordx, coordy, name, timestamp, id)
         self.type = type
         self.subtype = subtype
-        
-        
         
 class TextMessage(Base, Packable):
     __tablename__ = 'TextMessage'
@@ -451,18 +443,42 @@ class MissionData(Base, Packable):
             return repr
 
 class MessageType(object):
-    (mission, map, text, alarm, control, low_battery, status_update, 
-     mission_response, journal, alarm_ack, vvoip_request, 
-     vvoip_response, login, login_ack, action, id) = range(16)
+    object = u"object"
+    voip = u"voip"
+    vvoip = u"vvoip"
+    login = u"login"
+    journal = u"journal"
+    ack = u"ack"
+    text = u"text"
+    id = u"id"
+
+    # @TODO: Remove?
+    mission = "mission"
+    map = "map"
+    alarm = "alarm"
+    control = "control"
+    low_battery = "low_battery"
+    status_update = "status_update"
+    mission_response = "mission_response"
+    alarm_ack = "alarm_ack"
+    vvoip_request = "vvoip_request"
+    vvoip_response = "vvoip_response"
+    action = "action"
 
 class ActionType(object):
-    add, change, delete = range(3)
+    add = "add"
+    change = "change"
+    delete = "delete"
     
 class IDType(object):
-    request, response = range(2)
+    request = "request"
+    response = "response"
 
 class JournalType(object):
-    request, confirmation_response, confirmation_request, transfer = range(4)
+    request = "request"
+    confirmation_response = "confirmation_response"
+    confirmation_request = "confirmation_request"
+    transfer = "transfer"
 
 class Message(object):
     '''
@@ -575,13 +591,13 @@ class Message(object):
                         # object doesn't contain a list of units
                         pass
                     try:
-                        # replace timestamp string with a real datetime
                         poi_id = dict["poi"]
                         s = database._Session()
                         poi = s.query(POIData).filter_by(id=poi_id).first()
+                        print "poi_id:", poi_id, "poi:", poi
                         dict["poi"] = poi
                     except:
-                        # object doesn't contain a poi 
+                         # object doesn't contain a poi 
                         pass
                     # create and return an instance of the object
                     if classname == "dict":
@@ -634,14 +650,12 @@ def create_database(db = Database()):
 if __name__ == '__main__':
     print "Testing db"
     db = create_database()
-    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.accident, POISubType.tree)
-    poi_data.id = 5
-    s = db._Session()
-    print poi_data.id
-    s.add(poi_data)
-    print poi_data.id
-    s.commit()
-    print poi_data.id
+    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.obstacle, POISubType.tree)
+    db.add(poi_data)
+    alarm = Alarm(u"räv", u"Linköping", poi_data, u"Klasse", u"11111", 7, u"nada")
+    db.add(alarm)
+    msg = Message("ragnar", "server", unpacked_data = alarm)
+    print Message.unpack(msg.packed_data, db)
 
 #    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.accident, POISubType.tree)
 #    

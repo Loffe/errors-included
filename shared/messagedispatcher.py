@@ -7,11 +7,12 @@ class MessageDispatcher(object):
     connected_ids = {}
     connected_types = {}
     def __init__(self, bus, database, path="included.errors.Client"):
+        self.db = database 
         self.connect_to_dbus(bus, path)
         self.queue = DatabaseInQueue(database)
 
     def connect_to_id(self, id, callback):
-        self.connected_ids[id] = callback;
+        self.connected_ids[id] = callback
 
     def connect_to_type(self, type, callback):
         self.connected_types[type] = callback
@@ -25,8 +26,8 @@ class MessageDispatcher(object):
     def dispatch(self, local_id, response_to):
         print local_id, response_to
         data = self.queue.peek(local_id)
-        msg = Message.unpack(data)
-        print msg
+        print data
+        msg = Message.unpack(data, self.db)
         type = msg.type
         # execute the callbacks
         if self.connected_ids.has_key(response_to):

@@ -64,15 +64,21 @@ class ClientGui(hildon.Program):
         self.window.set_title("ClientGui")
         self.window.set_size_request(800,480)
         self.add_window(self.window)
-        
-        # Creates a empty list that contains previous screens
-        self.prev_page = []
 
         # create the database
         db = ClientDatabase(self.queue)
         self.db = shared.data.create_database(db)
+        # create message dispatcher
         self.message_dispatcher = shared.messagedispatcher.MessageDispatcher(bus, db)
+        # connect the dispatcher to database
         self.db.dispatcher = self.message_dispatcher
+
+        # create gui
+        self.create_gui()
+    
+    def create_gui(self):
+        # Creates a empty list that contains previous screens
+        self.prev_page = []
 
         # A dict containing all the containers (used for hiding/showing) 
         self.screens = {}
@@ -266,7 +272,7 @@ class ClientGui(hildon.Program):
         self.buttons_box.pack_start(back_button)
         back_button.connect("clicked", self.back_button_function)
 
-        ok_button = gtk.Button("OK")
+        ok_button = gtk.Button("Ok")
         ok_button.connect("clicked", self.ok_button_function)
         ok_button.set_flags(gtk.CAN_DEFAULT)
         self.buttons_box.pack_start(ok_button)
@@ -291,6 +297,7 @@ class ClientGui(hildon.Program):
         self.window_in_fullscreen = False
         log.info("ClientGui created")
         
+
     def sending_vvoip(self, event):
         msg = shared.data.Message(self.controller.name, "server",
                                   type=shared.data.MessageType.vvoip_request,
@@ -305,15 +312,25 @@ class ClientGui(hildon.Program):
     def incoming_vvoip(self):
         pass
 
+    def start(self, event):
+        # show gui
+        self.window.show_all()
+        self.show_default()
+        # start controller
+        self.start_controller()
+        # connect service level signal from controller
+        self.controller.interface.connect_to_signal("signal_changed_service_level", self.update_service_level)
+        # only do start method once
+        self.db.disconnect(self.ready_handler_id)
+
+
     def run(self):
         '''
         Main GUI loop
         '''
-        self.window.show_all()
-        self.show_default()
         gobject.threads_init()
-        # start gtk main (gui) thread
-        self.start_controller()
+        self.ready_handler_id = self.db.connect("ready", self.start)
+        self.db.ensure_ids()
         while self.mainloop.is_running():
             try:
                 self.mainloop.run()
@@ -327,7 +344,14 @@ class ClientGui(hildon.Program):
         name = u"Ragnar Dahlberg"
         unit_type = shared.data.UnitType.commander
         status = u"Available"
-        self.controller = controller.ClientController(name, unit_type,status, self.db)
+        self.controller = controller.ClientController(name, 
+                                                      unit_type,
+                                                      status, 
+                                                      self.db,
+                                                      self.message_dispatcher)
+
+    def update_service_level(self):
+        print "new service level"
 
     ''' Handle events
     ''' 
@@ -339,14 +363,6 @@ class ClientGui(hildon.Program):
             if screen.props.visible and isinstance(screen, Screen):
                 screen.ok_button_function(event)
     
-    def set_mission(self, data):
-        '''
-        Append a mission to own missions.
-        @param data: the mission to append.
-        '''
-        self.controller.missions.append(data)
-        print "got new mission:", type(data), data
-    
     # mission view event handlers
     def show_mission(self, event):
         self.toggle_show("mission", ["notifications", "map", "mission_menu"], 
@@ -354,10 +370,14 @@ class ClientGui(hildon.Program):
     
     # mission buttons event handlers
     def show_mission_info(self, event):
-        self.show(["info", "buttons"])
+        self.toggle_show("mission", ["notifications", "info", "buttons"], 
+                         "Här visas info om ditt uppdrag")
+        #self.show(["info", "buttons"])
     
     def show_status(self, event):
-        self.show(["status", "buttons"])
+        self.toggle_show("mission", ["notifications", "status", "buttons"], 
+                         "Här kan du välj en status")
+        #self.show(["status", "buttons"])
   
 #        dialog = gtk.Dialog("Samtal",
 #                 self.window,  #the toplevel wgt of your app
@@ -397,10 +417,14 @@ class ClientGui(hildon.Program):
 #        dialog.destroy()
     
     def show_journals(self, event):
-        self.show(["patient_journal", "buttons"])
+        self.toggle_show("mission", ["notifications", "patient_journal", "buttons"], 
+                         "Här kan du hämta patient journaler")
+        #self.show(["patient_journal", "buttons"])
     
     def show_faq(self, event):
-        self.show(["faq", "back_button_box"])
+        self.toggle_show("mission", ["notifications", "faq", "back_button_box"], 
+                         "Här kan du få information om vanliga sjukdomar")
+        #self.show(["faq", "back_button_box"])
         
     # add object view event handlers
     def show_add_object(self, event):
@@ -424,14 +448,15 @@ class ClientGui(hildon.Program):
         self.screens["make_mission"].location_entry2.set_text(str(self.screens["map"].gps_x))
         self.screens["make_mission"].location_entry3.set_text(str(self.screens["map"].gps_y))
         
-#        self.screens["make_mission"].combo_box.clear()
+
         combo = self.screens["make_mission"].combo_box
         for alarm in self.db.get_all_alarms():
             combo.remove_text(alarm.id)
             combo.insert_text(alarm.id, alarm.event)
 
     def create_new_message(self, event):
-        self.show(["new_message", "buttons"])
+        self.toggle_show("messages", ["notifications", "new_message","buttons"], "Här kan du skriva ett nytt meddelanden")
+        #self.show(["new_message", "buttons"])
         
     def show_cam(self, event):
 #        self.screens["camera"].start_video_send(self.screens["contact"].ip)
@@ -444,7 +469,8 @@ class ClientGui(hildon.Program):
         self.show(["camera"])
         
     def show_outbox(self, event):
-        self.show(["output", "message_menu"])
+        self.toggle_show("messages", ["notifications", "output","message_menu"], "Här visas dina utgångna meddelanden")
+        #self.show(["output", "message_menu"])
         
         combo = self.screens["output"].combo_box
         for textmessages in self.db.textmessages():
@@ -452,7 +478,9 @@ class ClientGui(hildon.Program):
             combo.insert_text(textmessages.id, textmessages.subject)
         
     def show_inbox(self, event):
-        self.show(["message", "message_menu"])
+        self.toggle_show("messages", ["notifications", "message","message_menu"], "Här visas dina utgångna meddelanden")
+        #self.show(["message", "message_menu"])
+        
         combo = self.screens["message"].combo_box
         for textmessages in self.db.textmessages():
             combo.remove_text(textmessages.id)

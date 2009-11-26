@@ -50,12 +50,9 @@ class InboxScreen(gtk.ScrolledWindow, gui.Screen):
         vbox = gtk.VBox(False,0)
         self.add_with_viewport(vbox)
 
-        # create entries
-        #label, self.to_entry = new_entry("Till",vbox)
-        
         self.combo_box = gtk.combo_box_new_text()
         self.combo_box.set_size_request(300,50)
-        self.combo_box.append_text("Välj larm...")
+        self.combo_box.append_text("Välj Meddelande...")
         vbox.pack_start(self.combo_box, True,True, 0)
 
         label, self.subject_entry = new_entry("Ämne",vbox)
@@ -68,7 +65,7 @@ class InboxScreen(gtk.ScrolledWindow, gui.Screen):
         textbox.set_size_request(250,250)
         textbox.set_wrap_mode(gtk.WRAP_WORD_CHAR)
         self.buffer = textbox.get_buffer()
-        self.buffer.set_text("Skriv ditt meddelande här")
+        self.buffer.set_text("")
         msgbox = gtk.HBox(True,0)
         msgbox.pack_start(msg_label)
         msgbox.pack_start(textbox)

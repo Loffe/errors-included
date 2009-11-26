@@ -8,8 +8,13 @@ import shared.messagedispatcher
 import shared.queueinterface
 
 from idprovider import IDProvider
+
 from voiphandler import VoipHandler
+
+from mapobjecthandler import MapObjectHandler
+
 from database import ServerDatabase
+from shared.data import MessageType
 
 
 class ServerManager(object):
@@ -24,18 +29,26 @@ class ServerManager(object):
         bus = dbus.SessionBus()
         self.queue = shared.queueinterface.get_interface(bus, "included.errors.Server")
         self.idprovider = IDProvider(self.database, self.queue)
+
         self.voiphandler = VoipHandler(self.database, self.queue)
+
+        self.mapobjecthandler = MapObjectHandler(self.database, self.queue)
+
         self.messagedispatcher = shared.messagedispatcher.MessageDispatcher(bus,
                 self.database,
                 path="included.errors.Server")
 
         self.messagedispatcher.connect_to_type(shared.data.MessageType.id, self.idprovider.provide)
+
         self.messagedispatcher.connect_to_type(shared.data.MessageType.vvoip_request, self.voiphandler.handler)
+
+        self.messagedispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
+
 
     def _message_available(self, packed_data):
         print "_message_available"
         packed_data = str(packed_data)
-        msg = shared.data.Message.unpack(packed_data)
+        msg = shared.data.Message.unpack(packed_data, self.database)
         print msg
 
     def dbusloop(self):
@@ -64,14 +77,14 @@ if __name__ == "__main__":
         session = db._Session()
 
         # Create users
-        u = User(u"Ragnar", u"prydlig frisyr")
+        u = User(u"ragnar", u"prydlig frisyr")
         session.add(u)
-        u = User(u"Slanggurka", u"smakar som nors")
+        u = User(u"slanggurka", u"smakar som nors")
         session.add(u)
 
         # Create units
-        u = UnitData(13, 37, "RD1337", datetime.now())
-        session.add(u)
+#        u = UnitData(13, 37, "RD1337", datetime.now())
+#        session.add(u)
 
         session.commit()
     else:

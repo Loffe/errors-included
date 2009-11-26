@@ -55,12 +55,9 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
 
         types = {}
         i = 0
-        for type in shared.data.POISubType.__dict__.keys():
-            if type[0] != "_":
-                types[shared.data.POISubType.__dict__[type]] = type
-        for type in types.keys():
-            combo_box.remove_text(type)
-            combo_box.insert_text(type, types[type])
+        types = ["tree", "brige", "other"]
+        for type in types:
+            combo_box.append_text(type)
 
         # add event handler
         combo_box.connect('changed', self.select_type)
@@ -80,13 +77,17 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         @param combobox: the changed combobox
         '''
         # set the selected type
-        self.selected_type = combobox.get_active()
+        self.selected_type = unicode(combobox.get_active_text())
         
     def ok_button_function(self, event):
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
 
-        poi_data = shared.data.POIData(lon, lat, self.location_entry.get_text().encode('utf-8'), datetime.datetime.now(), type=shared.data.POIType.obstacle, subtype=self.selected_type)
+        poi_data = shared.data.POIData(lon, lat,
+                unicode(self.location_entry.get_text()),
+                datetime.datetime.now(),
+                type=shared.data.POIType.obstacle,
+                subtype=self.selected_type)
         self.db.add(poi_data)
 
         self.emit("okbutton-obstacle-clicked")

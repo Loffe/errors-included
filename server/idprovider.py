@@ -2,7 +2,6 @@ import shared.data
 
 class IDProvider(object):
     INTERVAL = 1000
-    next_interval_start = 1
     database = None
     queue = None
 
@@ -12,9 +11,20 @@ class IDProvider(object):
 
     def provide(self, message):
         print message
-        start = self.next_interval_start
+        session = self.database._Session()
+        # Fetch next available id from db
+        nextstart = session.query(shared.data.ObjectID).filter_by(name=u"id_nextstart").first()
+        if nextstart is None:
+            nextstart = shared.data.ObjectID(u"id_nextstart", 1)
+
+        start = nextstart.value
         stop = start + self.INTERVAL - 1
-        self.next_interval_start = stop + 1
+
+        # Update next available id
+        nextstart.value = stop + 1
+        session.add(nextstart)
+        session.commit()
+        session.close()
         ack = shared.data.Message("server", message.sender,
                 type=shared.data.MessageType.id,
                 subtype=shared.data.IDType.response,
