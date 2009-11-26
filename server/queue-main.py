@@ -42,8 +42,13 @@ class ServerNetworkHandler(dbus.service.Object):
     @dbus.service.method(dbus_interface='included.errors.Server',
                          in_signature='ssi', out_signature='s')
     def enqueue(self, reciever, msg, prio):
+        '''
+        @param reciever the name of the unit to send to
+        @param msg the packed_data to send
+        @param prio priority of the message
+        '''
         queue = self.outqueues[reciever]
-        queue.enqueue(msg, prio)
+        queue.enqueue(unicode(msg), prio)
         print "Enqueue called"
         return "Enqueue :)"
 
@@ -173,13 +178,13 @@ class ServerNetworkHandler(dbus.service.Object):
                     data = s.recv(length)
                     if data:
                         log.debug("data from client:" + str(data))
-                        local_id = self.inqueue.put(data)
+                        local_id = self.inqueue.put(unicode(data))
                         m = None
                         try:
                             m = shared.data.Message.unpack(data, self.db)
                         except ValueError, ve:
-                            log.debug("Crappy data = ! JSON")
-                            log.debug(ve)
+                            log.info("Crappy data = ! JSON")
+                            log.info(ve)
                             continue
 
                         if m.type == shared.data.MessageType.login:

@@ -1,6 +1,8 @@
 import Queue
 import data as data
 import simplejson as json
+from shared.util import getLogger
+log = getLogger("server.log")
 
 class DatabaseQueue(Queue.Queue):
     direction_in, direction_out = range(2)
@@ -39,7 +41,7 @@ class DatabaseQueue(Queue.Queue):
         session.flush()
         d = json.loads(item.data)
         d["message_id"] = item.id
-        item.data = json.dumps(d)
+        item.data = unicode(json.dumps(d))
         session.add(item)
         session.commit()
         session.close()
@@ -61,7 +63,7 @@ class DatabaseQueue(Queue.Queue):
     def put(self, data, priority=0, block=True, timeout=None):
         item = data, priority
         item = self.item_type(data, priority)
-        print "putting:", data
+        log.debug("putting:" + data)
         Queue.Queue.put(self, item, block, timeout)
         return item.id
 

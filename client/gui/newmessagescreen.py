@@ -5,6 +5,7 @@ import map.mapdata
 import shared.data
 import gui
 import pango
+import datetime
 import gobject
 from selectunit import SelectUnitButton
 from selectunit import SelectUnitDialog
@@ -71,7 +72,7 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         selected = self.select_unit_button.select_dialog.selected_units
         units = self.db.get_units(selected)
         
-        text = shared.data.TextMessage(self.subject_entry.get_text(), self.buffer.get_text(self.buffer.get_start_iter(), self.buffer.get_end_iter(), True), units)
+        text = shared.data.TextMessage(self.subject_entry.get_text(), self.buffer.get_text(self.buffer.get_start_iter(), self.buffer.get_end_iter(), True), units, datetime.datetime.now())
         self.db.add(text)
         self.emit("okbutton_clicked_new_message")
         

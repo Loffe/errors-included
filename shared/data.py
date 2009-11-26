@@ -171,7 +171,7 @@ class ObjectID(Base):
             return repr
 
 class UnitType(object):
-    ambulance = u"ambulance", # Regular unit
+    ambulance = u"ambulance" # Regular unit
     army = u"army" # short for Swedish Armed Forces
     commander = u"commander" # Nana nana nana nana LEADER! leader..
     srsa = u"srsa" # Swedish Rescue Services Agency (SRSA)
@@ -540,7 +540,7 @@ class Message(object):
         except:
             dict["packed_data"] = self.unpacked_data
         self.packed_data = json.dumps(dict)
-        return self.packed_data
+        return unicode(self.packed_data)
 
     def unpack(cls, raw_message, database=None):
         '''

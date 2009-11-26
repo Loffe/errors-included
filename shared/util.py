@@ -7,6 +7,7 @@ def getLogger(filename="log.txt"):
     fh.setFormatter(formatter)
     logger.addHandler(fh)
     ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
     logger.addHandler(ch)
     logger.setLevel(logging.DEBUG)
 

@@ -37,7 +37,7 @@ class NetworkOutQueue(NetworkQueue):
 
     def enqueue(self, packed_data, prio):
         print "enqueued"
-        local_id = self.queue.put(packed_data, prio)
+        local_id = self.queue.put(unicode(packed_data), prio)
         if not self.sending:
             self.start_sending()
         return local_id
