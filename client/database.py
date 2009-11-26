@@ -50,20 +50,20 @@ class ClientDatabase(Database):
         session.close()
         
         # enqueue a message with the added object
-        msg = Message(self.name, "server", MessageType.action, ActionType.add,
+        msg = Message(self.name, "server", MessageType.object, ActionType.add,
                       unpacked_data=object)
         self.queue.enqueue(msg.packed_data, msg.prio)
         self.emit("mapobject-added", object)
 
     def change(self, object):
         Database.change(self, object)
-        msg = Message(self.name, "server", MessageType.action, ActionType.change,
+        msg = Message(self.name, "server", MessageType.object, ActionType.change,
                       unpacked_data=object)
         self.queue.enqueue(msg.packed_data, msg.prio)
 
     def delete(self, object):
         Database.delete(self, object)
-        msg = Message(self.name, "server", MessageType.action, ActionType.delete,
+        msg = Message(self.name, "server", MessageType.object, ActionType.delete,
                       unpacked_data=object)
         self.queue.enqueue(msg.packed_data, msg.prio)
 
