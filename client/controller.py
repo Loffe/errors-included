@@ -28,8 +28,6 @@ class ClientController(object):
         
         # the database to save to
         self.db = db
-        # set sender name in db
-        self.db.name = name
 
         # the dispatcher to recieve messages from
         self.dispatcher = dispatcher
