@@ -652,10 +652,16 @@ if __name__ == '__main__':
     db = create_database()
     poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.obstacle, POISubType.tree)
     db.add(poi_data)
+    poi_data2 = POIData(122,333, u"goal", datetime(2013,10,10), POIType.obstacle, POISubType.tree)
+    db.add(poi_data2)
     alarm = Alarm(u"räv", u"Linköping", poi_data, u"Klasse", u"11111", 7, u"nada")
     db.add(alarm)
     msg = Message("ragnar", "server", unpacked_data = alarm)
     print Message.unpack(msg.packed_data, db)
+    alarm = db._Session().query(Alarm).filter_by(id=alarm.id).first()
+    alarm.poi = poi_data2
+    print alarm
+    db.add(alarm)
 
 #    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.accident, POISubType.tree)
 #    

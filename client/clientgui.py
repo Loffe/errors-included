@@ -338,6 +338,7 @@ class ClientGui(hildon.Program):
                                                       self.db,
                                                       self.message_dispatcher)
         self.mapobjecthandler.controller = self.controller
+        self.screens["info"].controller = self.controller
 
     def update_service_level(self):
         print "new service level"

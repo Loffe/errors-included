@@ -16,12 +16,12 @@ class MapObjectHandler(object):
             pass
         elif subtype == ActionType.add:
             self.database.add(object)
-            if object.__class__ == MissionData:
-                for unit in object.units:
-                    msg = Message(u"server", u"ragnar", MessageType.object, 
-                                  ActionType.add, unpacked_data=object)
-                    print "packed data, rdy to enqueue:", msg.packed_data
-                    self.queue.enqueue(msg.reciever, msg.packed_data, msg.prio)
+#            if object.__class__ == MissionData:
+#                for unit in object.units:
+#                    msg = Message(u"server", u"ragnar", MessageType.object, 
+#                                  ActionType.add, unpacked_data=object)
+#                    print "packed data, rdy to enqueue:", msg.packed_data
+#                    self.queue.enqueue(msg.reciever, msg.packed_data, msg.prio)
         elif subtype == ActionType.delete:
             pass
         else:
