@@ -118,8 +118,7 @@ class ServerNetworkHandler(dbus.service.Object):
             if self.db.is_valid_login(m.sender, m.unpacked_data["password"]):
                 self.outqueues[id] = self.outqueues[socket]
                 del self.outqueues[socket]
-                
-#                self.set_ip(m.sender, socket.getpeername()[0])
+
                 log.debug("logged in and now has a named queue")
                 ack = shared.data.Message("server", id, response_to=m.message_id,
                                           type=shared.data.MessageType.ack,
@@ -137,12 +136,6 @@ class ServerNetworkHandler(dbus.service.Object):
         else:
             log.debug("no such socket or user already logged in")
             
-    def set_ip(self, name, ip):
-        session = self.db._Session()
-        unit = session.query(shared.data.UnitData).filter_by(name=name).first()
-        print name,unit, ip
-        unit.ip = ip
-        session.commit()
 
     def run(self):
         running = True

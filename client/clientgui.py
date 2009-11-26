@@ -9,7 +9,7 @@ import datetime
 import shared.messagedispatcher
 from shared.data import *
 import shared.queueinterface
-from shared.util import getLogger
+from shared.util import getLogger, get_ip
 log = getLogger("client.log")
 log.debug("clientgui imported log")
 from map.mapdata import *
@@ -73,9 +73,13 @@ class ClientGui(hildon.Program):
         self.message_dispatcher = shared.messagedispatcher.MessageDispatcher(bus, db)
         # connect the dispatcher to database
         self.db.dispatcher = self.message_dispatcher
-        
+
         self.mapobjecthandler = MapObjectHandler(self.db, self.queue)
         self.message_dispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
+        
+        self.message_dispatcher.connect_to_type(shared.data.MessageType.vvoip, self.check_if_ok)
+        self.message_dispatcher.connect_to_type(shared.data.MessageType.voip, self.check_if_ok)
+
 
         # create gui
         self.create_gui()
@@ -206,9 +210,9 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.contact_menu, False, False, 0)
         self.screens["contact_menu"] = self.contact_menu
         call = gtk.Button("Bröstsamtal")
-        call.connect("clicked", self.show_voice)
+        call.connect("clicked", self.sending_vvoip)
         video = gtk.Button("Videosamtal")
-        video.connect("clicked", self.show_cam)
+        video.connect("clicked", self.sending_vvoip)
         self.contact_menu.add(call)
         self.contact_menu.add(video)
 
@@ -301,6 +305,43 @@ class ClientGui(hildon.Program):
         self.window_in_fullscreen = False
         log.info("ClientGui created")
         
+
+    def sending_voip(self, event):
+        msg = shared.data.Message(self.controller.name, "server",
+                                  type=shared.data.MessageType.voip, 
+                                  subtype=shared.data.VOIPType.request,
+                                  unpacked_data={"reciever": self.screens["contact"].name, 
+                                                 "ip": get_ip(), "port": 5432,
+                                                 "class": "dict"})
+        self.queue.enqueue(msg.packed_data, msg.prio)
+        
+    def sending_vvoip(self, event):
+        msg = shared.data.Message(self.controller.name, "server",
+                                  type=shared.data.MessageType.vvoip, 
+                                  subtype=shared.data.VVOIPType.request,
+                                  unpacked_data={"reciever": self.screens["contact"].name, 
+                                                 "ip": get_ip(), "port1": 5432, "port2": 5434, 
+                                                 "class": "dict"})
+        self.queue.enqueue(msg.packed_data, msg.prio)
+    
+    def check_if_ok(self, msg):
+        type = msg.type
+        subtype = msg.subtype
+        data = msg.unpacked_data
+        if type == shared.data.MessageType.voip:
+            if subtype == shared.data.VOIPType.response:
+                self.show_voice(ip=data.ip, port=data.port)
+            if subtype == shared.data.VOIPType.request:
+                self.show_voice(ip=data.ip, port=data.port)
+        elif type == shared.data.MessageType.vvoip:
+            if subtype == shared.data.VVOIPType.response:
+                self.show_cam(ip=data.ip, port1=data.port1, port2=data.port2)
+            elif subtype == shared.data.VVOIPType.request:
+                self.show_cam(ip=data.ip, port1=data.port1, port2=data.port2)
+    
+    def incoming_vvoip(self):
+        pass
+
     def start(self, event):
         # show gui
         self.window.show_all()
@@ -311,6 +352,7 @@ class ClientGui(hildon.Program):
         self.controller.interface.connect_to_signal("signal_changed_service_level", self.update_service_level)
         # only do start method once
         self.db.disconnect(self.ready_handler_id)
+
 
     def run(self):
         '''
@@ -448,14 +490,14 @@ class ClientGui(hildon.Program):
         self.toggle_show("messages", ["notifications", "new_message","buttons"], "Här kan du skriva ett nytt meddelanden")
         #self.show(["new_message", "buttons"])
         
-    def show_cam(self, event):
+    def show_cam(self,ip, port1, port2, event = None):
 #        self.screens["camera"].start_video_send(self.screens["contact"].ip)
-        self.screens["camera"].start_vvoip(self.screens["contact"].ip2)
+        self.screens["camera"].start_vvoip(ip, port1, port2)
         self.show(["camera"])
         
-    def show_voice(self, event):
+    def show_voice(self, ip, port, event = None):
 #        self.screens["camera"].start_video_send(self.screens["contact"].ip)
-        self.screens["camera"].start_voip(self.screens["contact"].ip2)
+        self.screens["camera"].start_voip(ip, port)
         self.show(["camera"])
         
     def show_outbox(self, event):
