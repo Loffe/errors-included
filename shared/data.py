@@ -482,6 +482,14 @@ class ActionType(object):
     change = "change"
     delete = "delete"
     
+class VOIPType(object):
+    request = u"request"
+    response = u"response"
+
+class VVOIPType(object):
+    request = u"request"
+    response = u"response"
+    
 class IDType(object):
     request = "request"
     response = "response"
