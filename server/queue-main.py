@@ -10,6 +10,7 @@ import dbus.service
 import shared.networkqueue
 from shared.dbqueue import DatabaseInQueue
 from shared.util import getLogger
+from shared.networkqueue import NetworkOutQueue
 from database import ServerDatabase
 log = getLogger("server.log")
 import shared.data
@@ -36,6 +37,7 @@ class ServerNetworkHandler(dbus.service.Object):
         self.server = None
         self.inqueue = DatabaseInQueue(self.db)
         self.outqueues = {}
+        self._init_queues()
         self.mainloop = None
         self.message_handler = handler.MessageHandler(self)
 
@@ -95,10 +97,14 @@ class ServerNetworkHandler(dbus.service.Object):
         for s in self.input:
             s.close()
 
+    def _init_queues(self):
+        users = self.db.get_all_users()
+        for u in users:
+            self.outqueues[u.name] = NetworkOutQueue(None, self.db)
+
     def _accept_client(self, socket, port):
         self.input.append(socket)
         self.output.append(socket)
-        self.outqueues[socket] = shared.networkqueue.NetworkOutQueue(socket, self.db)
 
     def _disconnect_client(self, socket):
         print "client disconnected"
@@ -116,8 +122,7 @@ class ServerNetworkHandler(dbus.service.Object):
         if self.outqueues.has_key(socket):
             id = m.sender
             if self.db.is_valid_login(m.sender, m.unpacked_data["password"]):
-                self.outqueues[id] = self.outqueues[socket]
-                del self.outqueues[socket]
+                self.outqueues[id].replace_socket(socket)
                 
 #                self.set_ip(m.sender, socket.getpeername()[0])
                 log.debug("logged in and now has a named queue")
