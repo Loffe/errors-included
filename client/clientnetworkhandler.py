@@ -116,7 +116,7 @@ class ClientNetworkHandler(dbus.service.Object):
                     junk = sys.stdin.readline()
                     if junk == '':
                         self.inputs.remove(s)
-                    if junk.startswith("quit"):
+                    if junk.startswith("q"):
                         print "got quit"
                         running = False
                     else:

@@ -152,7 +152,7 @@ class ServerNetworkHandler(dbus.service.Object):
                     self._accept_client(client, port)
                 elif s == sys.stdin:
                     junk = sys.stdin.readline()
-                    if junk.startswith("quit"):
+                    if junk.startswith("q"):
                         print "got quit"
                         running = False
                 else:
