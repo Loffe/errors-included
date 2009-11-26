@@ -118,6 +118,18 @@ class Database(gobject.GObject):
         session.close()
         return alarms
     
+    def get_all_missions(self):
+        session = self._Session()
+        missions = []
+        for m in session.query(MissionData):
+            for p in session.query(POIData).filter_by(id=m.poi_id):
+                m.poi = p
+            for u in session.query(UnitsInMissions).filter_by(mission_id = m.id):
+                m.units.append(u)
+            missions.append(m)
+        session.close()
+        return missions
+    
     def textmessages(self):
         session = self._Session()
         textmessages = []

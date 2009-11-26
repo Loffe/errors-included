@@ -107,6 +107,8 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
 #        # set the first item added as active
 #        self.combo_box.set_active(0)
 
+        self.combo_box.connect('changed', self.select_mission)
+
         # show 'em all! (:
         main_box.show_all()
 
@@ -161,4 +163,20 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
 #        self.timestamp = timestamp
 #        self.units = units
 #        self.id = id
- 
+    def select_mission(self, combobox):
+        '''
+        Call when combobox changes to switch obstacle type.
+        @param combobox: the changed combobox
+        '''
+        # set the selected type
+        self.selected_mission = self.combo_box.get_active_text()
+        missions = self.db.get_all_missions()
+        for mission in missions:
+            if mission.event == self.selected_mission:
+                self.event_entry.set_text(mission.event_type)
+                self.location_entry2.set_text(str(mission.poi.coordx))
+                self.location_entry3.set_text(str(mission.poi.coordy))    
+                self.hurted_entry.set_text(str(mission.number_of_wounded))
+                self.name_entry.set_text(mission.contact_person)
+                self.number_entry.set_text(mission.contact_number)
+                self.random_entry.set_text(mission.other)
