@@ -98,7 +98,7 @@ class ClientNetworkHandler(dbus.service.Object):
         if response_to == self.login_msg_id:
             print "got a login ack"
             data = self.input.get(local_id)
-            ack = shared.data.Message.unpack(data)
+            ack = shared.data.Message.unpack(data, self.db)
             if ack.unpacked_data["result"] == "no":
                 print "Couldn't login. Please check username/password"
                 self.close()

@@ -176,7 +176,7 @@ class ServerNetworkHandler(dbus.service.Object):
                         local_id = self.inqueue.put(data)
                         m = None
                         try:
-                            m = shared.data.Message.unpack(data)
+                            m = shared.data.Message.unpack(data, self.db)
                         except ValueError, ve:
                             log.debug("Crappy data = ! JSON")
                             log.debug(ve)

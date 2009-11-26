@@ -77,6 +77,7 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
                     unicode(self.event_entry.get_text()),
                     datetime.datetime.now(),
                     shared.data.POIType.flag)
+            self.db.add(poi_data)
 
             alarm = shared.data.Alarm(
                     unicode(self.event_entry.get_text()),

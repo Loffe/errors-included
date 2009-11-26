@@ -91,6 +91,7 @@ class NetworkOutQueue(NetworkQueue):
 class NetworkInQueue(NetworkQueue):
     def __init__(self, socket, db):
         NetworkQueue.__init__(self, socket, DatabaseInQueue(db))
+        self.db = db
 
     def receive(self):
         ''' Receives data from network and puts it in a DatabaseQueue.
@@ -125,7 +126,7 @@ class NetworkInQueue(NetworkQueue):
             local_id = self.queue.put(data, 37)
             m = None
             try:
-                m = shared.data.Message.unpack(data)
+                m = shared.data.Message.unpack(data, self.db)
             except ValueError, ve:
                 log.debug("Crappy data = ! JSON")
                 log.debug(ve)

@@ -591,13 +591,13 @@ class Message(object):
                         # object doesn't contain a list of units
                         pass
                     try:
-                        # replace timestamp string with a real datetime
                         poi_id = dict["poi"]
                         s = database._Session()
                         poi = s.query(POIData).filter_by(id=poi_id).first()
+                        print "poi_id:", poi_id, "poi:", poi
                         dict["poi"] = poi
                     except:
-                        # object doesn't contain a poi 
+                         # object doesn't contain a poi 
                         pass
                     # create and return an instance of the object
                     if classname == "dict":
@@ -650,14 +650,12 @@ def create_database(db = Database()):
 if __name__ == '__main__':
     print "Testing db"
     db = create_database()
-    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.accident, POISubType.tree)
-    poi_data.id = 5
-    s = db._Session()
-    print poi_data.id
-    s.add(poi_data)
-    print poi_data.id
-    s.commit()
-    print poi_data.id
+    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.obstacle, POISubType.tree)
+    db.add(poi_data)
+    alarm = Alarm(u"räv", u"Linköping", poi_data, u"Klasse", u"11111", 7, u"nada")
+    db.add(alarm)
+    msg = Message("ragnar", "server", unpacked_data = alarm)
+    print Message.unpack(msg.packed_data, db)
 
 #    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.accident, POISubType.tree)
 #    
