@@ -67,7 +67,7 @@ class OutboxScreen(gtk.ScrolledWindow, gui.Screen):
         textbox.set_editable(False)
         textbox.set_size_request(250,250)
         self.buffer = textbox.get_buffer()
-        self.buffer.set_text("Skriv ditt meddelande här")
+        self.buffer.set_text("")
         msgbox = gtk.HBox(True,0)
         msgbox.pack_start(msg_label)
         msgbox.pack_start(textbox)
