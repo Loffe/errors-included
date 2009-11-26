@@ -64,18 +64,22 @@ class ClientGui(hildon.Program):
         self.window.set_title("ClientGui")
         self.window.set_size_request(800,480)
         self.add_window(self.window)
-        
-        # Creates a empty list that contains previous screens
-        self.prev_page = []
 
         # create the database
         db = ClientDatabase(self.queue)
         self.db = shared.data.create_database(db)
+        # create message dispatcher
         self.message_dispatcher = shared.messagedispatcher.MessageDispatcher(bus, db)
+        # connect the dispatcher to database
         self.db.dispatcher = self.message_dispatcher
+
+        # create gui
         self.create_gui()
     
     def create_gui(self):
+        # Creates a empty list that contains previous screens
+        self.prev_page = []
+
         # A dict containing all the containers (used for hiding/showing) 
         self.screens = {}
 
@@ -324,7 +328,11 @@ class ClientGui(hildon.Program):
         name = u"Ragnar Dahlberg"
         unit_type = shared.data.UnitType.commander
         status = u"Available"
-        self.controller = controller.ClientController(name, unit_type,status, self.db)
+        self.controller = controller.ClientController(name, 
+                                                      unit_type,
+                                                      status, 
+                                                      self.db,
+                                                      self.message_dispatcher)
 
     def update_service_level(self):
         print "new service level"
@@ -338,14 +346,6 @@ class ClientGui(hildon.Program):
         for screen in self.screens.values():
             if screen.props.visible and isinstance(screen, Screen):
                 screen.ok_button_function(event)
-    
-    def set_mission(self, data):
-        '''
-        Append a mission to own missions.
-        @param data: the mission to append.
-        '''
-        self.controller.missions.append(data)
-        print "got new mission:", type(data), data
     
     # mission view event handlers
     def show_mission(self, event):

@@ -117,13 +117,13 @@ class ServerNetworkHandler(dbus.service.Object):
 #                self.set_ip(m.sender, socket.getpeername()[0])
                 log.debug("logged in and now has a named queue")
                 ack = shared.data.Message("server", id, response_to=m.message_id,
-                                          type=shared.data.MessageType.login_ack,
+                                          type=shared.data.MessageType.ack,
                                           unpacked_data={"result": "yes", "class": "dict"})
                 self.enqueue(m.sender, ack.packed_data, 5)
             else:
                 log.debug("login denied")
                 nack = shared.data.Message("server", id, response_to=m.message_id,
-                                           type=shared.data.MessageType.login_ack,
+                                           type=shared.data.MessageType.ack,
                                            unpacked_data={"result": "no", "class": "dict"})
                 # queue is not named because login failed
                 self.enqueue(socket, nack.packed_data, 5)
@@ -176,7 +176,7 @@ class ServerNetworkHandler(dbus.service.Object):
                         local_id = self.inqueue.put(data)
                         m = None
                         try:
-                            m = shared.data.Message.unpack(data)
+                            m = shared.data.Message.unpack(data, self.db)
                         except ValueError, ve:
                             log.debug("Crappy data = ! JSON")
                             log.debug(ve)
