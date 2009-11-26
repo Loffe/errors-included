@@ -142,16 +142,16 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
         self.video_recv.set_state(gst.STATE_PLAYING)
         
         
-    def start_vvoip(self,ip):
-            self.start_audio_recv(5432)
-            self.start_audio_send(ip, 5432)
-            self.start_video_recv(5434)
-            self.start_video_send(ip, 5434)
+    def start_vvoip(self,ip,port1,port2):
+            self.start_audio_recv(port1)
+            self.start_audio_send(ip, port1)
+            self.start_video_recv(port2)
+            self.start_video_send(ip, port2)
             self.video_started = True            
             
-    def start_voip(self, ip):
-            self.start_audio_recv(5432)
-            self.start_audio_send(ip, 5432)          
+    def start_voip(self, ip, port):
+            self.start_audio_recv(port) #5432 ?
+            self.start_audio_send(ip,port)          
  
     def stop(self,w):
         if self.video_started:

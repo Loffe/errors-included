@@ -40,7 +40,8 @@ class ServerManager(object):
 
         self.messagedispatcher.connect_to_type(shared.data.MessageType.id, self.idprovider.provide)
 
-        self.messagedispatcher.connect_to_type(shared.data.MessageType.vvoip_request, self.voiphandler.handler)
+        self.messagedispatcher.connect_to_type(shared.data.MessageType.voip, self.voiphandler.handler)
+        self.messagedispatcher.connect_to_type(shared.data.MessageType.vvoip, self.voiphandler.handler)
 
         self.messagedispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
 
