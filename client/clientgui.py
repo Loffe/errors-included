@@ -272,7 +272,7 @@ class ClientGui(hildon.Program):
         self.buttons_box.pack_start(back_button)
         back_button.connect("clicked", self.back_button_function)
 
-        ok_button = gtk.Button("Ok")
+        ok_button = gtk.Button("OK")
         ok_button.connect("clicked", self.ok_button_function)
         ok_button.set_flags(gtk.CAN_DEFAULT)
         self.buttons_box.pack_start(ok_button)
