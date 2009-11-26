@@ -69,6 +69,16 @@ if __name__ == "__main__":
         u = User(u"slanggurka", u"smakar som nors")
         session.add(u)
 
+        i = 0
+        for name in [u"Erik", u"Martin", u"Freddie", u"Linus", u"Emil", u"DT"]:
+            u = User(name, name)
+            session.add(u)
+
+            unit = UnitData(0, 0, name, datetime.now())
+            unit.id = i*10 + 3
+            i+=1
+            session.add(unit)
+
         # Create units
 #        u = UnitData(13, 37, "RD1337", datetime.now())
 #        session.add(u)
