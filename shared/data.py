@@ -171,7 +171,7 @@ class ObjectID(Base):
             return repr
 
 class UnitType(object):
-    ambulance = u"ambulance", # Regular unit
+    ambulance = u"ambulance" # Regular unit
     army = u"army" # short for Swedish Armed Forces
     commander = u"commander" # Nana nana nana nana LEADER! leader..
     srsa = u"srsa" # Swedish Rescue Services Agency (SRSA)
