@@ -30,6 +30,7 @@ from gui.statusscreen import StatusScreen
 from gui.patientjournalscreen import PatientJournalScreen
 from gui.contactscreen import ContactScreen
 from gui.camerascreen import CamScreen
+from mapobjecthandler import MapObjectHandler
 
 
 try:
@@ -72,6 +73,9 @@ class ClientGui(hildon.Program):
         self.message_dispatcher = shared.messagedispatcher.MessageDispatcher(bus, db)
         # connect the dispatcher to database
         self.db.dispatcher = self.message_dispatcher
+        
+        self.mapobjecthandler = MapObjectHandler(self.db, self.queue)
+        self.message_dispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
 
         # create gui
         self.create_gui()
@@ -333,6 +337,7 @@ class ClientGui(hildon.Program):
                                                       status, 
                                                       self.db,
                                                       self.message_dispatcher)
+        self.mapobjecthandler.controller = self.controller
 
     def update_service_level(self):
         print "new service level"
