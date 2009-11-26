@@ -48,7 +48,7 @@ class ServerNetworkHandler(dbus.service.Object):
         @param prio priority of the message
         '''
         queue = self.outqueues[reciever]
-        queue.enqueue(msg, prio)
+        queue.enqueue(unicode(msg), prio)
         print "Enqueue called"
         return "Enqueue :)"
 
@@ -178,13 +178,13 @@ class ServerNetworkHandler(dbus.service.Object):
                     data = s.recv(length)
                     if data:
                         log.debug("data from client:" + str(data))
-                        local_id = self.inqueue.put(data)
+                        local_id = self.inqueue.put(unicode(data))
                         m = None
                         try:
                             m = shared.data.Message.unpack(data)
                         except ValueError, ve:
-                            log.debug("Crappy data = ! JSON")
-                            log.debug(ve)
+                            log.info("Crappy data = ! JSON")
+                            log.info(ve)
                             continue
 
                         if m.type == shared.data.MessageType.login:

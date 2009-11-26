@@ -540,7 +540,7 @@ class Message(object):
         except:
             dict["packed_data"] = self.unpacked_data
         self.packed_data = json.dumps(dict)
-        return self.packed_data
+        return unicode(self.packed_data)
 
     def unpack(cls, raw_message, database=None):
         '''
