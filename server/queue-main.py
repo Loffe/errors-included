@@ -100,7 +100,7 @@ class ServerNetworkHandler(dbus.service.Object):
     def _init_queues(self):
         users = self.db.get_all_users()
         for u in users:
-            self.outqueues[u.name] = NetworkOutQueue(None, self.db)
+            self.outqueues[u.name] = NetworkOutQueue(None, self.db, u.name)
 
     def _accept_client(self, socket, port):
         self.input.append(socket)
