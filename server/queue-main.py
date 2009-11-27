@@ -115,9 +115,6 @@ class ServerNetworkHandler(dbus.service.Object):
             self.input.remove(socket)
         except ValueError:
             print "Client not in input list. Why?"
-        for id in self.outqueues.keys():
-            if self.outqueues[id].socket == socket:
-                del self.outqueues[id]
 
     def _login_client(self, socket, message):
         m = message
