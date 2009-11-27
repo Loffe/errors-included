@@ -14,7 +14,7 @@ from voiphandler import VoipHandler
 from mapobjecthandler import MapObjectHandler
 
 from database import ServerDatabase
-from shared.data import MessageType
+from shared.data import Message,MessageType
 
 
 class ServerManager(object):
