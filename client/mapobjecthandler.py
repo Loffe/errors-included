@@ -1,4 +1,4 @@
-from shared.data import Message, MessageType, MissionData, ActionType
+from shared.data import Message, MessageType, MissionData, ActionType, Database
 
 class MapObjectHandler(object):
     database = None
