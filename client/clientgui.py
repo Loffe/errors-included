@@ -374,14 +374,9 @@ class ClientGui(hildon.Program):
         '''
         Create and start ClientController
         '''
-        name = config.client.name
-        unit_type = shared.data.UnitType.commander
+        # My initial status
         status = u"Available"
-        self.controller = controller.ClientController(name, 
-                                                      unit_type,
-                                                      status, 
-                                                      self.db,
-                                                      self.message_dispatcher)
+        self.controller = controller.ClientController(status, self.db)
         self.mapobjecthandler.controller = self.controller
 
     def update_service_level(self, service_level):
