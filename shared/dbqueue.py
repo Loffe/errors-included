@@ -47,19 +47,6 @@ class DatabaseQueue(Queue.Queue):
         session.commit()
         session.close()
 
-    # Get an item from the queue
-    def _get(self):
-        # @TODO
-        session = self.db._Session()
-        print "_get"
-        if self.item_type == data.NetworkOutQueueItem:
-            q = session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.sent == False)
-            item = q.first()
-            return item.data, item.id
-        print "nope, don't think so"
-        session.close()
-        return None
-
     # shadow and wrap Queue.Queue's own `get' to strip auxiliary aspects
     def get(self, block=True, timeout=None):
         item, id = Queue.Queue.get(self, block, timeout)
@@ -116,6 +103,16 @@ class DatabaseOutQueue(DatabaseQueue):
         log.debug("putting:" + data)
         Queue.Queue.put(self, item, block, timeout)
         return item.id
+
+    # Get an item from the queue
+    def _get(self):
+        # @TODO
+        session = self.db._Session()
+        print "_get"
+        q = session.query(NetworkOutQueueItem).filter(NetworkOutQueueItem.sent == False).filter(NetworkOutQueueItem.name == self.name)
+        item = q.first()
+        session.close()
+        return item.data, item.id
 
 
 if __name__ == "__main__":
