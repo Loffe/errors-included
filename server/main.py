@@ -28,6 +28,8 @@ class ServerManager(object):
         self.database = shared.data.create_database(ServerDatabase())
         bus = dbus.SessionBus()
         self.queue = shared.queueinterface.get_interface(bus, "included.errors.Server")
+
+        self.queue.connect_to_signal("user_login", self._user_login)
         self.idprovider = IDProvider(self.database, self.queue)
 
         self.voiphandler = VoipHandler(self.database, self.queue)
@@ -45,6 +47,8 @@ class ServerManager(object):
 
         self.messagedispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
 
+    def _user_login(self, username):
+        print "User %s logged in to queue" % username
 
     def _message_available(self, packed_data):
         print "_message_available"
