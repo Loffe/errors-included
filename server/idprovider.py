@@ -15,7 +15,7 @@ class IDProvider(object):
         # Fetch next available id from db
         nextstart = session.query(shared.data.ObjectID).filter_by(name=u"id_nextstart").first()
         if nextstart is None:
-            nextstart = shared.data.ObjectID(u"id_nextstart", 1)
+            nextstart = shared.data.ObjectID(u"id_nextstart", 1000)
 
         start = nextstart.value
         stop = start + self.INTERVAL - 1
