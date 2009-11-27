@@ -31,7 +31,7 @@ class ClientNetworkHandler(dbus.service.Object):
                                      '/Queue')
         self.server = (host, port)
         self.db = shared.data.create_database()
-        self.output = NetworkOutQueue(self.socket, self.db)
+        self.output = NetworkOutQueue(self.socket, self.db, config.client.name)
         self.input = NetworkInQueue(self.socket, self.db)
         self.inputs = [sys.stdin]
 
@@ -179,9 +179,9 @@ class ClientNetworkHandler(dbus.service.Object):
             print errno, errmsg
 
     def _login(self):
-        login_msg = shared.data.Message("ragnar", "server",
+        login_msg = shared.data.Message(config.client.name, "server",
                                         type=shared.data.MessageType.login,
                                         unpacked_data={"class": "dict",
-                                            "password": "prydlig frisyr"})
+                                            "password":config.client.password})
         self.login_msg_id = self.enqueue(login_msg.packed_data, 5)
 

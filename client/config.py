@@ -15,3 +15,4 @@ except ImportError:
 
 server = settings.server
 queue = settings.queue
+client = settings.client

@@ -13,3 +13,8 @@ class ServerDatabase(Database):
         if user is None:
             return False
         return user.password == password
+
+    def get_all_users(self):
+        s = self._Session()
+        users = s.query(data.User)
+        return [u for u in users]

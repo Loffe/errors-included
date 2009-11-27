@@ -221,13 +221,15 @@ class NetworkInQueueItem(Base):
 class NetworkOutQueueItem(Base):
     __tablename__ = 'OutQueue'
     id = Column(Integer, primary_key=True)
+    name = Column(UnicodeText)
     sent = Column(Boolean)
     acked = Column(Boolean)
     prio = Column(Integer)
     data = Column(UnicodeText)
 
-    def __init__(self, data, prio):
+    def __init__(self, name, data, prio):
         self.sent = False
+        self.name = name
         self.acked = False
         self.data = data
         self.prio = prio

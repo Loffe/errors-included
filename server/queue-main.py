@@ -10,6 +10,7 @@ import dbus.service
 import shared.networkqueue
 from shared.dbqueue import DatabaseInQueue
 from shared.util import getLogger
+from shared.networkqueue import NetworkOutQueue
 from database import ServerDatabase
 log = getLogger("server.log")
 import shared.data
@@ -29,13 +30,14 @@ class ServerNetworkHandler(dbus.service.Object):
                                      '/Queue')
         db = ServerDatabase()
         self.db = shared.data.create_database(db)
-        self.host = '127.0.0.1'
+        self.host = ''
         self.port = 50000
         self.backlog = 5
         self.size = 1024
         self.server = None
         self.inqueue = DatabaseInQueue(self.db)
         self.outqueues = {}
+        self._init_queues()
         self.mainloop = None
         self.message_handler = handler.MessageHandler(self)
 
@@ -95,10 +97,16 @@ class ServerNetworkHandler(dbus.service.Object):
         for s in self.input:
             s.close()
 
+    def _init_queues(self):
+        users = self.db.get_all_users()
+        for u in users:
+            self.outqueues[u.name] = NetworkOutQueue(None, self.db, u.name)
+
+        print self.outqueues
+
     def _accept_client(self, socket, port):
         self.input.append(socket)
         self.output.append(socket)
-        self.outqueues[socket] = shared.networkqueue.NetworkOutQueue(socket, self.db)
 
     def _disconnect_client(self, socket):
         print "client disconnected"
@@ -113,28 +121,25 @@ class ServerNetworkHandler(dbus.service.Object):
 
     def _login_client(self, socket, message):
         m = message
-        if self.outqueues.has_key(socket):
-            id = m.sender
-            if self.db.is_valid_login(m.sender, m.unpacked_data["password"]):
-                self.outqueues[id] = self.outqueues[socket]
-                del self.outqueues[socket]
-
-                log.debug("logged in and now has a named queue")
-                ack = shared.data.Message("server", id, response_to=m.message_id,
-                                          type=shared.data.MessageType.ack,
-                                          unpacked_data={"result": "yes", "class": "dict"})
-                self.enqueue(m.sender, ack.packed_data, 5)
-            else:
-                log.debug("login denied")
-                nack = shared.data.Message("server", id, response_to=m.message_id,
-                                           type=shared.data.MessageType.ack,
-                                           unpacked_data={"result": "no", "class": "dict"})
-                # queue is not named because login failed
-                self.enqueue(socket, nack.packed_data, 5)
-                print "Login failed"
-                #self._disconnect_client(socket)
+        id = m.sender
+        if self.db.is_valid_login(m.sender, m.unpacked_data["password"]):
+            self.outqueues[id].replace_socket(socket)
+            
+#                self.set_ip(m.sender, socket.getpeername()[0])
+            log.info("%s logged in and now has a named queue" % id)
+            ack = shared.data.Message("server", id, response_to=m.message_id,
+                                      type=shared.data.MessageType.ack,
+                                      unpacked_data={"result": "yes", "class": "dict"})
+            self.enqueue(m.sender, ack.packed_data, 5)
         else:
-            log.debug("no such socket or user already logged in")
+            log.info("login denied")
+            nack = shared.data.Message("server", id, response_to=m.message_id,
+                                       type=shared.data.MessageType.ack,
+                                       unpacked_data={"result": "no", "class": "dict"})
+            # queue is not named because login failed
+            self.enqueue(m.sender, nack.packed_data, 5)
+            print "Login failed"
+            #self._disconnect_client(socket)
             
 
     def run(self):
