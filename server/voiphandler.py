@@ -1,4 +1,4 @@
-import shared.data
+from shared.data import *
 
 class VoipHandler(object):
     database = None
@@ -16,3 +16,4 @@ class VoipHandler(object):
                                   unpacked_data=message.unpacked_data)
         self.queue.enqueue(msg.reciever, msg.packed_data, msg.prio)
         print "forwarding", msg
+

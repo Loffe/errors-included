@@ -310,40 +310,122 @@ class ClientGui(hildon.Program):
         
 
     def sending_voip(self, event):
-        msg = shared.data.Message(self.controller.name, "server",
+        msg = shared.data.Message(self.controller.name, 
+                                  self.screens["contact"].name,
                                   type=shared.data.MessageType.voip, 
                                   subtype=shared.data.VOIPType.request,
-                                  unpacked_data={"reciever": self.screens["contact"].name, 
-                                                 "ip": get_ip(), "port": 5432,
+                                  unpacked_data={"ip": get_ip(), "port": 5432,
                                                  "class": "dict"})
         self.queue.enqueue(msg.packed_data, msg.prio)
+        self.out_call_popup(msg)
         
     def sending_vvoip(self, event):
-        msg = shared.data.Message(self.controller.name, "server",
+        msg = shared.data.Message(self.controller.name, 
+                                  self.screens["contact"].name,
                                   type=shared.data.MessageType.vvoip, 
                                   subtype=shared.data.VVOIPType.request,
-                                  unpacked_data={"reciever": self.screens["contact"].name, 
-                                                 "ip": get_ip(), "port1": 5432, "port2": 5434, 
-                                                 "class": "dict"})
+                                  unpacked_data={"ip": get_ip(), "port1": 5432, 
+                                                 "port2": 5434, "class": "dict"})
         self.queue.enqueue(msg.packed_data, msg.prio)
+        self.out_call_popup(msg)
     
     def check_if_ok(self, msg):
+        sender = msg.sender
+        reciever = msg.reciever
         type = msg.type
         subtype = msg.subtype
         data = msg.unpacked_data
         if type == shared.data.MessageType.voip:
             if subtype == shared.data.VOIPType.response:
+                self.out_dialog.destroy()
                 self.show_voice(ip=data.ip, port=data.port)
             if subtype == shared.data.VOIPType.request:
-                self.show_voice(ip=data.ip, port=data.port)
+                self.inc_call_popup(msg)
         elif type == shared.data.MessageType.vvoip:
             if subtype == shared.data.VVOIPType.response:
+                self.out_dialog.destroy()
                 self.show_cam(ip=data.ip, port1=data.port1, port2=data.port2)
             elif subtype == shared.data.VVOIPType.request:
-                self.show_cam(ip=data.ip, port1=data.port1, port2=data.port2)
+                self.inc_call_popup(msg)
     
-    def incoming_vvoip(self):
-        pass
+    
+    def start_voip(self, msg):
+        sender = msg.sender
+        reciever = msg.reciever
+        type = msg.type
+        subtype = msg.subtype
+        data = msg.unpacked_data
+        message = shared.data.Message(self.controller.name, sender,
+                                      type=shared.data.MessageType.voip, 
+                                      subtype=shared.data.VOIPType.response,
+                                      unpacked_data={"ip": get_ip(), "port": 5432, 
+                                                     "class": "dict"})
+        self.queue.enqueue(message.packed_data, message.prio)
+        self.show_voice(ip=data.ip, port=data.port)
+        
+    def start_vvoip(self, msg):
+        sender = msg.sender
+        reciever = msg.reciever
+        type = msg.type
+        subtype = msg.subtype
+        data = msg.unpacked_data
+        message = shared.data.Message(self.controller.name, sender,
+                                  type=shared.data.MessageType.vvoip, 
+                                  subtype=shared.data.VVOIPType.response,
+                                  unpacked_data={"ip": get_ip(), "port1": 5432,
+                                                 "port2": 5434, "class": "dict"})
+        self.queue.enqueue(message.packed_data, message.prio)
+        self.show_cam(ip=data.ip, port1=data.port1, port2=data.port2)
+    
+    def inc_call_popup(self, msg):
+        inc_dialog = gtk.Dialog("Samtal",
+                 self.window,  #the toplevel wgt of your app
+                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
+                 ("     Svara     ", 77, "  Lägg på  ", 666))
+        who = gtk.Label("Någon ringer...")
+        who.show()
+        inc_dialog.set_size_request(400,200)
+        #dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+
+        inc_dialog.vbox.pack_start(who)
+        question = gtk.Label("Vill du svara?")
+        question.show()
+        inc_dialog.vbox.pack_start(question)
+        inc_dialog.show()
+        result = inc_dialog.run()
+        if result == 77:
+            if msg.type == shared.data.MessageType.voip:
+                self.start_voip(msg)
+            elif msg.type == shared.data.MessageType.vvoip:
+                self.start_vvoip(msg)
+        elif result == 666:
+            # @todo: return nack if we dont want to answer
+            print "upptaget"
+        inc_dialog.destroy()
+        
+    def out_call_popup(self, msg):
+        if self.screens["contact"].name == None:
+            return 0
+        
+        self.out_dialog = gtk.Dialog("Samtal",
+                 self.window,  #the toplevel wgt of your app
+                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
+                 ("     Lägg på     ", 77))
+        
+        who = gtk.Label("Du ringer till "+self.screens["contact"].name)
+        who.show()
+        #dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+        self.out_dialog.vbox.pack_start(who)
+        self.out_dialog.set_size_request(400,200)
+        #dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+        self.out_dialog.show()
+        result = self.out_dialog.run()
+        if result == 77:
+            if msg.type == shared.data.MessageType.voip:
+                print "Lägger på"
+            elif msg.type == shared.data.MessageType.vvoip:
+                print "Lägger på"
+        self.out_dialog.destroy()
 
     def start(self, event):
         # show gui

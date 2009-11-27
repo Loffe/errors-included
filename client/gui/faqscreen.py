@@ -41,6 +41,7 @@ class FAQScreen(gtk.ScrolledWindow, gui.Screen):
         self.textview = gtk.TextView()
         self.textview.set_editable(False)
         self.textview.set_size_request(400,-1)
+        self.textview.set_wrap_mode(gtk.WRAP_WORD_CHAR)
         main_box.pack_start(self.textview)
         # add event handler
         self.combo_box.connect('changed', self.selected)
