@@ -1,6 +1,7 @@
 import Queue
 import data as data
 import simplejson as json
+from data import NetworkInQueueItem, NetworkOutQueueItem
 from shared.util import getLogger
 log = getLogger("server.log")
 
@@ -46,27 +47,6 @@ class DatabaseQueue(Queue.Queue):
         session.commit()
         session.close()
 
-    # Get an item from the queue
-    def _get(self):
-        # @TODO
-        session = self.db._Session()
-        print "_get"
-        if self.item_type == data.NetworkOutQueueItem:
-            q = session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.sent == False)
-            item = q.first()
-            return item.data, item.id
-        print "nope, don't think so"
-        session.close()
-        return None
-
-    # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
-    def put(self, data, priority=0, block=True, timeout=None):
-        item = data, priority
-        item = self.item_type(data, priority)
-        log.debug("putting:" + data)
-        Queue.Queue.put(self, item, block, timeout)
-        return item.id
-
     # shadow and wrap Queue.Queue's own `get' to strip auxiliary aspects
     def get(self, block=True, timeout=None):
         item, id = Queue.Queue.get(self, block, timeout)
@@ -100,10 +80,46 @@ class DatabaseInQueue(DatabaseQueue):
         else:
             return None
 
+    # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
+    def put(self, data, priority=0, block=True, timeout=None):
+        item = data, priority
+        item = NetworkInQueueItem(data, priority)
+        log.debug("putting:" + data)
+        Queue.Queue.put(self, item, block, timeout)
+        return item.id
+
+
 
 class DatabaseOutQueue(DatabaseQueue):
-    def __init__(self, database):
+    name = None
+    def __init__(self, database, name):
         DatabaseQueue.__init__(self, database, DatabaseQueue.direction_out)
+        self.name = name
+
+    def _empty(self):
+        session = self.db._Session()
+        result = session.query(NetworkOutQueueItem).filter_by(sent = 0).filter_by(name=self.name).count() == 0
+        session.close()
+        return result
+
+    # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
+    def put(self, data, priority=0, block=True, timeout=None):
+        item = data, priority
+        item = NetworkOutQueueItem(self.name, data, priority)
+        log.debug("putting:" + data)
+        Queue.Queue.put(self, item, block, timeout)
+        return item.id
+
+    # Get an item from the queue
+    def _get(self):
+        # @TODO
+        session = self.db._Session()
+        print "_get"
+        q = session.query(NetworkOutQueueItem).filter_by(sent = False).filter_by(name = self.name)
+        item = q.first()
+        session.close()
+        return item.data, item.id
+
 
 if __name__ == "__main__":
     import data

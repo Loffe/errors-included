@@ -30,8 +30,8 @@ class NetworkOutQueue(NetworkQueue):
     sending = False
     need_connection = True
 
-    def __init__(self, socket, db):
-        NetworkQueue.__init__(self, socket, DatabaseOutQueue(db))
+    def __init__(self, socket, db, name):
+        NetworkQueue.__init__(self, socket, DatabaseOutQueue(db, name))
         if self.socket:
             self.need_connection = False
 

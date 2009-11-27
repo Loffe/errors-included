@@ -80,7 +80,13 @@ class Database(gobject.GObject):
         @param object: the object to add.
         '''
         session = self._Session()
-        session.add(object)
+        result = session.query(object.__class__).filter_by(id=object.id).first()
+        if result is None:
+            session.add(object)
+        else:
+            session.delete(result)
+            session.add(object)
+
         session.commit()
         session.close()
         self.emit("mapobject-added", object)
@@ -92,7 +98,13 @@ class Database(gobject.GObject):
         '''
         session = self._Session()
         object.timestamp = datetime.now()
-        session.add(object)
+        result = session.query(object.__class__).filter_by(id=object.id).first()
+        if result is None:
+            session.add(object)
+        else:
+            session.delete(result)
+            session.add(object)
+
         session.commit()
         session.close()
         self.emit("mapobject-changed", object)
@@ -221,13 +233,15 @@ class NetworkInQueueItem(Base):
 class NetworkOutQueueItem(Base):
     __tablename__ = 'OutQueue'
     id = Column(Integer, primary_key=True)
+    name = Column(UnicodeText)
     sent = Column(Boolean)
     acked = Column(Boolean)
     prio = Column(Integer)
     data = Column(UnicodeText)
 
-    def __init__(self, data, prio):
+    def __init__(self, name, data, prio):
         self.sent = False
+        self.name = name
         self.acked = False
         self.data = data
         self.prio = prio

@@ -1,4 +1,5 @@
 from shared.data import Database, Message, MessageType, ActionType, IDType, ObjectID
+import config
 import gobject
 
 class ClientDatabase(Database):
@@ -9,7 +10,7 @@ class ClientDatabase(Database):
         Database.__init__(self)
         self.queue = queue
         self.dispatcher = None
-        self.name = "Anonymous"
+        self.name = config.client.name
         self.id_stop = ObjectID(u"id_stop", None)
         self.id_start = ObjectID(u"id_start", None)
         self.id_current = ObjectID(u"id_current", None)
@@ -71,7 +72,7 @@ class ClientDatabase(Database):
         '''
         Request a new range of ids from server.
         '''
-        msg = Message("ragnar", "server", MessageType.id, IDType.request,
+        msg = Message(self.name, "server", MessageType.id, IDType.request,
                       unpacked_data=None)
         self.queue.enqueue(msg.packed_data, msg.prio)
         self.dispatcher.connect_to_type(MessageType.id, self.set_ids)
