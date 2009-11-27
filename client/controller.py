@@ -5,6 +5,7 @@ import shared.data
 import dbus
 import dbus.mainloop.glib
 import gobject
+import config
 import datetime
 
 class ClientController(object):
@@ -31,8 +32,6 @@ class ClientController(object):
 
         # My name
         self.name = config.client.name
-        # My unit type
-        self.unit_type = unit_type
         # My status
         self.status = status
         # My missions
