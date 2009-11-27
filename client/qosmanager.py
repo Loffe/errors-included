@@ -198,6 +198,7 @@ class QoSManager(dbus.service.Object):
         Update the gps coordinate on specified udate interval.
         '''
         # main loop
+        from random import random
         while self.running:
             time.sleep(self.gps_update_interval)
             print "gps_updater"
@@ -208,7 +209,7 @@ class QoSManager(dbus.service.Object):
                 # Not in N810, got no GPS-device; do nothing...
                 print "gps failure"
                 # @todo: REMOVE, THIS IS ONLY A TEST!
-                self.signal_new_gps_coord("15.5726","58.4035")
+                self.signal_new_gps_coord(str(15.5726 + random()/50), str(58.4035 + random()/50))
     
     def service_level_updater(self):
         '''
