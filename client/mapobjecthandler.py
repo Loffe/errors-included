@@ -1,4 +1,4 @@
-from shared.data import Message, MessageType, MissionData, ActionType, Database
+from shared.data import Message, MessageType, UnitData, MissionData, ActionType, Database
 
 class MapObjectHandler(object):
     database = None
@@ -19,6 +19,11 @@ class MapObjectHandler(object):
 
         elif subtype == ActionType.add:
             Database.add(self.database, object)
+            # if a unit_data with my name was added, set it to mine
+            if object.__class__ == UnitData:
+                if object.name == self.controller.name:
+                    self.controller.unit_data = object
+            # if a mission with my unit_data was added, assign me to it (show it)
             if object.__class__ == MissionData:
                 for unit in object.units:
                     if unit.id == self.controller.unit_data.id:
@@ -27,4 +32,3 @@ class MapObjectHandler(object):
             pass
         else:
             raise Error("Invalid subtype")
-

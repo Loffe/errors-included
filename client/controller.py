@@ -46,6 +46,7 @@ class ClientController(object):
         @param coordx: the x-coordinate to set.
         @param coordy: the y-coordinate to set.
         '''
+        # No unit data yet
         if self.unit_data == None:
             return
         self.unit_data.coordx = float(coordx)
