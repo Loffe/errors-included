@@ -11,7 +11,7 @@ class ClientController(object):
     '''
     Self. This is me. Holds my name, unit_type, status and gps-coordinates.
     '''
-    def __init__(self, name, unit_type, status, db):
+    def __init__(self, status, db):
         '''
         Constructor. Creates a client controller.
         @param name: my name.
