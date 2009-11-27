@@ -61,6 +61,19 @@ class Packable(object):
         dict["class"] = self.__class__.__name__
         return dict
 
+    def copy(cls, origin, target):
+        attrs = {}
+        for k in origin.__dict__.keys():
+            if not k.startswith("_"):
+                attrs[k] = origin.__dict__[k]
+
+        print attrs
+        for key in attrs.keys():
+            target.__dict__[key] = attrs[key]
+        print target
+
+    copy = classmethod(copy)
+
 class Database(gobject.GObject):
     '''
     A sqlite3 database using sqlalchemy.
@@ -99,11 +112,8 @@ class Database(gobject.GObject):
         session = self._Session()
         object.timestamp = datetime.now()
         result = session.query(object.__class__).filter_by(id=object.id).first()
-        if result is None:
-            session.add(object)
-        else:
-            session.delete(result)
-            session.add(object)
+        Packable.copy(object, result)
+        session.add(result)
 
         session.commit()
         session.close()
