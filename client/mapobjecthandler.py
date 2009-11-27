@@ -21,7 +21,7 @@ class MapObjectHandler(object):
             Database.add(self.database, object)
             # if a unit_data with my name was added, set it to mine
             if object.__class__ == UnitData:
-                if object.name == self.controller.name:
+                if self.controller is not None and object.name == self.controller.name:
                     self.controller.unit_data = object
             # if a mission with my unit_data was added, assign me to it (show it)
             if object.__class__ == MissionData:
