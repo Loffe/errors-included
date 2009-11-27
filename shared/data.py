@@ -124,7 +124,7 @@ class Database(gobject.GObject):
         for m in session.query(MissionData):
             for p in session.query(POIData).filter_by(id=m.poi_id):
                 m.poi = p
-            for u in session.query(UnitsInMissions).filter_by(mission_id = m.id):
+            for u in session.query(units_in_missions).filter_by(mission_id = m.id):
                 m.units.append(u)
             missions.append(m)
         session.close()
