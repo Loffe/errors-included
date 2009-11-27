@@ -435,6 +435,7 @@ class ClientGui(hildon.Program):
         self.start_controller()
         # connect service level signal from controller
         self.controller.interface.connect_to_signal("signal_changed_service_level", self.update_service_level)
+        self.message_dispatcher.process_items()
         # only do start method once
         self.db.disconnect(self.ready_handler_id)
 

@@ -230,7 +230,7 @@ class POISubType(object):
 class NetworkInQueueItem(Base):
     __tablename__ = 'InQueue'
     id = Column(Integer, primary_key=True)
-    processed = Column(Boolean)
+    processed = Column(Integer) # 0: ¬ processed, 1: processed, 2: failed
     data = Column(UnicodeText)
     def __init__(self, data, prio=0):
         ''' Construct a new queue item.

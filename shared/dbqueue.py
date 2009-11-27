@@ -67,7 +67,7 @@ class DatabaseInQueue(DatabaseQueue):
 
     def _empty(self):
         session = self.db._Session()
-        result = session.query(data.NetworkInQueueItem).filter(data.NetworkInQueueItem.sent == 0).count() == 0
+        result = session.query(data.NetworkInQueueItem).filter(data.NetworkInQueueItem.processed == 0).count() == 0
         session.close()
         return result
 
@@ -89,6 +89,15 @@ class DatabaseInQueue(DatabaseQueue):
         session.commit()
         session.close()
 
+    def mark_as_failed(self, id):
+        # @TODO: acuire lock maybe?
+        session = self.db._Session()
+        q = session.query(data.NetworkInQueueItem).filter_by(id = id)
+        item = q.first()
+        item.processed = 2
+        session.commit()
+        session.close()
+
     # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
     def put(self, data, priority=0, block=True, timeout=None):
         item = data, priority
@@ -97,7 +106,14 @@ class DatabaseInQueue(DatabaseQueue):
         Queue.Queue.put(self, item, block, timeout)
         return item.id
 
-
+    def _get(self):
+        # @TODO
+        session = self.db._Session()
+        print "_get"
+        q = session.query(NetworkInQueueItem).filter_by(processed = False)
+        item = q.first()
+        session.close()
+        return item.data, item.id
 
 class DatabaseOutQueue(DatabaseQueue):
     name = None

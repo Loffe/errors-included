@@ -1,6 +1,6 @@
 import dbus
 from shared.dbqueue import DatabaseInQueue
-from shared.data import Message
+from shared.data import Message, NetworkInQueueItem
 
 
 class MessageDispatcher(object):
@@ -36,9 +36,24 @@ class MessageDispatcher(object):
             result = callback(msg)
             if result:
                 self.queue.mark_as_processed(local_id)
+            else:
+                self.queue.mark_as_failed(local_id)
+            return
         if self.connected_types.has_key(type):
             print "execute on type", type
             callback = self.connected_types[type]
             result = callback(msg)
             if result:
                 self.queue.mark_as_processed(local_id)
+            else:
+                self.queue.mark_as_failed(local_id)
+            return
+        self.queue.mark_as_failed(local_id)
+
+    def process_items(self):
+        print "processing"
+        session = self.db._Session()
+        query = session.query(NetworkInQueueItem).filter_by(processed=0)
+        for item in query:
+            self.dispatch(item.id, 0)
+        session.close()
