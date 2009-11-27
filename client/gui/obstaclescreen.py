@@ -55,7 +55,7 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
 
         types = {}
         i = 0
-        types = ["tree", "brige", "other"]
+        types = ["tree", "bridge", "other"]
         for type in types:
             combo_box.append_text(type)
 
