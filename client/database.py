@@ -30,14 +30,14 @@ class ClientDatabase(Database):
             self.id_current.value += 1
 
             # current id is large enough to request a new id range
-            if (self.id_current.value > float(self.id_stop.value-
-                self.id_start.value)/2 and not self.requested):
+            interval_mid = self.id_start.value + \
+                           (self.id_stop.value - self.id_start.value)/2
+            if (self.id_current.value > interval_mid  and not self.requested):
                 self.request_ids()
-                self.requested = True
 
             # if out of range, activate the next range
             elif self.id_current.value >= self.id_stop.value:
-                self.id_current.value = self.id_next_start.value
+                self.id_current.value = self.id_nextstart.value
                 self.id_nextstart.value = None
                 self.id_stop.value = self.id_nextstop.value
                 self.id_nextstop.value = None
@@ -76,6 +76,7 @@ class ClientDatabase(Database):
                       unpacked_data=None)
         self.queue.enqueue(msg.packed_data, msg.prio)
         self.dispatcher.connect_to_type(MessageType.id, self.set_ids)
+        self.requested = True
         print "requesting ids"
         
     def set_ids(self, msg):
