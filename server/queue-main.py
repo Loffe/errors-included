@@ -66,6 +66,11 @@ class ServerNetworkHandler(dbus.service.Object):
         print "Message Available!!"
         return "Message Available!!"
 
+    @dbus.service.signal(dbus_interface='included.errors.Server',
+                         signature='s')
+    def user_login(self, username):
+        print "Login from", username
+
     def open_socket(self):
         log.info("Server is opening socket")
         try:
@@ -128,6 +133,7 @@ class ServerNetworkHandler(dbus.service.Object):
                                       type=shared.data.MessageType.ack,
                                       unpacked_data={"result": "yes", "class": "dict"})
             self.enqueue(m.sender, ack.packed_data, 5)
+            self.user_login(m.sender)
         else:
             log.info("login denied")
             nack = shared.data.Message("server", id, response_to=m.message_id,
