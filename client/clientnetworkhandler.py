@@ -31,7 +31,7 @@ class ClientNetworkHandler(dbus.service.Object):
                                      '/Queue')
         self.server = (host, port)
         self.db = shared.data.create_database()
-        self.output = NetworkOutQueue(self.socket, self.db)
+        self.output = NetworkOutQueue(self.socket, self.db, config.client.name)
         self.input = NetworkInQueue(self.socket, self.db)
         self.inputs = [sys.stdin]
 

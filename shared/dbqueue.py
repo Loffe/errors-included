@@ -112,9 +112,9 @@ class DatabaseOutQueue(DatabaseQueue):
     # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
     def put(self, data, priority=0, block=True, timeout=None):
         item = data, priority
-        item = NetworkOutQueueItem(data, priority)
+        item = NetworkOutQueueItem(self.name, data, priority)
         log.debug("putting:" + data)
-        Queue.Queue.put(self, self.name, item, block, timeout)
+        Queue.Queue.put(self, item, block, timeout)
         return item.id
 
 
