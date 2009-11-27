@@ -380,7 +380,6 @@ class ClientGui(hildon.Program):
                                                       self.db,
                                                       self.message_dispatcher)
         self.mapobjecthandler.controller = self.controller
-        self.screens["info"].controller = self.controller
 
     def update_service_level(self):
         print "new service level"
@@ -404,6 +403,7 @@ class ClientGui(hildon.Program):
     def show_mission_info(self, event):
         self.toggle_show("mission", ["notifications", "info", "buttons"], 
                          "Här visas info om ditt uppdrag")
+        self.screens["info"].update_info(self.controller)
         #self.show(["info", "buttons"])
     
     def show_status(self, event):

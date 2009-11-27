@@ -42,5 +42,6 @@ class Screen(gtk.Widget):
         label.set_alignment(0, 0.5)
         left_box.pack_start(label)
         invisible = gtk.Label()
+        invisible.modify_font(pango.FontDescription("sans 14"))
         invisible.set_alignment(0, 0.5)
         right_box.pack_start(invisible)
