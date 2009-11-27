@@ -14,5 +14,5 @@ queue = Config()
 queue.reconnect_interval = 10*1000
 
 client = Config()
-client.name = 'Ragnar Dahlberg'
-client.password = 'Prydlig frisyr'
+client.name = u'Anonymous'
+client.password = u'Anonymous'
