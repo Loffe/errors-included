@@ -78,11 +78,6 @@ if __name__ == "__main__":
         session = db._Session()
 
         # Create users
-        u = User(u"ragnar", u"prydlig frisyr")
-        session.add(u)
-        u = User(u"slanggurka", u"smakar som nors")
-        session.add(u)
-
         i = 0
         for name in [u"Erik", u"Martin", u"Freddie", u"Linus", u"Emil", u"DT"]:
             u = User(name, name)

@@ -225,6 +225,7 @@ class QoSManager(dbus.service.Object):
             except:
                 # Not in N810, modules doesn't work; do nothing...
                 print "battery level: failure"
+                self.signal_changed_service_level("mega-low")
 
             # get signal strength
             try:

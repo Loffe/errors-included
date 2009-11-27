@@ -96,6 +96,12 @@ class DatabaseOutQueue(DatabaseQueue):
         DatabaseQueue.__init__(self, database, DatabaseQueue.direction_out)
         self.name = name
 
+    def _empty(self):
+        session = self.db._Session()
+        result = session.query(NetworkOutQueueItem).filter_by(sent = 0).filter_by(name=self.name).count() == 0
+        session.close()
+        return result
+
     # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
     def put(self, data, priority=0, block=True, timeout=None):
         item = data, priority
@@ -109,7 +115,7 @@ class DatabaseOutQueue(DatabaseQueue):
         # @TODO
         session = self.db._Session()
         print "_get"
-        q = session.query(NetworkOutQueueItem).filter(NetworkOutQueueItem.sent == False).filter(NetworkOutQueueItem.name == self.name)
+        q = session.query(NetworkOutQueueItem).filter_by(sent = False).filter_by(name = self.name)
         item = q.first()
         session.close()
         return item.data, item.id

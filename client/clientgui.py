@@ -32,6 +32,7 @@ from gui.patientjournalscreen import PatientJournalScreen
 from gui.contactscreen import ContactScreen
 from gui.camerascreen import CamScreen
 from mapobjecthandler import MapObjectHandler
+from gui.notificationscreen import NotificationScreen
 
 
 try:
@@ -131,12 +132,13 @@ class ClientGui(hildon.Program):
         panels.pack_start(vbox_right, True, True, 0)
         
         # adding the notification bar
-        notifications = gtk.Label("Team Med Fel")
-        notifications.set_alignment(0,0)
-        notifications.modify_font(pango.FontDescription("sans 14"))
-        notifications.set_size_request(0, 25)
-        vbox_right.pack_start(notifications, False, False, 0)
-        self.screens["notifications"] = notifications
+        self.notifications = NotificationScreen()
+#        notifications = gtk.Label("Team Med Fel")
+#        notifications.set_alignment(0,0)
+#        notifications.modify_font(pango.FontDescription("sans 14"))
+#        notifications.set_size_request(0, 25)
+        vbox_right.pack_start(self.notifications, False, False, 0)
+        self.screens["notifications"] = self.notifications
 
         # add the map screen
         self.map = MapScreen(self.db)
@@ -396,8 +398,8 @@ class ClientGui(hildon.Program):
                                                       self.message_dispatcher)
         self.mapobjecthandler.controller = self.controller
 
-    def update_service_level(self):
-        print "new service level"
+    def update_service_level(self, service_level):
+        self.screens["notifications"].update_label(service_level)
 
     ''' Handle events
     ''' 
@@ -591,7 +593,7 @@ class ClientGui(hildon.Program):
         for key in self.screens.keys():
             self.screens[key].hide_all()
         self.screens["notifications"].set_label("Team Med Fel")
-        self.screens["notifications"].show()
+        self.screens["notifications"].show_all()
         self.screens["map"].show()
         self.screens["map"].sign = False
         self.screens["map"].remove_sign()
