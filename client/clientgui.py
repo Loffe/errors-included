@@ -308,24 +308,26 @@ class ClientGui(hildon.Program):
         
 
     def sending_voip(self, event):
-        msg = shared.data.Message(self.controller.name, "server",
+        msg = shared.data.Message(self.controller.name, 
+                                  self.screens["contact"].name,
                                   type=shared.data.MessageType.voip, 
                                   subtype=shared.data.VOIPType.request,
-                                  unpacked_data={"reciever": self.screens["contact"].name, 
-                                                 "ip": get_ip(), "port": 5432,
+                                  unpacked_data={"ip": get_ip(), "port": 5432,
                                                  "class": "dict"})
         self.queue.enqueue(msg.packed_data, msg.prio)
         
     def sending_vvoip(self, event):
-        msg = shared.data.Message(self.controller.name, "server",
+        msg = shared.data.Message(self.controller.name, 
+                                  self.screens["contact"].name,
                                   type=shared.data.MessageType.vvoip, 
                                   subtype=shared.data.VVOIPType.request,
-                                  unpacked_data={"reciever": self.screens["contact"].name, 
-                                                 "ip": get_ip(), "port1": 5432, "port2": 5434, 
-                                                 "class": "dict"})
+                                  unpacked_data={"ip": get_ip(), "port1": 5432, 
+                                                 "port2": 5434, "class": "dict"})
         self.queue.enqueue(msg.packed_data, msg.prio)
     
     def check_if_ok(self, msg):
+        sender = msg.sender
+        reciever = msg.reciever
         type = msg.type
         subtype = msg.subtype
         data = msg.unpacked_data
@@ -333,11 +335,23 @@ class ClientGui(hildon.Program):
             if subtype == shared.data.VOIPType.response:
                 self.show_voice(ip=data.ip, port=data.port)
             if subtype == shared.data.VOIPType.request:
+                message = shared.data.Message(self.controller.name, sender,
+                                  type=shared.data.MessageType.voip, 
+                                  subtype=shared.data.VOIPType.response,
+                                  unpacked_data={"ip": get_ip(), "port": 5432, 
+                                                 "class": "dict"})
+                self.queue.enqueue(message.packed_data, message.prio)
                 self.show_voice(ip=data.ip, port=data.port)
         elif type == shared.data.MessageType.vvoip:
             if subtype == shared.data.VVOIPType.response:
                 self.show_cam(ip=data.ip, port1=data.port1, port2=data.port2)
             elif subtype == shared.data.VVOIPType.request:
+                message = shared.data.Message(self.controller.name, sender,
+                                  type=shared.data.MessageType.vvoip, 
+                                  subtype=shared.data.VVOIPType.response,
+                                  unpacked_data={"ip": get_ip(), "port1": 5432,
+                                                 "port2": 5434, "class": "dict"})
+                self.queue.enqueue(message.packed_data, message.prio)
                 self.show_cam(ip=data.ip, port1=data.port1, port2=data.port2)
     
     def incoming_vvoip(self):

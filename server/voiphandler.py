@@ -1,4 +1,4 @@
-import shared.data
+from shared.data import *
 
 class VoipHandler(object):
     INTERVAL = 1000
@@ -10,15 +10,40 @@ class VoipHandler(object):
         self.database = database
         self.queue = queue
 
-    def handler(self, message):
-        
-        print "YAWTAPSFS"
-#        start = self.next_interval_start
-#        stop = start + self.INTERVAL - 1
-#        self.next_interval_start = stop + 1
-#        ack = shared.data.Message("server", message.sender,
-#                type=shared.data.MessageType.id,
-#                subtype=shared.data.IDType.response,
-#                unpacked_data={'class': 'dict', 'nextstart': start, 'nextstop': stop})
-#        self.queue.enqueue(message.sender, ack.packed_data, 9)
-#        print "providing"
+    def voip_handler(self, message):
+        print "waagh"
+#        sender = message.sender
+#        reciever = message.reciever
+#        type = message.type
+#        subtype = message.subtype
+#        data = message.unpacked_data
+#        
+#        msg = Message(sender, reciever, type, subtype)
+#        
+#        if subtype == VOIPType.request:
+#            data = message.unpacked_data
+#            ip = data.ip
+#            port = data.port
+#            
+#    
+#            msg = shared.data.Message("server", reciever,
+#                                      type=shared.data.MessageType.voip, 
+#                                      subtype=shared.data.VOIPType.request,
+#                                      unpacked_data={"ip": ip, "port": port,
+#                                                     "class": "dict"})
+#            self.queue.enqueue(msg.packed_data, msg.prio)
+#        elif subtype == VOIPType.response:
+#            data = message.unpacked_data
+#            ip = data.ip
+#            port = data.port
+#            
+#    
+#            msg = shared.data.Message("server", reciever,
+#                                      type=shared.data.MessageType.voip, 
+#                                      subtype=shared.data.VOIPType.request,
+#                                      unpacked_data={"ip": ip, "port": port,
+#                                                     "class": "dict"})
+#            self.queue.enqueue(msg.packed_data, msg.prio)
+
+    def vvoip_handler(self, message):
+        pass
