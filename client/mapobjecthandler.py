@@ -14,17 +14,15 @@ class MapObjectHandler(object):
         subtype = message.subtype
         object = message.unpacked_data
         if subtype == ActionType.change:
-            pass
+            Database.change(self.database, object)
+            self.database.emit("mapobject-changed", object)
+
         elif subtype == ActionType.add:
-            session = self.database._Session()
-            session.add(object)
-            session.commit()
-            session.close()
+            Database.add(self.database, object)
             if object.__class__ == MissionData:
                 for unit in object.units:
                     if unit.id == self.controller.unit_data.id:
                         self.controller.add_mission(object)
-            self.database.emit("mapobject-changed", object)
         elif subtype == ActionType.delete:
             pass
         else:
