@@ -80,6 +80,15 @@ class DatabaseInQueue(DatabaseQueue):
         else:
             return None
 
+    def mark_as_processed(self, id):
+        # @TODO: acuire lock maybe?
+        session = self.db._Session()
+        q = session.query(data.NetworkInQueueItem).filter_by(id = id)
+        item = q.first()
+        item.processed = True
+        session.commit()
+        session.close()
+
     # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
     def put(self, data, priority=0, block=True, timeout=None):
         item = data, priority

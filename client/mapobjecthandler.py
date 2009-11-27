@@ -32,3 +32,5 @@ class MapObjectHandler(object):
             pass
         else:
             raise Error("Invalid subtype")
+
+        return True

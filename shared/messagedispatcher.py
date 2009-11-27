@@ -32,7 +32,13 @@ class MessageDispatcher(object):
         # execute the callbacks
         if self.connected_ids.has_key(response_to):
             print "execute on id", type
-            self.connected_ids[response_to](msg)
+            callback = self.connected_ids[response_to]
+            result = callback(msg)
+            if result:
+                self.queue.mark_as_processed(local_id)
         if self.connected_types.has_key(type):
             print "execute on type", type
-            self.connected_types[type](msg)
+            callback = self.connected_types[type]
+            result = callback(msg)
+            if result:
+                self.queue.mark_as_processed(local_id)
