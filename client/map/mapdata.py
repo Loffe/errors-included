@@ -293,12 +293,14 @@ class POI(MapObject):
         sub = poi_data.subtype
         if sub == shared.data.POISubType.tree:
             path = "map/data/icons/tree.png" 
-        elif poi_data.type == shared.data.POISubType.pasta_wagon:
+        elif sub == shared.data.POISubType.pasta_wagon:
             path = "map/data/icons/pastawagon.png"
-        elif poi_data.type == shared.data.POISubType.fire:
+        elif sub == shared.data.POISubType.fire:
             path = "map/data/icons/fire.png"
-        elif poi_data.type == shared.data.POISubType.accident:
+        elif sub == shared.data.POISubType.accident:
             path = "map/data/icons/accident.png"
+        elif sub == shared.data.POISubType.bridge:
+            path = "map/data/icons/bridge.png"
         elif poi_data.type == shared.data.POIType.flag:
             path = "map/data/icons/default.png"
             offset = (8, -13)

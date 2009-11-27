@@ -218,7 +218,7 @@ class POIType(object):
     flag = u"flag" # Remove?
 
 class POISubType(object):
-    brigde = u"brigde"
+    bridge = u"bridge"
     tree = u"tree"
     accident = u"accident"
     fire = u"fire"
