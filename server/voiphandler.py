@@ -1,8 +1,6 @@
 import shared.data
 
 class VoipHandler(object):
-    INTERVAL = 1000
-    next_interval_start = 1
     database = None
     queue = None
 
@@ -10,15 +8,11 @@ class VoipHandler(object):
         self.database = database
         self.queue = queue
 
-    def handler(self, message):
+    def handle(self, message):
         
         print "YAWTAPSFS"
-#        start = self.next_interval_start
-#        stop = start + self.INTERVAL - 1
-#        self.next_interval_start = stop + 1
-#        ack = shared.data.Message("server", message.sender,
-#                type=shared.data.MessageType.id,
-#                subtype=shared.data.IDType.response,
-#                unpacked_data={'class': 'dict', 'nextstart': start, 'nextstop': stop})
-#        self.queue.enqueue(message.sender, ack.packed_data, 9)
-#        print "providing"
+        msg = shared.data.Message(message.sender, message.reciever,
+                                  message.type, message.subtype,
+                                  unpacked_data=message.unpacked_data)
+        self.queue.enqueue(msg.reciever, msg.packed_data, msg.prio)
+        print "forwarding", msg
