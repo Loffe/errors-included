@@ -31,8 +31,6 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
         self.db = db 
         
         self.entries = []
-        
-        self.controller = None
 
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
@@ -87,16 +85,16 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
         
         # create entries
         self.new_section("Mitt uppdarag", left_box, right_box)
-        self.event_entry = self.new_coordlabel("     Händelse:", left_box, right_box)
+        self.event_entry = self.new_entry("     Händelse:", left_box, right_box)
 
         self.location_entry2 = self.new_coordlabel("     Skadeplats: lon-Gps", left_box, right_box)
         self.location_entry3 = self.new_coordlabel("     Skadeplats: lat-Gps", left_box, right_box)      
-        self.hurted_entry = self.new_coordlabel("     Antal skadade:", left_box, right_box)
+        self.hurted_entry = self.new_entry("     Antal skadade:", left_box, right_box)
         self.new_section("Kontaktperson", left_box, right_box)
-        self.name_entry = self.new_coordlabel("     Namn:", left_box, right_box)
-        self.number_entry = self.new_coordlabel("     Nummer:", left_box, right_box)
+        self.name_entry = self.new_entry("     Namn:", left_box, right_box)
+        self.number_entry = self.new_entry("     Nummer:", left_box, right_box)
         self.new_section("Övrigt", left_box, right_box)
-        self.random_entry = self.new_coordlabel("     Information:", left_box, right_box)
+        self.random_entry = self.new_entry("     Information:", left_box, right_box)
 
 #        self.select_unit_button = SelectUnitButton(self.db)
 #        main_box.add(self.select_unit_button)        
@@ -135,7 +133,7 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
 #                self.random_entry.set_text(alarm.other)
 
     def ok_button_function(self, event):
-        self.update_info(self.controller)
+        pass
 #        self.event_entry.set_text(controller.mission.event_type)
 #        self.location_entry2.set_text(str("hej"))
 #        self.location_entry3.set_text(str("hej"))                
@@ -148,12 +146,12 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
         if len(controller.missions) > 0:
             self.event_entry.set_text(controller.missions[0].event_type)
             # @todo: to be continued to fill in the rest of the fields.
-        self.location_entry2.set_text(str("hej"))
-        self.location_entry3.set_text(str("hej"))                
-        self.name_entry.set_text("hej")
-        self.hurted_entry.set_text(str("hej"))
-        self.number_entry.set_text("hej")
-        self.random_entry.set_text("hej")
+            self.location_entry2.set_text(str(controller.missions[0].poi.coordx))
+            self.location_entry3.set_text(str(controller.missions[0].poi.coordy))                
+            self.name_entry.set_text(controller.missions[0].contact_person)
+            self.hurted_entry.set_text(str(controller.missions[0].number_of_wounded))
+            self.number_entry.set_text(controller.missions[0].contact_number)
+            self.random_entry.set_text(controller.missions[0].other)
             
 #        self.event_type = event_type
 #        self.poi = poi
