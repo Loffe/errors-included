@@ -11,7 +11,7 @@ class ClientController(object):
     '''
     Self. This is me. Holds my name, unit_type, status and gps-coordinates.
     '''
-    def __init__(self, name, unit_type, status, db):
+    def __init__(self, status, db):
         '''
         Constructor. Creates a client controller.
         @param name: my name.
@@ -46,6 +46,7 @@ class ClientController(object):
         @param coordx: the x-coordinate to set.
         @param coordy: the y-coordinate to set.
         '''
+        # No unit data yet
         if self.unit_data == None:
             return
         self.unit_data.coordx = float(coordx)
