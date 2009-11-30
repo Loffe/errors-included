@@ -211,7 +211,7 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.contact_menu, False, False, 0)
         self.screens["contact_menu"] = self.contact_menu
         call = gtk.Button("Bröstsamtal")
-        call.connect("clicked", self.sending_vvoip)
+        call.connect("clicked", self.sending_voip)
         video = gtk.Button("Videosamtal")
         video.connect("clicked", self.sending_vvoip)
         self.contact_menu.add(call)
@@ -334,6 +334,7 @@ class ClientGui(hildon.Program):
         type = msg.type
         subtype = msg.subtype
         data = msg.unpacked_data
+        print "Data:", data
         if type == shared.data.MessageType.voip:
             if subtype == shared.data.VOIPType.response:
                 print "voip response"
