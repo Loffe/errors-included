@@ -140,7 +140,11 @@ class DatabaseOutQueue(DatabaseQueue):
         # @TODO
         session = self.db._Session()
         print "_get"
-        q = session.query(NetworkOutQueueItem).filter_by(sent = False).filter_by(name = self.name)
+        q = session.query(NetworkOutQueueItem).filter_by(sent = False) \
+                .filter_by(name = self.name) \
+                .order_by(NetworkOutQueueItem.prio.desc()) \
+                .order_by(NetworkOutQueueItem.id.asc())
+                #.order_by(NetworkOutQueueItem.timestamp.desc())
         item = q.first()
         session.close()
         return item.data, item.id
