@@ -108,6 +108,8 @@ class Database(gobject.GObject):
         Change an existing objects state in the database.
         @param object: the object that has changed.
         '''
+        if object is None:
+            print "Stop being stupid!"
         session = self._Session()
         object.timestamp = datetime.now()
         result = session.query(object.__class__).filter_by(id=object.id).first()
