@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
         # Create users
         i = 0
-        for name in [u"Erik", u"Martin", u"Freddie", u"Linus", u"Emil", u"DT"]:
+        for name in [u"Erik", u"Martin", u"Freddie", u"Linus", u"Emil", u"DT", u"Leader", u"Slave"]:
             u = User(name, name)
             session.add(u)
 
