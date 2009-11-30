@@ -32,6 +32,7 @@ class ClientController(object):
 
         # My name
         self.name = config.client.name
+        print self.name
         # My status
         self.status = status
         # My missions

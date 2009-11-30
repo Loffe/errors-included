@@ -24,7 +24,7 @@ class MessageDispatcher(object):
         queueinterface.connect_to_signal("message_received", self.dispatch)
 
     def dispatch(self, local_id, response_to):
-        print local_id, response_to
+        print "dispatching:", local_id, response_to
         data = self.queue.peek(local_id)
         print data
         msg = Message.unpack(data, self.db)
