@@ -11,9 +11,9 @@ class VoipHandler(object):
     def handle(self, message):
         
         print "YAWTAPSFS"
-        msg = shared.data.Message(message.sender, message.reciever,
-                                  message.type, message.subtype,
-                                  unpacked_data=message.unpacked_data)
+        msg = Message(message.sender, message.reciever,
+                      message.type, message.subtype,
+                      unpacked_data=message.unpacked_data)
         self.queue.enqueue(msg.reciever, msg.packed_data, msg.prio)
         print "forwarding", msg
 
