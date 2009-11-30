@@ -339,7 +339,7 @@ class ClientGui(hildon.Program):
             if subtype == shared.data.VOIPType.response:
                 print "voip response"
                 self.out_dialog.destroy()
-                self.show_voice(ip=data.ip, port=data.port)
+                self.show_voice(ip=data["ip"], port=data["port"])
             if subtype == shared.data.VOIPType.request:
                 print "voip request"
                 self.inc_call_popup(msg)
@@ -347,7 +347,7 @@ class ClientGui(hildon.Program):
             if subtype == shared.data.VVOIPType.response:
                 print "vvoip response"
                 self.out_dialog.destroy()
-                self.show_cam(ip=data.ip, port1=data.port1, port2=data.port2)
+                self.show_cam(ip=data["ip"], port1=data["port1"], port2=data["port2"])
             elif subtype == shared.data.VVOIPType.request:
                 print "vvoip request"
                 self.inc_call_popup(msg)
@@ -366,7 +366,7 @@ class ClientGui(hildon.Program):
                                       unpacked_data={"ip": get_ip(), "port": 5432, 
                                                      "class": "dict"})
         self.queue.enqueue(message.packed_data, message.prio)
-        self.show_voice(ip=data.ip, port=data.port)
+        self.show_voice(ip=data["ip"], port=data["port"])
         
     def start_vvoip(self, msg):
         print "Staring vvoip"
@@ -381,34 +381,50 @@ class ClientGui(hildon.Program):
                                   unpacked_data={"ip": get_ip(), "port1": 5432,
                                                  "port2": 5434, "class": "dict"})
         self.queue.enqueue(message.packed_data, message.prio)
-        self.show_cam(ip=data.ip, port1=data.port1, port2=data.port2)
+        self.show_cam(ip=data["ip"], port1=data["port1"], port2=data["port2"])
     
     def inc_call_popup(self, msg):
         print "Inkommande samtal = popup"
         inc_dialog = gtk.Dialog("Samtal",
                  self.window,  #the toplevel wgt of your app
                  gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
-                 ("     Svara     ", 77, "  Lägg på  ", 666))
+                 )
         who = gtk.Label("Någon ringer...")
         who.show()
         inc_dialog.set_size_request(400,200)
         #dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-
-        inc_dialog.vbox.pack_start(who)
-        question = gtk.Label("Vill du svara?")
-        question.show()
-        inc_dialog.vbox.pack_start(question)
-        inc_dialog.show()
-        result = inc_dialog.run()
-        if result == 77:
+        hang_up_button = gtk.Button("  Lägg på  ")
+        inc_dialog.action_area.pack_start(hang_up_button)
+        def hang_up(event):
+            # @todo: return nack if we dont want to answer
+            print "upptaget"
+            inc_dialog.destroy()
+        hang_up_button.connect("clicked", hang_up)
+        
+        answer_button = gtk.Button("     Svara     ")
+        inc_dialog.action_area.pack_start(answer_button)
+        def answer(event):
             if msg.type == shared.data.MessageType.voip:
                 self.start_voip(msg)
             elif msg.type == shared.data.MessageType.vvoip:
                 self.start_vvoip(msg)
-        elif result == 666:
-            # @todo: return nack if we dont want to answer
-            print "upptaget"
-        inc_dialog.destroy()
+        answer_button.connect("clicked", answer)
+        
+        inc_dialog.vbox.pack_start(who)
+        question = gtk.Label("Vill du svara?")
+        question.show()
+        inc_dialog.vbox.pack_start(question)
+        inc_dialog.show_all()
+#        result = inc_dialog.run()
+#        if result == 77:
+#            if msg.type == shared.data.MessageType.voip:
+#                start_voip = True
+#            elif msg.type == shared.data.MessageType.vvoip:
+#                start_vvoip = True
+#        elif result == 666:
+#            # @todo: return nack if we dont want to answer
+#            print "upptaget"
+#        inc_dialog.destroy()
         
     def out_call_popup(self, msg):
         print "Utgående samtal = popup"
