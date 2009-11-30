@@ -330,6 +330,7 @@ class ClientGui(hildon.Program):
         self.out_call_popup(msg)
     
     def check_if_ok(self, msg):
+        print "Check if ok-function"
         sender = msg.sender
         reciever = msg.reciever
         type = msg.type
@@ -337,19 +338,24 @@ class ClientGui(hildon.Program):
         data = msg.unpacked_data
         if type == shared.data.MessageType.voip:
             if subtype == shared.data.VOIPType.response:
+                print "voip response"
                 self.out_dialog.destroy()
                 self.show_voice(ip=data.ip, port=data.port)
             if subtype == shared.data.VOIPType.request:
+                print "voip request"
                 self.inc_call_popup(msg)
         elif type == shared.data.MessageType.vvoip:
             if subtype == shared.data.VVOIPType.response:
+                print "vvoip response"
                 self.out_dialog.destroy()
                 self.show_cam(ip=data.ip, port1=data.port1, port2=data.port2)
             elif subtype == shared.data.VVOIPType.request:
+                print "vvoip request"
                 self.inc_call_popup(msg)
     
     
     def start_voip(self, msg):
+        print "Staring voip"
         sender = msg.sender
         reciever = msg.reciever
         type = msg.type
@@ -364,6 +370,7 @@ class ClientGui(hildon.Program):
         self.show_voice(ip=data.ip, port=data.port)
         
     def start_vvoip(self, msg):
+        print "Staring vvoip"
         sender = msg.sender
         reciever = msg.reciever
         type = msg.type
@@ -378,6 +385,7 @@ class ClientGui(hildon.Program):
         self.show_cam(ip=data.ip, port1=data.port1, port2=data.port2)
     
     def inc_call_popup(self, msg):
+        print "Inkommande samtal = popup"
         inc_dialog = gtk.Dialog("Samtal",
                  self.window,  #the toplevel wgt of your app
                  gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
@@ -404,6 +412,7 @@ class ClientGui(hildon.Program):
         inc_dialog.destroy()
         
     def out_call_popup(self, msg):
+        print "Utgående samtal = popup"
         if self.screens["contact"].name == None:
             return 0
         
