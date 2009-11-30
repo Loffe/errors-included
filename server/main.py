@@ -49,16 +49,12 @@ class ServerManager(object):
 
     def _user_login(self, username):
         print "User %s logged in to queue" % username
-        s = self.database._Session()
-        unit = s.query(shared.data.UnitData).filter_by(name=username).first()
-        if unit is None:
-            print "There is no unit with name %s" % username
-        else:
-            you_are_msg = Message("server", username,
-                                  MessageType.object, ActionType.add,
-                                  unpacked_data=unit);
-            self.queue.enqueue(username, you_are_msg.packed_data, you_are_msg.prio)
-        s.close()
+        units = self.database.get_all_units()
+        for unit in units:
+            unit_msg = Message("server", username,
+                               MessageType.object, ActionType.add,
+                               unpacked_data=unit);
+            self.queue.enqueue(username, unit_msg.packed_data, unit_msg.prio)
 
     def _message_available(self, packed_data):
         print "_message_available"
