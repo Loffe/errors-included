@@ -97,9 +97,8 @@ class Database(gobject.GObject):
         if result is None:
             session.add(object)
         else:
-            session.delete(result)
-            session.add(object)
-
+            Packable.copy(object, result)
+            
         session.commit()
         session.close()
         self.emit("mapobject-added", object)
