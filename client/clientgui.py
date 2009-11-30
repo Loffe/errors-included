@@ -79,8 +79,6 @@ class ClientGui(hildon.Program):
         self.mapobjecthandler = MapObjectHandler(self.db, self.queue)
         self.message_dispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
         
-        self.message_dispatcher.connect_to_type(shared.data.MessageType.vvoip, self.check_if_ok)
-        self.message_dispatcher.connect_to_type(shared.data.MessageType.voip, self.check_if_ok)
 
 
         # create gui
@@ -445,6 +443,8 @@ class ClientGui(hildon.Program):
         self.start_controller()
         # connect service level signal from controller
         self.controller.interface.connect_to_signal("signal_changed_service_level", self.update_service_level)
+        self.message_dispatcher.connect_to_type(shared.data.MessageType.vvoip, self.check_if_ok)
+        self.message_dispatcher.connect_to_type(shared.data.MessageType.voip, self.check_if_ok)
         # only do start method once
         self.db.disconnect(self.ready_handler_id)
 
