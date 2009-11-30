@@ -26,8 +26,9 @@ class MapObjectHandler(object):
             # if a mission with my unit_data was added, assign me to it (show it)
             if object.__class__ == MissionData:
                 for unit in object.units:
-                    if unit.id == self.controller.unit_data.id:
-                        self.controller.add_mission(object)
+                    if self.controller is not None:
+                        if unit.id == self.controller.unit_data.id:
+                            self.controller.add_mission(object)
         elif subtype == ActionType.delete:
             pass
         else:

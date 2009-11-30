@@ -62,7 +62,7 @@ class ClientNetworkHandler(dbus.service.Object):
             ssh_options = ["ssh",
                              "-C", "-f",
                              "-L", str(config.server.localport)+":127.0.0.1:"+str(port),
-                             host, "sleep", "10"]
+                             host, "-o", "TCPKeepAlive=yes", "sleep", "10"]
             print " ".join(ssh_options)
             subprocess.call(ssh_options)
             host = "127.0.0.1"

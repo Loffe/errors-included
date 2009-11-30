@@ -90,7 +90,7 @@ class DatabaseInQueue(DatabaseQueue):
         session.close()
 
     def mark_as_failed(self, id, error_code = 2):
-        print "marking %d as failed"
+        print "marking %d as failed" % id
         # @TODO: acuire lock maybe?
         session = self.db._Session()
         q = session.query(data.NetworkInQueueItem).filter_by(id = id)
