@@ -111,7 +111,11 @@ class Database(gobject.GObject):
         session = self._Session()
         object.timestamp = datetime.now()
         result = session.query(object.__class__).filter_by(id=object.id).first()
-        Packable.copy(object, result)
+        if result is None:
+            session.add(object)
+            print "This cannot happen in reality"
+        else:
+            Packable.copy(object, result)
         session.add(result)
 
         session.commit()
