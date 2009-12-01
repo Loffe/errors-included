@@ -622,7 +622,7 @@ class ClientGui(hildon.Program):
             combo.insert_text(textmessages.id, textmessages.subject)
         
     def show_inbox(self, event):
-        self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här ska bara inkomna medelande finnas")
+        self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här ska bara inkomna meddelande finnas")
         #self.show(["message", "message_menu"])
         
         combo = self.screens["message"].combo_box

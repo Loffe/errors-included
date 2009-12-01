@@ -161,10 +161,21 @@ class Database(gobject.GObject):
         session = self._Session()
         textmessages = []
         for t in session.query(TextMessage):
+            
             textmessages.append(t)
         session.close()
         return textmessages
     
+    def get_all_outboxmessages(self):
+        session = self._Session()
+        textmessages = []
+        for t in session.query(TextMessage):
+            if config.client.id[-2] == textmessages.id[-2]:
+                textmessages.append(t)
+        session.close()
+        return textmessages
+        
+        #if config.client.type == 'commander':
     
     def get_all_units(self):
         session = self._Session()

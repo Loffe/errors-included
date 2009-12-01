@@ -30,8 +30,6 @@ class MapObjectHandler(object):
                         if unit.id == self.controller.unit_data.id:
                             self.controller.add_mission(object)
                             
-
-                            
         elif subtype == ActionType.delete:
             pass
         else:
