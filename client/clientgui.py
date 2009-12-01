@@ -351,12 +351,7 @@ class ClientGui(hildon.Program):
             elif subtype == shared.data.VVOIPType.request:
                 print "vvoip request"
                 self.inc_call_popup(msg)
-                
     
-    def check_if_ok2(self, msg):
-        pass
-        
-        
     def start_voip(self, msg):
         print "Staring voip"
         sender = msg.sender
@@ -468,8 +463,6 @@ class ClientGui(hildon.Program):
         self.controller.interface.connect_to_signal("signal_changed_service_level", self.update_service_level)
         self.message_dispatcher.connect_to_type(shared.data.MessageType.vvoip, self.check_if_ok)
         self.message_dispatcher.connect_to_type(shared.data.MessageType.voip, self.check_if_ok)
-        
-        self.message_dispatcher.connect_to_type(shared.data.MessageType.object, self.check_if_ok2)
         
 
 
