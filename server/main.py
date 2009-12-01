@@ -84,7 +84,7 @@ if __name__ == "__main__":
         from datetime import datetime
         if os.path.exists("database.db"):
             os.remove("database.db")
-        db = create_database()
+        db = create_database(ServerDatabase())
         session = db._Session()
 
         # Create users

@@ -1,11 +1,13 @@
 from shared.data import Database
 import data
+import config
 
 class ServerDatabase(Database):
     ''' Handles database querys '''
 
     def __init__(self):
-        Database.__init__(self)
+        Database.__init__(self, config.server.database)
+        print "Connected to database at", config.server.database
 
     def is_valid_login(self, username, password):
         s = self._Session()

@@ -79,12 +79,12 @@ class Database(gobject.GObject):
     A sqlite3 database using sqlalchemy.
     '''
 
-    def __init__(self):
+    def __init__(self, path='sqlite:///database.db'):
         '''
         Create database engine and session.
         '''
         gobject.GObject.__init__(self)
-        self.engine = create_engine('sqlite:///database.db', echo=False)
+        self.engine = create_engine(path, echo=False)
         self._Session = scoped_session(sessionmaker(bind=self.engine))
         
     def add(self, object):
