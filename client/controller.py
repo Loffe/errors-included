@@ -40,6 +40,12 @@ class ClientController(object):
         self.missions = []
         # The unit I am (will be set upon login)
         self.unit_data = shared.data.UnitData(coordx=0, coordy=0, name=self.name, timestamp=datetime.now(), id=self.id)
+        
+        # load all own missions
+        for mission in self.db.get_all_missions():
+            for unit in mission.units:
+                if unit.id == self.unit_data.id:
+                    self.add_mission(mission)
 
     def update_coords(self, coordx, coordy):
         '''

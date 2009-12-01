@@ -27,6 +27,7 @@ class MapObjectHandler(object):
             if object.__class__ == MissionData:                
                 for unit in object.units:
                     if self.controller is not None:
+                        print "unit.id", unit.id, "controller.id", self.controller.unit_data.id 
                         if unit.id == self.controller.unit_data.id:
                             self.controller.add_mission(object)
                             
