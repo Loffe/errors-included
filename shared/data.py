@@ -118,7 +118,7 @@ class Database(gobject.GObject):
             print "This cannot happen in reality"
         else:
             Packable.copy(object, result)
-        session.add(result)
+            session.add(result)
 
         session.commit()
         session.close()
