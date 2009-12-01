@@ -136,7 +136,7 @@ class ServerNetworkHandler(dbus.service.Object):
             ack = shared.data.Message("server", id, response_to=m.message_id,
                                       type=shared.data.MessageType.ack,
                                       unpacked_data={"result": "yes", "class": "dict"})
-            self.enqueue(m.sender, ack.packed_data, 5)
+            self.enqueue(m.sender, ack.packed_data, 9)
             self.user_login(m.sender)
         else:
             log.info("login denied")
@@ -144,7 +144,7 @@ class ServerNetworkHandler(dbus.service.Object):
                                        type=shared.data.MessageType.ack,
                                        unpacked_data={"result": "no", "class": "dict"})
             # queue is not named because login failed
-            self.enqueue(m.sender, nack.packed_data, 5)
+            self.enqueue(m.sender, nack.packed_data, 9)
             print "Login failed"
             #self._disconnect_client(socket)
             

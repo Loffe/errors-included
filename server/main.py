@@ -54,7 +54,8 @@ class ServerManager(object):
             unit_msg = Message("server", username,
                                MessageType.object, ActionType.add,
                                unpacked_data=unit);
-            self.queue.enqueue(username, unit_msg.packed_data, unit_msg.prio)
+            # Send initial messages with high prio
+            self.queue.enqueue(username, unit_msg.packed_data, 9)
 
     def _message_available(self, packed_data):
         print "_message_available"
