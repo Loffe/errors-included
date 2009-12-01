@@ -139,8 +139,8 @@ class Database(gobject.GObject):
         session = self._Session()
         alarms = []
         for a in session.query(Alarm):
-            for p in session.query(POIData).filter_by(id=a.poi_id):
-                a.poi = p
+            # do lazy load (setup relations)
+            a.poi
             alarms.append(a)
         session.close()
         return alarms
@@ -148,8 +148,10 @@ class Database(gobject.GObject):
     def get_all_missions(self):
         session = self._Session()
         missions = []
-        # ought to work
         for m in session.query(MissionData):
+            # do lazy load (setup relations)
+            m.poi
+            m.units
             missions.append(m)
         session.close()
         return missions
