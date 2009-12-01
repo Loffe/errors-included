@@ -390,7 +390,7 @@ class TextMessage(Base, Packable):
         
     def __repr__(self):
             
-        repr = ("<%s: %s, %s, %s >" % 
+        repr = ("<%s: %s, %s, %s, %s >" % 
                 (self.__class__.__name__, self.subject, self.message_content, self.timestamp , self.id))
         try:
             return repr.encode('utf-8')
