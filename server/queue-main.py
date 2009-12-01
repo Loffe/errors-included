@@ -8,6 +8,7 @@ import Queue
 import dbus
 import dbus.service
 import shared.networkqueue
+import config
 from shared.dbqueue import DatabaseInQueue
 from shared.util import getLogger
 from shared.networkqueue import NetworkOutQueue
@@ -30,8 +31,11 @@ class ServerNetworkHandler(dbus.service.Object):
                                      '/Queue')
         db = ServerDatabase()
         self.db = shared.data.create_database(db)
-        self.host = ''
-        self.port = 50000
+        if config.server.ssh:
+            self.host = '127.0.0.1'
+        else:
+            self.host = ''
+        self.port = config.server.port
         self.backlog = 5
         self.size = 1024
         self.server = None
