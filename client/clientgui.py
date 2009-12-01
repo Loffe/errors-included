@@ -514,49 +514,19 @@ class ClientGui(hildon.Program):
         self.toggle_show("mission", ["notifications", "info", "buttons"], 
                          "Här visas info om ditt uppdrag")
         self.screens["info"].update_info(self.controller)
-        #self.show(["info", "buttons"])
+        
+        combo = self.screens["info"].combo_box
+        combo.get_model().clear()
+        combo.append_text("Välj uppdrag...")
+        combo.set_active(0)
+        for mission in self.controller.missions:
+            print "hej", event_type
+            combo.append_text(mission.event_type)
     
     def show_status(self, event):
         self.toggle_show("mission", ["notifications", "status", "buttons"], 
                          "Här kan du välj en status")
-        #self.show(["status", "buttons"])
   
-#        dialog = gtk.Dialog("Samtal",
-#                 self.window,  #the toplevel wgt of your app
-#                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
-#                 ("     Svara     ", 77, "  Upptaget  ", 666))
-#        who = gtk.Label("DT ringer...")
-#        who.show()
-#        dialog.set_size_request(400,200)
-#        #dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-#
-#        dialog.vbox.pack_start(who)
-#        question = gtk.Label("Vill du svara?")
-#        question.show()
-#        dialog.vbox.pack_start(question)
-#        dialog.show()
-#        result = dialog.run()
-#        if result == 77:
-#           print "svara"
-#
-#           dia = gtk.Dialog("Samtal",
-#                 self.window,  #the toplevel wgt of your app
-#                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
-#                 ("       Lägg på       ", 11))
-#        
-#           dia.set_size_request(400,200)
-#
-#           qu = gtk.Label("Vill du lägga på?")
-#           qu.show()
-#           dia.vbox.pack_start(qu)
-#           dia.show()
-#           result = dia.run()
-#           
-#           dia.destroy()
-#           
-#        elif result == 666:
-#            print "upptaget"
-#        dialog.destroy()
     
     def show_journals(self, event):
         self.toggle_show("mission", ["notifications", "patient_journal", "buttons"], 
