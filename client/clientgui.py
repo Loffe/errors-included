@@ -15,6 +15,7 @@ log = getLogger("client.log")
 log.debug("clientgui imported log")
 from map.mapdata import *
 import controller
+import config
 from database import ClientDatabase
 from gui.gui import Screen
 from gui.mapscreen import MapScreen
@@ -266,12 +267,13 @@ class ClientGui(hildon.Program):
         create_alarm_button.connect("clicked", self.create_alarm)
         create_obstacle_button = gtk.Button("Hinder")
         create_obstacle_button.connect("clicked", self.create_obstacle)
-        create_mission_button = gtk.Button("Uppdrag")
-        create_mission_button.connect("clicked", self.create_mission)
         self.add_object_menu.add(create_alarm_button)
         self.add_object_menu.add(create_obstacle_button)
-        self.add_object_menu.add(create_mission_button)
-        
+        if config.client.type == 'commander':
+            create_mission_button = gtk.Button("Uppdrag")
+            create_mission_button.connect("clicked", self.create_mission)
+            self.add_object_menu.add(create_mission_button)
+
         # add back- and ok-button (used in alarmscreen, obstaclescreen etc)
         self.buttons_box = gtk.HBox(False, 10)
         self.buttons_box.set_size_request(0, 60)

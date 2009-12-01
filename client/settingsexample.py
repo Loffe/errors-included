@@ -16,3 +16,4 @@ queue.reconnect_interval = 10*1000
 client = Config()
 client.name = u'Anonymous'
 client.password = u'Anonymous'
+client.type = u'ambulance'
