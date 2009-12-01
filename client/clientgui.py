@@ -383,12 +383,13 @@ class ClientGui(hildon.Program):
         self.show_cam(ip=data["ip"], port1=data["port1"], port2=data["port2"])
     
     def inc_call_popup(self, msg):
+        sender = msg.sender
         print "Inkommande samtal = popup"
         inc_dialog = gtk.Dialog("Samtal",
                  self.window,  #the toplevel wgt of your app
                  gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,  #binary flags or'ed together
                  )
-        who = gtk.Label("Någon ringer...")
+        who = gtk.Label(str(sender+" ringer..."))
         who.show()
         inc_dialog.set_size_request(400,200)
         #dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
