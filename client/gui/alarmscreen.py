@@ -70,7 +70,7 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
     def ok_button_function(self, event):
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
-
+        print "alarm"
         if lon != None and lat != None:
             poi_data = shared.data.POIData(
                     lon,lat,

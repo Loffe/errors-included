@@ -7,7 +7,6 @@ class Screen(gtk.Widget):
         self.name = name
 
     def ok_button_function(self, event):
-        
         print "Default ok buttton pressed"
 
     def new_entry(self, labeltext, left_box, right_box):

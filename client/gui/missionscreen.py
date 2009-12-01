@@ -97,7 +97,6 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         for a in self.db.get_all_alarms():
             if a.event == self.selected_alarm:
                 alarm = a
-
         lon = float(self.location_entry2.get_text())
         lat = float(self.location_entry3.get_text())
         selected = self.select_unit_button.select_dialog.selected_units

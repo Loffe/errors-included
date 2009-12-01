@@ -496,17 +496,17 @@ class ClientGui(hildon.Program):
     ''' 
     def back_button_function(self, event):
         self.show(self.prev_page[-2])
-    
+
     def ok_button_function(self, event):
         for screen in self.screens.values():
             if screen.props.visible and isinstance(screen, Screen):
                 screen.ok_button_function(event)
-    
+
     # mission view event handlers
     def show_mission(self, event):
         self.toggle_show("mission", ["notifications", "map", "mission_menu"], 
                          "Här visas dina uppdrag")
-    
+
     # mission buttons event handlers
     def show_mission_info(self, event):
         self.toggle_show("mission", ["notifications", "info", "buttons"], 
@@ -587,12 +587,14 @@ class ClientGui(hildon.Program):
         self.show(["make_mission", "buttons"])
         self.screens["make_mission"].location_entry2.set_text(str(self.screens["map"].gps_x))
         self.screens["make_mission"].location_entry3.set_text(str(self.screens["map"].gps_y))
-        
 
         combo = self.screens["make_mission"].combo_box
-        for alarm in self.db.get_all_alarms():
-            combo.remove_text(alarm.id)
-            combo.insert_text(alarm.id, alarm.event)
+        combo.get_model().clear()
+        combo.append_text("Välj larm...")
+        combo.set_active(0)
+        alarms = self.db.get_all_alarms()
+        for alarm in alarms:
+            combo.append_text(alarm.event)
 
     def create_new_message(self, event):
         self.toggle_show("messages", ["notifications", "new_message","buttons"], "Här kan du skriva ett nytt meddelanden")
