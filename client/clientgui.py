@@ -607,7 +607,7 @@ class ClientGui(hildon.Program):
 
     # messages view event handlers
     def show_messages(self, event):
-        self.toggle_show("messages", ["notifications", "message","message_menu"], "Här visas dina meddelanden")
+        self.toggle_show("messages", ["notifications", "map","message_menu"], "Här visas dina meddelanden")
         
         
         self.update_messagesbox(event)

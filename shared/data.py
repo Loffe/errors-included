@@ -205,6 +205,8 @@ class ObjectID(Base):
     name = Column(UnicodeText)
     value = Column(Integer)
     
+    prio = -1
+    
     def __init__(self, name, value):
         self.name = name
         self.value = value
@@ -363,6 +365,7 @@ class TextMessage(Base, Packable):
     message_content = Column(UnicodeText)
     timestamp = Column(DateTime)
     
+    prio = 5
     
     def __init__(self, subject, message_content, units, timestamp = datetime.now(), id = None):
         self.subject = subject
@@ -564,7 +567,7 @@ class Message(object):
     # The timestamp of this message
     timestamp = None
     
-    def __init__(self, sender, reciever, type = None, subtype = None, response_to = 0, unpacked_data = None):
+    def __init__(self, sender, reciever, type = None, subtype = None, response_to = 0, unpacked_data = None, prio = -1):
         '''
         Constructor. Creates a message.
         @param type: the type of this message
@@ -577,7 +580,11 @@ class Message(object):
         self.unpacked_data = unpacked_data
         self.timestamp = datetime.now()
         self.response_to = response_to
-        
+        if unpacked_data is not None and hasattr(unpacked_data, "prio"):
+            self.prio = unpacked_data.prio
+        if prio != -1:
+            self.prio = prio
+
         # pack the unpacked data
         self.pack()
     
