@@ -599,6 +599,16 @@ class ClientGui(hildon.Program):
     # contacts view event handlers
     def show_contacts(self,event):
         self.toggle_show("contacts", ["notifications","contact", "contact_menu"], "Här visas dina kontakter och du kan ringa till dem")
+        screen = self.screens["contact"]
+        screen.buttons = []
+        for child in screen.vbox.get_children():
+            screen.vbox.remove(child)
+        for u in self.db.get_all_units():
+            button = gtk.ToggleButton("%s" % u.name)
+            button.show()
+            screen.vbox.pack_start(button)
+            button.connect("pressed", screen.select_contacts)
+            screen.buttons.append(button)
 
     # messages view event handlers
     def show_messages(self, event):
