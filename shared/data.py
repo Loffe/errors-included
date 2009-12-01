@@ -148,11 +148,8 @@ class Database(gobject.GObject):
     def get_all_missions(self):
         session = self._Session()
         missions = []
+        # ought to work
         for m in session.query(MissionData):
-            for p in session.query(POIData).filter_by(id=m.poi_id):
-                m.poi = p
-            for u in session.query(units_in_missions).filter_by(mission_id = m.id):
-                m.units.append(u)
             missions.append(m)
         session.close()
         return missions
@@ -435,15 +432,17 @@ class MissionData(Base, Packable):
     poi = relation(POIData)
     event_type = Column(UnicodeText)
     contact_person = Column(UnicodeText)
+    contact_number = Column(UnicodeText)
     timestamp = Column(DateTime)
     other = Column(UnicodeText)
 
-    def __init__(self, event_type, poi, number_of_wounded, contact_person, 
+    def __init__(self, event_type, poi, number_of_wounded, contact_person, contact_number,
                  other, units, timestamp = datetime.now(), id = None):
         self.event_type = event_type
         self.poi = poi
         self.number_of_wounded = number_of_wounded
         self.contact_person = contact_person
+        self.contact_number = contact_number
         self.other = other
         self.timestamp = timestamp
         self.units = units
@@ -700,30 +699,32 @@ def create_database(db = Database()):
 if __name__ == '__main__':
     print "Testing db"
     db = create_database()
-    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.obstacle, POISubType.tree)
-    db.add(poi_data)
-    poi_data2 = POIData(122,333, u"goal", datetime(2013,10,10), POIType.obstacle, POISubType.tree)
-    db.add(poi_data2)
-    alarm = Alarm(u"räv", u"Linköping", poi_data, u"Klasse", u"11111", 7, u"nada")
-    db.add(alarm)
-    msg = Message("ragnar", "server", unpacked_data = alarm)
-    print Message.unpack(msg.packed_data, db)
-    alarm = db._Session().query(Alarm).filter_by(id=alarm.id).first()
-    alarm.poi = poi_data2
-    print alarm
-    db.add(alarm)
+#    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.obstacle, POISubType.tree)
+#    db.add(poi_data)
+#    poi_data2 = POIData(122,333, u"goal", datetime(2013,10,10), POIType.obstacle, POISubType.tree)
+#    db.add(poi_data2)
+#    alarm = Alarm(u"räv", u"Linköping", poi_data, u"Klasse", u"11111", 7, u"nada")
+#    db.add(alarm)
+#    msg = Message("ragnar", "server", unpacked_data = alarm)
+#    print Message.unpack(msg.packed_data, db)
+#    alarm = db._Session().query(Alarm).filter_by(id=alarm.id).first()
+#    alarm.poi = poi_data2
+#    print alarm
+#    db.add(alarm)
 
-#    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.accident, POISubType.tree)
+    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.obstacle, POISubType.tree)
 #    
 ##    print poi_data, poi_data.to_dict()
-#    db.add(poi_data)
-#    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
-#    db.add(unit_data)
-#    unit_data2 = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
-#    db.add(unit_data2)
-#    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data, unit_data2])
+    db.add(poi_data)
+    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
+    db.add(unit_data)
+    unit_data2 = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
+    db.add(unit_data2)
+    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data, unit_data2])
 ##    print mission_data.to_dict()
-#    db.add(mission_data)
+    db.add(mission_data)
+
+    print db.get_all_missions()
 ##    print mission_data.to_changed_list(db)
 #    
 #    units = []
