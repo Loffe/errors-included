@@ -1,4 +1,4 @@
-from shared.data import Message, MessageType, UnitData, MissionData, ActionType, Database
+from shared.data import Message, MessageType, UnitData, MissionData, Alarm, ActionType, Database
 
 class MapObjectHandler(object):
     database = None
@@ -31,8 +31,9 @@ class MapObjectHandler(object):
                         if unit.id == self.controller.unit_data.id:
                             self.controller.add_mission(object)
                             
-            #if object.__class__ == AlarmData:
-                #print "--------------------hej"
+            if object.__class__ == Alarm:
+                pass
+                            
         elif subtype == ActionType.delete:
             pass
         else:

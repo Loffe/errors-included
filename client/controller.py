@@ -6,7 +6,7 @@ import dbus
 import dbus.mainloop.glib
 import gobject
 import config
-import datetime
+from datetime import datetime
 
 class ClientController(object):
     '''
@@ -32,13 +32,14 @@ class ClientController(object):
 
         # My name
         self.name = config.client.name
-        print self.name
+        # My unit id
+        self.id = config.client.id
         # My status
         self.status = status
         # My missions
         self.missions = []
         # The unit I am (will be set upon login)
-        self.unit_data = None
+        self.unit_data = shared.data.UnitData(coordx=0, coordy=0, name=self.name, timestamp=datetime.now(), id=self.id)
 
     def update_coords(self, coordx, coordy):
         '''
@@ -52,9 +53,9 @@ class ClientController(object):
         self.unit_data.coordx = float(coordx)
         self.unit_data.coordy = float(coordy)
         print "Got coords update", coordx, coordy
-        self.unit_data.timestamp = datetime.datetime.now()
+        self.unit_data.timestamp = datetime.now()
         self.db.change(self.unit_data)
     
     def add_mission(self, mission):
         self.missions.append(mission)
-        print "got new mission:", type(data), data
+        print "got new mission:", type(mission), mission
