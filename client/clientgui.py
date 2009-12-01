@@ -611,7 +611,7 @@ class ClientGui(hildon.Program):
         self.show(["camera"])
         
     def show_outbox(self, event):
-        self.toggle_show("messages", ["notifications", "output","message_menu"], "Här visas dina utgångna meddelanden")
+        self.toggle_show("messages", ["notifications", "output","back_button_box"], "Här visas dina utgångna meddelanden")
         #self.show(["output", "message_menu"])
         
         combo = self.screens["output"].combo_box
@@ -620,7 +620,7 @@ class ClientGui(hildon.Program):
             combo.insert_text(textmessages.id, textmessages.subject)
         
     def show_inbox(self, event):
-        self.toggle_show("messages", ["notifications", "message","message_menu"], "Här visas dina utgångna meddelanden")
+        self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här ska bara inkomna medelande finnas")
         #self.show(["message", "message_menu"])
         
         combo = self.screens["message"].combo_box
