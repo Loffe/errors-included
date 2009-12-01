@@ -73,29 +73,18 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
     def ok_button_function(self, event):
         pass
 
-    def update_info(self, controller):
-        if len(controller.missions) > 0:
-            self.event_entry.set_text(controller.missions[0].event_type)
-            self.location_entry2.set_text(str(controller.missions[0].poi.coordx))
-            self.location_entry3.set_text(str(controller.missions[0].poi.coordy))                
-            self.name_entry.set_text(controller.missions[0].contact_person)
-            self.hurted_entry.set_text(str(controller.missions[0].number_of_wounded))
-            self.number_entry.set_text(controller.missions[0].contact_number)
-            self.random_entry.set_text(controller.missions[0].other)
-
     def select_mission(self, combobox):
         '''
-        Call when combobox changes to switch obstacle type.
+        Call when combobox changes to switch selected mission.
         @param combobox: the changed combobox
         '''
         # set the selected type
         self.selected_mission = self.combo_box.get_active_text()
-        missions = self.db.get_all_missions()
-        for mission in missions:
+        for mission in self.db.get_all_missions():
             if mission.event_type == self.selected_mission:
                 self.event_entry.set_text(mission.event_type)
                 self.location_entry2.set_text(str(mission.poi.coordx))
-                self.location_entry3.set_text(str(mission.poi.coordy))    
+                self.location_entry3.set_text(str(mission.poi.coordy))
                 self.hurted_entry.set_text(str(mission.number_of_wounded))
                 self.name_entry.set_text(mission.contact_person)
                 self.number_entry.set_text(mission.contact_number)

@@ -513,12 +513,15 @@ class ClientGui(hildon.Program):
     def show_mission_info(self, event):
         self.toggle_show("mission", ["notifications", "info", "buttons"], 
                          "Här visas info om ditt uppdrag")
-        self.screens["info"].update_info(self.controller)
-        
+        for mission in self.db.get_all_missions():
+            for unit in mission.units:
+                if unit.id == self.controller.unit_data.id:
+                    self.controller.add_mission(mission)
         combo = self.screens["info"].combo_box
         combo.get_model().clear()
         combo.append_text("Välj uppdrag...")
         combo.set_active(0)
+        print self.controller.missions
         for mission in self.controller.missions:
             combo.append_text(mission.event_type)
     
