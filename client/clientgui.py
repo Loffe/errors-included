@@ -579,20 +579,19 @@ class ClientGui(hildon.Program):
     def show_outbox(self, event):
         self.toggle_show("messages", ["notifications", "output","back_button_box"], "Här visas dina utgångna meddelanden")
         #self.show(["output", "message_menu"])
-        
+       
         combo = self.screens["output"].combo_box
+        combo.get_model().clear()
+        combo.append_text("Välj textmeddeland...")
+        combo.set_active(0)
         for textmessages in self.db.textmessages():
-            combo.remove_text(textmessages.id)
-            combo.insert_text(textmessages.id, textmessages.subject)
-        
+            combo.append_text(textmessages.subject)
+       
     def show_inbox(self, event):
         self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här ska bara inkomna meddelande finnas")
         #self.show(["message", "message_menu"])
         
-        combo = self.screens["message"].combo_box
-        for textmessages in self.db.textmessages():
-            combo.remove_text(textmessages.id)
-            combo.insert_text(textmessages.id, textmessages.subject)
+        self.update_messagesbox(event)
 
     def show_alarms(self, event):
         self.show(["alarms", "message_menu"])
@@ -605,10 +604,17 @@ class ClientGui(hildon.Program):
     def show_messages(self, event):
         self.toggle_show("messages", ["notifications", "message","message_menu"], "Här visas dina meddelanden")
         
+        
+        self.update_messagesbox(event)
+            
+    def update_messagesbox(self, event):
+        
         combo = self.screens["message"].combo_box
+        combo.get_model().clear()
+        combo.append_text("Välj textmeddeland...")
+        combo.set_active(0)
         for textmessages in self.db.textmessages():
-            combo.remove_text(textmessages.id)
-            combo.insert_text(textmessages.id, textmessages.subject)
+            combo.append_text(textmessages.subject)
 
     # show certain screen methods
     def toggle_show(self, button_key, screen_keys, notification_text = ""):

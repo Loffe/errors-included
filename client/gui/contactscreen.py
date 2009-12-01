@@ -39,9 +39,3 @@ class ContactScreen(gtk.ScrolledWindow, gui.Screen):
                 button.set_active(False)
             else:
                 self.name = button.get_label()
-
-
-
-        
-
- 

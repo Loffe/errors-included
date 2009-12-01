@@ -9,6 +9,7 @@ import datetime
 import gobject
 from selectunit import SelectUnitButton
 from selectunit import SelectUnitDialog
+#from clientgui import ClientGui
 
 class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
     '''
@@ -75,6 +76,7 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         
         text = shared.data.TextMessage(self.subject_entry.get_text(), self.buffer.get_text(self.buffer.get_start_iter(), self.buffer.get_end_iter(), True), units, datetime.datetime.now())
         self.db.add(text)
+        #self.clientgui.update_messagesbox(event)
         self.emit("okbutton_clicked_new_message")
         
 gobject.type_register(NewMessageScreen)

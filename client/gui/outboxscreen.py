@@ -64,6 +64,7 @@ class OutboxScreen(gtk.ScrolledWindow, gui.Screen):
         
         msg_label.set_alignment(0, 0.5)
         textbox = gtk.TextView()
+        self.subject_entry.set_editable(False)
         textbox.set_editable(False)
         textbox.set_size_request(250,250)
         textbox.set_wrap_mode(gtk.WRAP_WORD_CHAR)
