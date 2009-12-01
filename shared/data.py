@@ -267,7 +267,7 @@ class MapObjectData(Base, Packable):
     '''
     __tablename__ = 'MapObjectData'
     id = Column(Integer, primary_key=True)
-    _data_type = Column(Integer)
+    _data_type = Column('_data_type', String(50))
     __mapper_args__ = {'polymorphic_identity': 'MapObjectData', "polymorphic_on": _data_type} 
     
     coordx = Column(Float)

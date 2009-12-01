@@ -82,8 +82,11 @@ if __name__ == "__main__":
         from shared.data import create_database, UnitData
         from data import User
         from datetime import datetime
-        if os.path.exists("database.db"):
-            os.remove("database.db")
+
+        db = create_database(ServerDatabase())
+
+        meta = shared.data.Base.metadata
+        meta.drop_all(bind=db.engine)
         db = create_database(ServerDatabase())
         session = db._Session()
 
