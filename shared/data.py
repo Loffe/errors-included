@@ -356,11 +356,12 @@ class TextMessage(Base, Packable):
     timestamp = Column(DateTime)
     
     
-    def __init__(self, subject, message_content, units, timestamp = datetime.now()):
+    def __init__(self, subject, message_content, units, timestamp = datetime.now(), id = None):
         self.subject = subject
         self.message_content = message_content
         self.timestamp = timestamp
         self.units = units
+        self.id = id
         
     def add_unit(self, unit):
         self.units.append(unit)
