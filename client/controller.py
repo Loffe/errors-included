@@ -58,4 +58,4 @@ class ClientController(object):
     
     def add_mission(self, mission):
         self.missions.append(mission)
-        print "got new mission:", type(data), data
+        print "got new mission:", type(mission), mission

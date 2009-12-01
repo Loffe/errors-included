@@ -102,7 +102,7 @@ class DatabaseInQueue(DatabaseQueue):
     # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
     def put(self, data, priority=0, block=True, timeout=None):
         item = data, priority
-        item = NetworkInQueueItem(data, priority)
+        item = NetworkInQueueItem(unicode(data), priority)
         log.debug("putting:" + data)
         Queue.Queue.put(self, item, block, timeout)
         return item.id
@@ -131,7 +131,7 @@ class DatabaseOutQueue(DatabaseQueue):
     # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
     def put(self, data, priority=0, block=True, timeout=None):
         item = data, priority
-        item = NetworkOutQueueItem(self.name, data, priority)
+        item = NetworkOutQueueItem(self.name, unicode(data), priority)
         log.debug("putting:" + data)
         Queue.Queue.put(self, item, block, timeout)
         return item.id
