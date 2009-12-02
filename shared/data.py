@@ -382,7 +382,7 @@ class TextMessage(Base, Packable):
         self.timestamp = timestamp
         self.units = units
         self.id = id
-        self.sender
+        self.sender = sender
         
     def add_unit(self, unit):
         self.units.append(unit)
