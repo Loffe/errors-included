@@ -82,11 +82,12 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
                                        message_content=unicode(self.buffer.get_text(self.buffer.get_start_iter(), self.buffer.get_end_iter(), True)),
                                        units=units, 
                                        sender=config.client.name,
+                                       senderandsubject= "från: " + str(config.client.name) + "    Ämne: " + str(self.subject_entry.get_text()),
                                        timestamp=datetime.datetime.now())
 
         self.db.add(text)
         
-        print "-----------sending from:", config.client.name
+        
         self.emit("okbutton_clicked_new_message")
         
 gobject.type_register(NewMessageScreen)

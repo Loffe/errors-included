@@ -626,10 +626,10 @@ class ClientGui(hildon.Program):
         #self.db.units_in_text()
                   
         for textmessages in self.db.textmessages():
-            #print self.UnitsInText.unit_id
-            senderandsubject = "från: " + str(textmessages.sender) + "    Ämne: " + str(textmessages.subject)
+            #print textmessages.senderandsubject
+            #senderandsubject = "från: " + str(textmessages.sender) + "    Ämne: " + str(textmessages.subject)
             if config.client.name != textmessages.sender:
-                combo.append_text(senderandsubject)
+                combo.append_text(textmessages.senderandsubject)
 
     # show certain screen methods
     def toggle_show(self, button_key, screen_keys, notification_text = ""):
