@@ -9,3 +9,9 @@ server.port = 50000
 server.ssh = False
 server.primary = True
 server.database = 'mysql://eriel743:PoAQjf29f@localhost/eriel743'
+
+primary = Config()
+primary.ip = 'sysi-14'
+primary.port = 50000
+primary.heartbeatport= 1337
+primary.heartbeatinterval= 5000

@@ -107,6 +107,8 @@ class ClientNetworkHandler(dbus.service.Object):
             elif ack.unpacked_data["result"] == "try_primary":
                 print "Primary is still alive"
                 self.close()
+            else:
+                print "Other random login failure"
         return
 
     def run(self):
