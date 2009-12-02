@@ -28,7 +28,7 @@ class MapObjectHandler(object):
                     msg = Message(u"server", u.name, MessageType.object,
                               ActionType.add, unpacked_data=object)
                     self.queue.enqueue(u.name, msg.packed_data, msg.prio)
-            else
+            else:
                 for u in self.database.get_all_users():
                     msg = Message(u"server", u.name, MessageType.object,
                                   ActionType.add, unpacked_data=object)
