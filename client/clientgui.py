@@ -589,8 +589,7 @@ class ClientGui(hildon.Program):
        
     def show_inbox(self, event):
         self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här ska bara inkomna meddelande finnas")
-        #self.show(["message", "message_menu"])
-        
+
         self.update_messagesbox(event)
 
     def show_alarms(self, event):
@@ -618,12 +617,14 @@ class ClientGui(hildon.Program):
         self.update_messagesbox(event)
             
     def update_messagesbox(self, event):
-        
         combo = self.screens["message"].combo_box
         combo.get_model().clear()
-        combo.append_text("Välj textmeddeland...")
+        combo.append_text("Välj textmeddelande...")
         combo.set_active(0)
+        #self.db.units_in_text()
+                  
         for textmessages in self.db.textmessages():
+            #print self.UnitsInText.unit_id
             combo.append_text(textmessages.subject)
 
     # show certain screen methods

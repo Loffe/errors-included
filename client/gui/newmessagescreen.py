@@ -9,6 +9,7 @@ import datetime
 import gobject
 from selectunit import SelectUnitButton
 from selectunit import SelectUnitDialog
+import config
 #from clientgui import ClientGui
 
 class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
@@ -74,7 +75,11 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         selected = self.select_unit_button.select_dialog.selected_units
         units = self.db.get_units(selected)
         print "Units to send messages to: ", units
-        text = shared.data.TextMessage(self.subject_entry.get_text(), self.buffer.get_text(self.buffer.get_start_iter(), self.buffer.get_end_iter(), True), units, datetime.datetime.now())
+        text = shared.data.TextMessage(subject=unicode(self.subject_entry.get_text()), 
+                                       message_content=unicode(self.buffer.get_text(self.buffer.get_start_iter(), self.buffer.get_end_iter(), True)),
+                                       units=units, 
+                                       timestamp=datetime.datetime.now(), 
+                                       sender=config.client.name)
         self.db.add(text)
         #self.clientgui.update_messagesbox(event)
         self.emit("okbutton_clicked_new_message")
