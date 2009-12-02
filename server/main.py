@@ -8,10 +8,9 @@ import shared.messagedispatcher
 import shared.queueinterface
 
 from idprovider import IDProvider
-
 from voiphandler import VoipHandler
-
 from mapobjecthandler import MapObjectHandler
+from textmessagehandler import TextMessageHandler
 
 from database import ServerDatabase
 from shared.data import Message,MessageType,ActionType
