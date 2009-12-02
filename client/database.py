@@ -51,7 +51,11 @@ class ClientDatabase(Database):
         session.close()
         
         # enqueue a message with the added object
-        msg = Message(self.name, "server", MessageType.object, ActionType.add,
+        if object.__class__ == TextMessage:
+            msgtype = MessageType.text
+        else:
+            msgtype = MessageType.object
+        msg = Message(self.name, "server", msgtype, ActionType.add,
                       unpacked_data=object)
         self.queue.enqueue(msg.packed_data, msg.prio)
         self.emit("mapobject-added", object)

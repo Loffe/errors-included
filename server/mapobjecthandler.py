@@ -23,16 +23,10 @@ class MapObjectHandler(object):
 
         elif subtype == ActionType.add:
             self.database.add(object)
-            if object.__class__ == TextMessage:
-                for u in message.unpacked_data.units:
-                    msg = Message(u"server", u.name, MessageType.object,
+            for u in self.database.get_all_users():
+                msg = Message(u"server", u.name, MessageType.object,
                               ActionType.add, unpacked_data=object)
-                    self.queue.enqueue(u.name, msg.packed_data, msg.prio)
-            else:
-                for u in self.database.get_all_users():
-                    msg = Message(u"server", u.name, MessageType.object,
-                                  ActionType.add, unpacked_data=object)
-                    self.queue.enqueue(u.name, msg.packed_data, msg.prio)
+                self.queue.enqueue(u.name, msg.packed_data, msg.prio)
         elif subtype == ActionType.delete:
             pass
         else:
