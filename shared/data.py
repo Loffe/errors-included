@@ -371,15 +371,18 @@ class TextMessage(Base, Packable):
     subject = Column(UnicodeText)
     message_content = Column(UnicodeText)
     timestamp = Column(DateTime)
+    sender = Column(UnicodeText)
+    
     
     prio = 5
     
-    def __init__(self, subject, message_content, units, timestamp = datetime.now(), id = None):
+    def __init__(self, subject, message_content, units, sender, timestamp = datetime.now(), id = None):
         self.subject = subject
         self.message_content = message_content
         self.timestamp = timestamp
         self.units = units
         self.id = id
+        self.sender
         
     def add_unit(self, unit):
         self.units.append(unit)
@@ -397,8 +400,9 @@ class TextMessage(Base, Packable):
         
     def __repr__(self):
             
-        repr = ("<%s: %s, %s, %s, %s >" % 
-                (self.__class__.__name__, self.subject, self.message_content, self.timestamp , self.id))
+        repr = ("<%s: subject=%s; message=%s, from=%s, to=%s, timestamp=%s, id=%s>" % 
+                (self.__class__.__name__, self.subject, self.message_content, self.sender, 
+                 self.units, self.timestamp , self.id))
         try:
             return repr.encode('utf-8')
         except:
