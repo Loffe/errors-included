@@ -8,10 +8,9 @@ import shared.messagedispatcher
 import shared.queueinterface
 
 from idprovider import IDProvider
-
 from voiphandler import VoipHandler
-
 from mapobjecthandler import MapObjectHandler
+from textmessagehandler import TextMessageHandler
 
 from database import ServerDatabase
 from shared.data import Message,MessageType,ActionType
@@ -22,6 +21,7 @@ class ServerManager(object):
     database = None
     idprovider = None
     voiphandler = None
+    textmessagehandler = None
 
     def __init__(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -35,6 +35,7 @@ class ServerManager(object):
         self.voiphandler = VoipHandler(self.database, self.queue)
 
         self.mapobjecthandler = MapObjectHandler(self.database, self.queue)
+        self.textmessagehandler = TextMessageHandler(self.database, self.queue)
 
         self.messagedispatcher = shared.messagedispatcher.MessageDispatcher(bus,
                 self.database,
@@ -45,6 +46,7 @@ class ServerManager(object):
         self.messagedispatcher.connect_to_type(shared.data.MessageType.voip, self.voiphandler.handle)
         self.messagedispatcher.connect_to_type(shared.data.MessageType.vvoip, self.voiphandler.handle)
 
+        self.messagedispatcher.connect_to_type(shared.data.MessageType.text, self.textmessagehandler.handle)
         self.messagedispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
 
     def _user_login(self, username):
