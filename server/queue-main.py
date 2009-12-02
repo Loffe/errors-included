@@ -44,6 +44,8 @@ class ServerNetworkHandler(dbus.service.Object):
         self._init_queues()
         self.mainloop = None
         self.message_handler = handler.MessageHandler(self)
+        if config.server.primary == False:
+            self.primary_alive = False
 
     @dbus.service.method(dbus_interface='included.errors.Server',
                          in_signature='ssi', out_signature='s')
@@ -111,6 +113,9 @@ class ServerNetworkHandler(dbus.service.Object):
         for u in users:
             self.outqueues[u.name] = NetworkOutQueue(None, self.db, u.name)
 
+        if config.server.primary == False:
+            self.primary_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.poll()
         print self.outqueues
 
     def _accept_client(self, socket, port):
@@ -128,6 +133,18 @@ class ServerNetworkHandler(dbus.service.Object):
     def _login_client(self, socket, message):
         m = message
         id = m.sender
+        if config.primary == False and self.primary_alive:
+            log.info("login denied")
+            nack = shared.data.Message("server", id, response_to=m.message_id,
+                                       type=shared.data.MessageType.ack,
+                                       unpacked_data={"result": "primary_alive", "class": "dict"})
+            # Don't send via database queue
+            data = nack.packed_data
+            content_length = '0x%04x' % len(data)
+            socket.send(content_length)
+            socket.send(data)
+            print "Login failed because primary is alive"
+            return
         if self.db.is_valid_login(m.sender, m.unpacked_data["password"]):
             self.outqueues[id].replace_socket(socket)
             
@@ -200,6 +217,21 @@ class ServerNetworkHandler(dbus.service.Object):
                         self._disconnect_client(s)
         
         self.close()
+
+    def poll(self):
+        print "Sent heatbeat, duh-duh..."
+        response = None
+        try:
+            self.primary_socket.connect((config.primary.ip, config.primary.heartbeatport))
+            self.primary_socket.send("ping")
+            response = self.primary_socket.recv(4, timeout=5)
+        except:
+            print "Exception during heartbeat"
+        self.primary_alive = response == "pong"
+        if not self.primary_alive:
+            gobject.timeout_add(config.primary.heartbeatinterval, self.poll)
+        else:
+            print "Primary is alive"
 
     def dbusloop(self):
         #import signal
