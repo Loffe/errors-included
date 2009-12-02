@@ -33,6 +33,7 @@ from gui.patientjournalscreen import PatientJournalScreen
 from gui.contactscreen import ContactScreen
 from gui.camerascreen import CamScreen
 from mapobjecthandler import MapObjectHandler
+from textmessagehandler import TextMessageHandler
 from gui.notificationscreen import NotificationScreen
 
 
@@ -78,8 +79,9 @@ class ClientGui(hildon.Program):
         self.db.dispatcher = self.message_dispatcher
 
         self.mapobjecthandler = MapObjectHandler(self.db, self.queue)
+        self.textmessagehandler = TextMessageHandler(self.db, self.queue)
         self.message_dispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
-        
+        self.message_dispatcher.connect_to_type(MessageType.text, self.textmessagehandler.handle)
 
 
         # create gui
