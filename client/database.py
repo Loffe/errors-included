@@ -1,4 +1,4 @@
-from shared.data import Database, Message, MessageType, ActionType, IDType, ObjectID
+from shared.data import Database, Message, MessageType, ActionType, IDType, ObjectID, TextMessage
 import config
 import gobject
 
