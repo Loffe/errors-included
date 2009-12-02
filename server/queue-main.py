@@ -133,11 +133,11 @@ class ServerNetworkHandler(dbus.service.Object):
     def _login_client(self, socket, message):
         m = message
         id = m.sender
-        if config.primary == False and self.primary_alive:
+        if config.server.primary == False and self.primary_alive:
             log.info("login denied")
             nack = shared.data.Message("server", id, response_to=m.message_id,
                                        type=shared.data.MessageType.ack,
-                                       unpacked_data={"result": "primary_alive", "class": "dict"})
+                                       unpacked_data={"result": "try_primary", "class": "dict"})
             # Don't send via database queue
             data = nack.packed_data
             content_length = '0x%04x' % len(data)
