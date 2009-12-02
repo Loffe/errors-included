@@ -143,6 +143,7 @@ class ClientGui(hildon.Program):
 
         # add the map screen
         self.map = MapScreen(self.db)
+        self.map.connect("show-object", self.show_object) 
         vbox_right.pack_start(self.map, True, True, 0)
         self.screens["map"] = self.map
 
@@ -310,6 +311,11 @@ class ClientGui(hildon.Program):
         self.window_in_fullscreen = False
         log.info("ClientGui created")
         
+    def show_object(self, event, object): 
+        if object.__class__ == POIData:
+#            self.show(["map"])
+            self.create_obstacle(event)
+            
 
     def sending_voip(self, event):
         msg = shared.data.Message(self.controller.name, 

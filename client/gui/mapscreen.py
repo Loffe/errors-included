@@ -7,6 +7,7 @@ import map.map_xml_reader
 import map
 from map.mapdata import *
 from datetime import datetime
+import gobject
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
     db = None
@@ -20,6 +21,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
     def __init__(self, db):
         gui.Screen.__init__(self, "Map")
         gtk.DrawingArea.__init__(self)
+        gtk.Box.__init__(self)
+#        gobject.GObject.__init__(self)
         self.db = db
         self.db.connect('mapobject-added', self.add_map_object)
         self.db.connect('mapobject-changed', self.change_map_object)
@@ -253,10 +256,10 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         (lon,lat) = self.pixel_to_gps(x,y)        
         (m,n) = self.pixel_to_gps(r.width/2, r.height/2)
         self.gps_x = self.origin_position["longitude"] - m + lon
-        self.gps_y = self.origin_position["latitude"] + n  - lat
+        self.gps_y = self.origin_position["latitude"] + n - lat
         
     def draw_sign(self):  
-        poi_data = shared.data.POIData(self.gps_x, self.gps_y, "goal", datetime.now(), shared.data.POIType.flag)
+        poi_data = shared.data.POIData(self.gps_x, self.gps_y, "sign", datetime.now(), shared.data.POIType.flag)
         self.mapdata.objects["add-sign"] = POI(poi_data)
         self.queue_draw()
         
@@ -268,6 +271,26 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
             pass
 
     def draw_clicked_pos(self, event):
+        # get the clicked coordinate
         self.get_clicked_coord(event)
+
+        # check if any mapobject was clicked (isch)
+        for obj in self.mapdata.objects.values():
+            data = obj.map_object_data
+            if (data.coordx >= self.gps_x-0.001 and 
+                data.coordx <= self.gps_x+0.001 and 
+                data.coordy >= self.gps_y-0.001 and
+                data.coordy <= self.gps_y+0.001 and not data.name == "sign"):
+                clicked_object = data
+                for m in self.db.get_all_missions():
+                    if data.id == m.poi.id:
+                        clicked_object = m
+                # tell clientgui to show the correct view if something cool was clicked!
+                self.emit("show-object", clicked_object)
+
+        # if sign should be drawn, do it!
         if self.sign:
             self.draw_sign()
+
+gobject.type_register(MapScreen)
+gobject.signal_new("show-object", MapScreen, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
