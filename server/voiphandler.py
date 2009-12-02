@@ -9,8 +9,6 @@ class VoipHandler(object):
         self.queue = queue
 
     def handle(self, message):
-        
-        print "YAWTAPSFS"
         message.unpacked_data['class'] = 'dict'
         msg = Message(message.sender, message.reciever,
                       message.type, message.subtype,

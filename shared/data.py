@@ -287,6 +287,8 @@ class MapObjectData(Base, Packable):
     name = Column(UnicodeText)
     timestamp = Column(DateTime)
     
+    prio = 5
+    
     def get_coords(self):
         return (self.coordx, self.coordy)
     
@@ -333,6 +335,8 @@ class UnitData(MapObjectData):
     id = Column(None, ForeignKey('MapObjectData.id'), primary_key=True)
 
     type = Column(UnicodeText)
+    
+    prio = 1
 
     def __init__(self, coordx, coordy, name, timestamp, 
                  type = UnitType.ambulance, id = None):
@@ -350,6 +354,7 @@ class POIData(MapObjectData):
     type = Column(UnicodeText)
     subtype = Column(UnicodeText)
     
+    prio = 7
 
     def __init__(self, coordx, coordy, name, timestamp, 
                  type = POIType.obstacle, subtype = None, id = None):
@@ -412,6 +417,8 @@ class Alarm(Base, Packable):
     contact_number = Column(UnicodeText)
     other = Column(UnicodeText)
     number_of_wounded = Column(Integer)
+    
+    prio = 8
 
     def __init__(self, event, location_name, poi, contact_person, 
                  contact_number, number_of_wounded, other, 
@@ -451,6 +458,8 @@ class MissionData(Base, Packable):
     contact_number = Column(UnicodeText)
     timestamp = Column(DateTime)
     other = Column(UnicodeText)
+    
+    prio = 7
 
     def __init__(self, event_type, poi, number_of_wounded, contact_person, contact_number,
                  other, units, timestamp = datetime.now(), id = None):
