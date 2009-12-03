@@ -9,6 +9,7 @@ import shared.data
 import datetime
 import gui
 import pango
+import config
 
 class InboxScreen(gtk.ScrolledWindow, gui.Screen):
     '''
@@ -94,7 +95,8 @@ class InboxScreen(gtk.ScrolledWindow, gui.Screen):
         self.selected_m = self.combo_box.get_active_text()
         messages = self.db.textmessages()
         for message in messages:
-            if message.senderandsubject == self.selected_m:
+            senderandsubject = "från: " + str(message.sender) + "    Ämne: " + str(message.subject)
+            if senderandsubject == self.selected_m:
                 self.subject_entry.set_text(message.subject)
                 self.buffer.set_text(message.message_content)
 
