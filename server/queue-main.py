@@ -114,6 +114,7 @@ class ServerNetworkHandler(dbus.service.Object):
             self.outqueues[u.name] = NetworkOutQueue(None, self.db, u.name)
 
         if config.server.primary:
+            print "starting heartbeat"
             self.heartbeat_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             if 'arm' not in sys.version.lower():
                 self.heartbeat_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -236,8 +237,8 @@ class ServerNetworkHandler(dbus.service.Object):
             self.primary_socket.send("ping")
             response = self.primary_socket.recv(4, timeout=5)
             self.primary_socket.close()
-        except:
-            print "Exception during heartbeat"
+        except Exception, e:
+            print "Exception during heartbeat", e
         self.primary_alive = response == "pong"
         if not self.primary_alive:
             gobject.timeout_add(config.primary.heartbeatinterval, self.ping)
