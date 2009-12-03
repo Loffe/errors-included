@@ -593,11 +593,12 @@ class ClientGui(hildon.Program):
         combo.append_text("Välj textmeddeland...")
         combo.set_active(0)
         for textmessages in self.db.textmessages():
-            combo.append_text(textmessages.subject)
+            if config.client.name == textmessages.sender:
+                combo.append_text(textmessages.subject)
        
     def show_inbox(self, event):
         self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här ska bara inkomna meddelande finnas")
-
+        
         self.update_messagesbox(event)
 
     def show_alarms(self, event):
@@ -620,8 +621,7 @@ class ClientGui(hildon.Program):
     # messages view event handlers
     def show_messages(self, event):
         self.toggle_show("messages", ["notifications", "map","message_menu"], "Här visas dina meddelanden")
-        
-        
+
         self.update_messagesbox(event)
             
     def update_messagesbox(self, event):
@@ -632,8 +632,10 @@ class ClientGui(hildon.Program):
         #self.db.units_in_text()
                   
         for textmessages in self.db.textmessages():
-            #print self.UnitsInText.unit_id
-            combo.append_text(textmessages.subject)
+            #print textmessages.senderandsubject
+            #senderandsubject = "från: " + str(textmessages.sender) + "    Ämne: " + str(textmessages.subject)
+            if config.client.name != textmessages.sender:
+                combo.append_text(textmessages.senderandsubject)
 
     # show certain screen methods
     def toggle_show(self, button_key, screen_keys, notification_text = ""):

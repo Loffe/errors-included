@@ -76,14 +76,18 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         units = self.db.get_units(selected)
         print "Units to send messages to: ", units
 
+        
+        
         text = shared.data.TextMessage(subject=unicode(self.subject_entry.get_text()), 
                                        message_content=unicode(self.buffer.get_text(self.buffer.get_start_iter(), self.buffer.get_end_iter(), True)),
                                        units=units, 
-                                       timestamp=datetime.datetime.now(), 
-                                       sender=config.client.name)
+                                       sender=config.client.name,
+                                       senderandsubject= "från: " + str(config.client.name) + "    Ämne: " + str(self.subject_entry.get_text()),
+                                       timestamp=datetime.datetime.now())
 
         self.db.add(text)
-        #self.clientgui.update_messagesbox(event)
+        
+        
         self.emit("okbutton_clicked_new_message")
         
 gobject.type_register(NewMessageScreen)
