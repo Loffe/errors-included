@@ -54,12 +54,39 @@ class ChangeMissionScreen(gtk.ScrolledWindow, gui.Screen):
         
     def set_entries(self, mission):
         self.mission = mission
+        self.event_entry.set_text(mission.event_type)
+        self.location_entry2.set_text(str(mission.poi.coordx))
+        self.location_entry3.set_text(str(mission.poi.coordy))        
+        self.hurted_entry.set_text(str(mission.number_of_wounded))
+        self.name_entry.set_text(mission.contact_person)
+        self.number_entry.set_text(mission.contact_number)
+        self.random_entry.set_text(mission.other)
         
     def delete_button_function(self, event):
-        pass
+        self.db.delete(self.mission)
 
     def change_button_function(self, event):
-        pass
+        poi_data = shared.data.POIData(
+                coordx=float(self.location_entry2.get_text()),
+                coordy=float(self.location_entry3.get_text()),
+                name=unicode(self.mission.poi.name),
+                timestamp=datetime.datetime.now(),
+                type=self.mission.poi.type,
+                subtype=self.mission.poi.subtype,
+                id=self.mission.poi.id)
+        self.db.change(poi_data)
+        mission_data = shared.data.MissionData(
+                event_type=unicode(self.event_entry.get_text()),
+                number_of_wounded=unicode(self.hurted_entry.get_text()),
+                contact_person=unicode(self.name_entry.get_text()),
+                contact_number=unicode(self.number_entry.get_text()),
+                other=unicode(self.random_entry.get_text()),
+                timestamp=datetime.datetime.now(),
+                poi=poi_data,
+                units=self.mission.units,
+                id=self.mission.id)
+        self.db.change(mission_data)
+
 #        self.emit("okbutton-mission-clicked")
         
 #gobject.type_register(MissionScreen)
