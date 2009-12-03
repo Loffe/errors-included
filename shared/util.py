@@ -1,7 +1,9 @@
 import logging
 import subprocess
 import re
-import time, wave, pymedia.audio.sound as sound
+import time
+import wave
+#import pymedia.audio.sound as sound
 
 def getLogger(filename="log.txt"):
     logger = logging.getLogger(filename)
