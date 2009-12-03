@@ -3,9 +3,13 @@ import subprocess
 import re
 import time
 import wave
-import pygst
-pygst.require('0.10')
-import gst
+try:
+    import pygst
+    pygst.require("0.10")
+    import gst
+except:
+    class gst(object):
+        pass
 import gobject, sys
 #import pymedia.audio.sound as sound
 
