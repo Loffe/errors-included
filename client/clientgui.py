@@ -319,10 +319,10 @@ class ClientGui(hildon.Program):
         print "*****************"
         print "GOT NEW MESSAGE!!"
         print "*****************"
-        try:
-            shared.util.set_color(0,255,0)
-        except:
-            print "Couldnt find led"
+#        try:
+#            shared.util.set_color(0,255,0)
+#        except:
+#            print "Couldnt find led"
             
         label = self.messages_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("green"))
@@ -639,10 +639,10 @@ class ClientGui(hildon.Program):
         self.toggle_show("messages", ["notifications", "map","message_menu"], "Här visas dina meddelanden")
 
         self.update_messagesbox(event)
-        try:
-            shared.util.set_color(0,0,0)
-        except:
-            print "Couldnt find led"
+#        try:
+#            shared.util.set_color(0,0,0)
+#        except:
+#            print "Couldnt find led"
             
         label = self.messages_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
