@@ -46,7 +46,7 @@ def set_mode(mode):
 #Parsing wave header is a simple thing using wave module:
 def play_sound():
     try:
-        f= wave.open( '/snd/mail3b.wav', 'rb' )
+        f= wave.open( 'snd/mail3b.wav', 'rb' )
         sampleRate= f.getframerate()
         channels= f.getnchannels()
     
