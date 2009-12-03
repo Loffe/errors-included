@@ -80,6 +80,7 @@ class ClientGui(hildon.Program):
 
         self.mapobjecthandler = MapObjectHandler(self.db, self.queue)
         self.textmessagehandler = TextMessageHandler(self.db, self.queue)
+
         self.message_dispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
         self.message_dispatcher.connect_to_type(MessageType.text, self.textmessagehandler.handle)
 
@@ -119,14 +120,15 @@ class ClientGui(hildon.Program):
         contacts_button.connect("clicked", self.show_contacts)
         self.menu_buttons["contacts"] = contacts_button
 
-        messages_button = gtk.ToggleButton("Meddelande")
-        messages_button.connect("clicked", self.show_messages)
-        self.menu_buttons["messages"] = messages_button
+        self.messages_button = gtk.ToggleButton("Meddelande")
+        self.messages_button.connect("clicked", self.show_messages) 
+        self.textmessagehandler.connect("got-new-message", self.new_message)
+        self.menu_buttons["messages"] = self.messages_button
 
         vbox.add(mission_button)
         vbox.add(add_object_button)
         vbox.add(contacts_button)
-        vbox.add(messages_button)
+        vbox.add(self.messages_button)
 
         # Right panel
         vbox_right = gtk.VBox(False, 0)
@@ -310,6 +312,11 @@ class ClientGui(hildon.Program):
         self.window_in_fullscreen = False
         log.info("ClientGui created")
         
+    def new_message(self,event):
+        print "*****************"
+        print "GOT NEW MESSAGE!!"
+        print "*****************"
+             
 
     def sending_voip(self, event):
         msg = shared.data.Message(self.controller.name, 
