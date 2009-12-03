@@ -43,7 +43,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         self.combo_box = gtk.combo_box_new_text()
         self.combo_box.set_size_request(300,50)
         self.combo_box.append_text("Välj larm...")
-        right_box.pack_start(self.combo_box, True,True, 0)
+        right_box.pack_start(self.combo_box, True,False, 0)
         
         label = self.new_section("Nytt uppdrag", left_box, right_box)
         
