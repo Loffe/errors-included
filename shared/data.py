@@ -130,8 +130,10 @@ class Database(gobject.GObject):
         @param object: the object to delete.
         '''
         session = self._Session()
-        session.delete(object)
-        session.commit()
+        result = session.query(object.__class__).filter_by(id=object.id).first()
+        if result is not None:
+            session.delete(result)
+            session.commit()
         session.close()
         self.emit("mapobject-deleted", object)
         

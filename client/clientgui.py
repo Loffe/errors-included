@@ -347,14 +347,16 @@ class ClientGui(hildon.Program):
         log.info("ClientGui created")
         
     def change_object(self, event, object):
+        keys = []
+        for key in self.screens.keys():
+                screen = self.screens[key]
+                if screen.props.visible:
+                    keys.append(key)
+        self.prev_page.append(keys)
         if object.__class__ == POIData:
-            # adding map to prev_page history
-            # @todo: something better (more nice)
-            self.show(["map"])
             # show the changeobstaclescreen
             self.change_obstacle(object)
         elif object.__class__ == MissionData:
-            self.show(["map"])
             self.change_mission(object)
             
     def change_obstacle(self, poi):
