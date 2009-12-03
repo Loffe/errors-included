@@ -28,7 +28,11 @@ class MapObjectHandler(object):
                               ActionType.add, unpacked_data=object)
                 self.queue.enqueue(u.name, msg.packed_data, msg.prio)
         elif subtype == ActionType.delete:
-            pass
+            self.database.delete(object)
+            for u in self.database.get_all_users():
+                msg = Message(u"server", u.name, MessageType.object,
+                              ActionType.delete, unpacked_data=object)
+                self.queue.enqueue(u.name, msg.packed_data, msg.prio)
         else:
             raise Error("Invalid subtype")
 
