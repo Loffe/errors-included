@@ -190,8 +190,17 @@ class ServerNetworkHandler(dbus.service.Object):
                         print "got quit"
                         running = False
                 elif s == self.heartbeat_socket:
-                    print "got ping => pong"
-                    s.send("pong")
+                    print "got heartbeat"
+                    data = None
+                    (pinger, port) = s.accept()
+                    try:
+                        data = pinger.recv(4)
+                        if data == "ping":
+                            print "got ping => pong"
+                        pinger.send("pong")
+                    except socket.error, e:
+                        print e
+                    pinger.close()
                 else:
                     # read and parse content length
                     length = 0
