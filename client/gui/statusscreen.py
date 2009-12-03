@@ -9,6 +9,9 @@ import gui
 import pango
 
 class StatusScreen(gtk.ScrolledWindow, gui.Screen):
+    
+    
+    
     '''
     The screen in which you create a new alarm.
     '''

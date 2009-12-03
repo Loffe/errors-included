@@ -38,6 +38,7 @@ from textmessagehandler import TextMessageHandler
 from gui.notificationscreen import NotificationScreen
 from gui.selectunit import SelectUnitButton
 from gui.selectunit import SelectUnitDialog
+from gui.activities import Activities
 
 
 try:
@@ -150,6 +151,9 @@ class ClientGui(hildon.Program):
         self.map = MapScreen(self.db)
         vbox_right.pack_start(self.map, True, True, 0)
         self.screens["map"] = self.map
+        
+        
+        
 
         # add the alarm screen
         self.alarm_screen = AlarmScreen(self.db)
@@ -263,6 +267,26 @@ class ClientGui(hildon.Program):
         self.message_menu.add(outbox)
         #fyller ingen funktion
         #self.message_menu.add(in_alarms)
+        
+        #Istället för popup så kopper en panel upp vid sidan.         
+
+       
+        vbox2 = gtk.VBox(False,0)
+        panels.pack_start(vbox2, False, False, 0)
+        vbox2.set_size_request(150,0)
+        
+
+
+        
+#        self.activities = gtk.VBox(False,0)
+        self.activities = Activities(self.db)
+        vbox2.pack_start(self.activities, False, False, 0)
+        self.screens["act"] = self.activities 
+#        self.activities = Activities(self.db)
+             
+#        self.ac = Activities(self.db)
+#        self.activities.add(self.ac)  
+
 
         # Add object buttons and their menu
         self.add_object_menu = gtk.HBox(False, 0)
@@ -632,8 +656,10 @@ class ClientGui(hildon.Program):
 
     # messages view event handlers
     def show_messages(self, event):
-        self.toggle_show("messages", ["notifications", "map","message_menu"], "Här visas dina meddelanden")
-
+        #self.toggle_show("messages", ["notifications", "map","message_menu"], "Här visas dina meddelanden")
+        
+        self.show(["act", "map"])
+        
         self.update_messagesbox(event)
             
     def update_messagesbox(self, event):
@@ -682,6 +708,22 @@ class ClientGui(hildon.Program):
 
         for key in self.screens.keys():
             self.screens[key].hide_all()
+        for key in keys:
+            self.screens[key].show_all()
+            
+    def show2(self, keys):
+        '''
+        Show specified screens.
+        @param keys: a list with keys to the screens to show. 
+        '''
+        self.prev_page.append(keys)
+
+        for key in self.screens.keys():
+            self.screens[key].hide_all()
+        for key in keys:
+            self.screens[key].show_all()
+        for key in keys:
+            self.screens[key].show_all()
         for key in keys:
             self.screens[key].show_all()
             
