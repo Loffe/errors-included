@@ -3,6 +3,10 @@ import subprocess
 import re
 import time
 import wave
+import pygst
+pygst.require('0.10')
+import gst
+import gobject, sys
 #import pymedia.audio.sound as sound
 
 def getLogger(filename="log.txt"):
@@ -56,4 +60,17 @@ def play_sound():
         while snd.isPlaying(): time.sleep( 0.05 )
     except:
         print "Couldnt play sound"
+        
+
+
+def play_uri(uri):
+    " play an uri like tada.wav "
+    player = gst.element_factory_make("playbin", "player")
+    
+    print 'Playing:', uri
+    player.set_property('uri', uri)
+    player.set_state(gst.STATE_PLAYING)
+    play_uri("/home/user/tada.wav")
+    pygame.time.delay(5000)
+
         

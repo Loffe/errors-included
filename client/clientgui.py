@@ -321,7 +321,7 @@ class ClientGui(hildon.Program):
         print "*****************"
         
         shared.util.set_color(0,255,0)
-        shared.util.play_sound()
+        shared.util.play_uri('snd/mail3b.wav')
         label = self.messages_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("green"))
 
