@@ -122,6 +122,7 @@ class ServerNetworkHandler(dbus.service.Object):
             self.heartbeat_socket.listen(5)
             self.input.append(self.heartbeat_socket)
         else:
+            self.heartbeat_socket = None
             self.ping()
         print self.outqueues
 
@@ -243,11 +244,8 @@ class ServerNetworkHandler(dbus.service.Object):
         try:
             self.primary_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.primary_socket.connect((config.primary.ip, config.primary.heartbeatport))
-            print "sending ping"
             self.primary_socket.send("ping")
-            print "recv"
             response = self.primary_socket.recv(4)
-            print "closing"
             self.primary_socket.close()
         except Exception, e:
             print "Exception during heartbeat", e
