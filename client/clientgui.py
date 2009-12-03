@@ -287,7 +287,7 @@ class ClientGui(hildon.Program):
 
        
         vbox2 = gtk.VBox(False,0)
-        panels.pack_start(vbox2, False, False, 0)
+        #panels.pack_start(vbox2, False, False, 0)
         vbox2.set_size_request(150,0)
         
 
