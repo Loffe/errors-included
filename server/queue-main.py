@@ -122,7 +122,6 @@ class ServerNetworkHandler(dbus.service.Object):
             self.heartbeat_socket.listen(5)
             self.input.append(self.heartbeat_socket)
         else:
-            self.primary_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.ping()
         print self.outqueues
 
@@ -233,17 +232,22 @@ class ServerNetworkHandler(dbus.service.Object):
         print "Sent heatbeat, duh-duh..."
         response = None
         try:
+            self.primary_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.primary_socket.connect((config.primary.ip, config.primary.heartbeatport))
+            print "sending ping"
             self.primary_socket.send("ping")
-            response = self.primary_socket.recv(4, timeout=5)
+            print "recv"
+            response = self.primary_socket.recv(4)
+            print "closing"
             self.primary_socket.close()
         except Exception, e:
             print "Exception during heartbeat", e
         self.primary_alive = response == "pong"
-        if not self.primary_alive:
-            gobject.timeout_add(config.primary.heartbeatinterval, self.ping)
-        else:
+        if self.primary_alive:
             print "Primary is alive"
+        else:
+            print "Primary is dead"
+        gobject.timeout_add(config.primary.heartbeatinterval, self.ping)
 
     def dbusloop(self):
         #import signal
