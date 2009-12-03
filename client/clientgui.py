@@ -35,6 +35,8 @@ from gui.camerascreen import CamScreen
 from mapobjecthandler import MapObjectHandler
 from textmessagehandler import TextMessageHandler
 from gui.notificationscreen import NotificationScreen
+from gui.selectunit import SelectUnitButton
+from gui.selectunit import SelectUnitDialog
 
 
 try:
@@ -586,9 +588,10 @@ class ClientGui(hildon.Program):
         combo.get_model().clear()
         combo.append_text("Välj textmeddeland...")
         combo.set_active(0)
+         
         for textmessages in self.db.textmessages():
             if config.client.name == textmessages.sender:
-                combo.append_text(textmessages.subject)
+                combo.append_text(textmessages.receiverandsubject)
        
     def show_inbox(self, event):
         self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här ska bara inkomna meddelande finnas")
@@ -627,9 +630,10 @@ class ClientGui(hildon.Program):
                   
         for textmessages in self.db.textmessages():
             #print textmessages.senderandsubject
-            #senderandsubject = "från: " + str(textmessages.sender) + "    Ämne: " + str(textmessages.subject)
+            senderandsubject = "från: " + str(textmessages.sender) + "    Ämne: " + str(textmessages.subject)
+            #textmessages.
             if config.client.name != textmessages.sender:
-                combo.append_text(textmessages.senderandsubject)
+                combo.append_text(senderandsubject)
 
     # show certain screen methods
     def toggle_show(self, button_key, screen_keys, notification_text = ""):

@@ -373,10 +373,12 @@ class TextMessage(Base, Packable):
     timestamp = Column(DateTime)
     sender = Column(UnicodeText)
     senderandsubject = Column(UnicodeText)
+    receiverandsubject = Column(UnicodeText)
+    
     
     prio = 5
     
-    def __init__(self, subject, message_content, units, sender, senderandsubject, timestamp = datetime.now(), id = None):
+    def __init__(self, subject, message_content, units, sender, senderandsubject, receiverandsubject, timestamp = datetime.now(), id = None):
         self.subject = subject
         self.message_content = message_content
         self.timestamp = timestamp
@@ -384,6 +386,7 @@ class TextMessage(Base, Packable):
         self.id = id
         self.sender = sender
         self.senderandsubject= senderandsubject
+        self.receiverandsubject = receiverandsubject
         
     def add_unit(self, unit):
         self.units.append(unit)

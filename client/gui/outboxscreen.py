@@ -7,6 +7,8 @@ import shared.data
 import datetime
 import gui
 import pango
+import config
+
 
 class OutboxScreen(gtk.ScrolledWindow, gui.Screen):
     '''
@@ -74,11 +76,6 @@ class OutboxScreen(gtk.ScrolledWindow, gui.Screen):
         msgbox.pack_start(msg_label)
         msgbox.pack_start(textbox)
         vbox.add(msgbox)  
-        
-        
-        
-
-       
 #
 #        # add event handler
         self.combo_box.connect('changed', self.select_m)
@@ -101,8 +98,9 @@ class OutboxScreen(gtk.ScrolledWindow, gui.Screen):
         # set the selected type
         self.selected_m = self.combo_box.get_active_text()
         messages = self.db.textmessages()
+        
         for message in messages:
-            if message.subject == self.selected_m:
+            if message.receiverandsubject == self.selected_m:
                 self.subject_entry.set_text(message.subject)
                 self.buffer.set_text(message.message_content)
 
