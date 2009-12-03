@@ -645,7 +645,7 @@ class ClientGui(hildon.Program):
             print "Couldnt find led"
             
         label = self.messages_button.get_child()
-        label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(0,0,0))
+        label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
             
     def update_messagesbox(self, event):
         combo = self.screens["message"].combo_box
