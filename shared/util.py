@@ -64,7 +64,6 @@ def play_sound():
 
 
 def play_uri(uri):
-    " play an uri like tada.wav "
     player = gst.element_factory_make("playbin", "player")
     
     print 'Playing:', uri
