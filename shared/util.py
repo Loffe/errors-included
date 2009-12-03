@@ -73,7 +73,7 @@ def play_uri(uri):
     print 'Playing:', uri
     player.set_property('uri', uri)
     player.set_state(gst.STATE_PLAYING)
-    play_uri("/home/user/tada.wav")
+    #play_uri("/home/user/tada.wav")
     pygame.time.delay(5000)
 
         
