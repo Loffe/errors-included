@@ -52,10 +52,13 @@ class ChangeMissionScreen(gtk.ScrolledWindow, gui.Screen):
         # show 'em all! (:
         vbox.show_all()
         
-    def delete(self, event):
+    def set_entries(self, mission):
+        self.mission = mission
+        
+    def delete_button_function(self, event):
         pass
 
-    def change(self, event):
+    def change_button_function(self, event):
         pass
 #        self.emit("okbutton-mission-clicked")
         

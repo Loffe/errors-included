@@ -38,29 +38,19 @@ class ChangeObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         left_box.pack_start(type_label, True, True, 0)
         
         # create and pack combobox
-        combo_box = gtk.combo_box_new_text()
+        self.combo_box = gtk.combo_box_new_text()
         #combo_box.set_size_request(300,50)
-        right_box.pack_start(combo_box, True, False, 0)
+        right_box.pack_start(self.combo_box, True, False, 0)
         
         self.location_entry = self.new_entry("Händelse:", left_box, right_box)
         
-        self.location_entry2 = self.new_coordlabel("Skadeplats GPS-lon:", left_box, right_box)      
+        self.new_section("Position:", left_box, right_box)
+        self.location_entry2 = self.new_entry("Longitud:", left_box, right_box)      
                 
-        self.location_entry3 = self.new_coordlabel("Skadeplats GPS-lat:", left_box, right_box)
-
-        # add selectable types
-
-        types = {}
-        i = 0
-        types = ["tree", "bridge", "other"]
-        for type in types:
-            combo_box.append_text(type)
+        self.location_entry3 = self.new_entry("Latitud:", left_box, right_box)
 
         # add event handler
-        combo_box.connect('changed', self.select_type)
-
-        # set the first item added as active
-        combo_box.set_active(0)
+        self.combo_box.connect('changed', self.select_type)
 
         # show 'em all! (:
         main_box.show_all()
@@ -75,12 +65,35 @@ class ChangeObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         '''
         # set the selected type
         self.selected_type = unicode(combobox.get_active_text())
+        
+    def set_entries(self, poi):
+        self.poi = poi
+        self.location_entry.set_text(poi.name)
+        self.location_entry2.set_text(str(poi.coordx))
+        self.location_entry3.set_text(str(poi.coordy))
+        #clear types
+        self.combo_box.get_model().clear()
+        # add selectable types
+        types = ["tree", "bridge", "other"]
+        self.combo_box.append_text(poi.subtype)
+        for type in types:
+            if not type == poi.subtype:
+                self.combo_box.append_text(type)
+        self.combo_box.set_active(0)
     
-    def delete(self, event):
-        pass    
-    
-    def change(self, event):
-        pass
+    def delete_button_function(self, event):
+        self.db.delete(self.poi)
+
+    def change_button_function(self, event):
+        poi_data = shared.data.POIData(
+                coordx=float(self.location_entry2.get_text()),
+                coordy=float(self.location_entry3.get_text()),
+                name=unicode(self.location_entry.get_text()),
+                timestamp=datetime.datetime.now(),
+                type=shared.data.POIType.obstacle,
+                subtype=self.selected_type,
+                id=self.poi.id)
+        self.db.change(poi_data)
 
 #        self.emit("okbutton-obstacle-clicked")
 

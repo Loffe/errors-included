@@ -305,16 +305,15 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                 data.coordy <= min_gps_y and 
                 not data.name == "sign" and
                 not found):
-                clicked_object = data
                 if obj.picture.marked:
-                    print "signal"
+                    clicked_object = data
+                    for m in self.db.get_all_missions():
+                        if data.id == m.poi.id:
+                            clicked_object = m
                     # tell clientgui to show the correct view if something cool was clicked!
                     self.emit("object-clicked", clicked_object)
                 else:
                     obj.picture.marked = True
-                for m in self.db.get_all_missions():
-                    if data.id == m.poi.id:
-                        clicked_object = m
                 found = True
             else:
                 obj.picture.marked = False

@@ -24,6 +24,7 @@ from gui.inboxscreen import InboxScreen
 from gui.obstaclescreen import ObstacleScreen
 from gui.changeobstaclescreen import ChangeObstacleScreen
 from gui.missionscreen import MissionScreen
+from gui.changemissionscreen import ChangeMissionScreen
 from gui.newmessagescreen import NewMessageScreen
 from gui.outboxscreen import OutboxScreen
 from gui.alarminboxscreen import AlarmInboxScreen
@@ -189,6 +190,12 @@ class ClientGui(hildon.Program):
         self.mission_screen.connect("okbutton-mission-clicked", self.back_button_function)
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
+        
+        # add the change mission screen
+        self.change_mission_screen = ChangeMissionScreen(self.db)
+#        self.change_mission_screen.connect("okbutton-mission-clicked", self.back_button_function)
+        vbox_right.pack_start(self.change_mission_screen, True, True, 0)
+        self.screens["change_mission"] = self.change_mission_screen
 
         self.faq_screen = FAQScreen(self.db)               
         vbox_right.pack_start(self.faq_screen, True, True, 0)
@@ -320,12 +327,12 @@ class ClientGui(hildon.Program):
         change_back_button.connect("clicked", self.back_button_function)
         
         delete_button = gtk.Button("Ta bort")
-#        delete_button("clicked", self.change_obstacle)
+        delete_button.connect("clicked", self.delete_button_function)
         delete_button.set_flags(gtk.CAN_DEFAULT)
         self.change_buttons.pack_start(delete_button)
 
         change_button = gtk.Button("Spara ändringar")
-#        change_button.connect("clicked", self.change_obstacle)
+        change_button.connect("clicked", self.change_button_function)
         change_button.set_flags(gtk.CAN_DEFAULT)
         self.change_buttons.pack_start(change_button)
         
@@ -340,9 +347,11 @@ class ClientGui(hildon.Program):
         log.info("ClientGui created")
         
     def change_object(self, event, object):
-        print object
         if object.__class__ == POIData:
+            # adding map to prev_page history
+            # @todo: something better (more nice)
             self.show(["map"])
+            # show the changeobstaclescreen
             self.change_obstacle(object)
         elif object.__class__ == MissionData:
             self.show(["map"])
@@ -350,11 +359,11 @@ class ClientGui(hildon.Program):
             
     def change_obstacle(self, poi):
         self.show(["change_obstacle", "change_buttons"])
-        self.screens["change_obstacle"].poi = poi
+        self.screens["change_obstacle"].set_entries(poi)
         
     def change_mission(self, mission):
         self.show(["change_mission", "change_buttons"])
-        self.screens["change_mission"].mission = mission
+        self.screens["change_mission"].set_entries(mission)
 
     def sending_voip(self, event):
         msg = shared.data.Message(self.controller.name, 
@@ -548,6 +557,18 @@ class ClientGui(hildon.Program):
         for screen in self.screens.values():
             if screen.props.visible and isinstance(screen, Screen):
                 screen.ok_button_function(event)
+                
+    def change_button_function(self, event):
+        for screen in self.screens.values():
+            if screen.props.visible and isinstance(screen, Screen):
+                screen.change_button_function(event)
+        self.back_button_function(event)
+                
+    def delete_button_function(self, event):
+        for screen in self.screens.values():
+            if screen.props.visible and isinstance(screen, Screen):
+                screen.delete_button_function(event)
+        self.back_button_function(event)
 
     # mission view event handlers
     def show_mission(self, event):
