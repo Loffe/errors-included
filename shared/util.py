@@ -74,6 +74,9 @@ def play_uri(uri):
         print 'Playing:', uri
         player.set_property('uri', uri)
         player.set_state(gst.STATE_PLAYING)
+        print player.get_state()
+        while player.get_state() == gst.STATE_PLAYING: 
+            time.sleep( 0.05 )
         #play_uri("/home/user/tada.wav")
         #pygame.time.delay(5000)
     except:
