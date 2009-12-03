@@ -8,6 +8,7 @@ class Picture(object):
     pixbuf = None
     offset = (0, 0)
     center = False
+    marked = False
     
     def __init__(self, path):
         if path == None:
@@ -24,6 +25,11 @@ class Picture(object):
 #            context.set_source_pixbuf(self.get_picture(), x, y)
 #        context.paint()
 
+    def draw_rectangle(self, context, x, y):
+        context.rectangle(x-1, y-1, 34, 34)
+        context.set_source_rgb(0, 0, 0)
+        context.stroke() #context.stroke()
+
     def draw(self, context, x, y):
         if not self.pixbuf:
             self.load()
@@ -34,6 +40,8 @@ class Picture(object):
             dx, dy = (0, 0)
         context.set_source_pixbuf(self.pixbuf, x+dx, y+dy)
         context.paint()
+        if self.marked:
+            self.draw_rectangle(context, x+dx, y+dy)
         
     def load(self):
         self.pixbuf = gtk.gdk.pixbuf_new_from_file(self.path)
@@ -301,6 +309,9 @@ class POI(MapObject):
             path = "map/data/icons/accident.png"
         elif sub == shared.data.POISubType.bridge:
             path = "map/data/icons/bridge.png"
+        elif poi_data.type == shared.data.POISubType.other:
+            path = "map/data/icons/default.png"
+            offset = (8, -13)
         elif poi_data.type == shared.data.POIType.flag:
             path = "map/data/icons/default.png"
             offset = (8, -13)

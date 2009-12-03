@@ -7,7 +7,7 @@ import map.map_xml_reader
 import map
 from map.mapdata import *
 from datetime import datetime
-import gobject
+#import gobject
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
     db = None
@@ -269,28 +269,57 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
             self.queue_draw()  
         except:
             pass
+    
+    def get_clicked_bounds(self, event):
+        '''
+        Find out in which bounds to look for objects to mark.
+        @param event: the click event.
+        '''
+        r = self.get_allocation()
+        x, y, state = event.window.get_pointer()
+        min_x = x-16
+        max_x = x+16
+        min_y = y-16
+        max_y = y+16
+        (lon,lat) = self.pixel_to_gps(min_x,min_y)
+        (m,n) = self.pixel_to_gps(r.width/2, r.height/2)
+        min_gps_x = self.origin_position["longitude"] - m + lon
+        min_gps_y = self.origin_position["latitude"] + n - lat
+        (lon,lat) = self.pixel_to_gps(max_x,max_y)
+        (m,n) = self.pixel_to_gps(r.width/2, r.height/2)
+        max_gps_x = self.origin_position["longitude"] - m + lon
+        max_gps_y = self.origin_position["latitude"] + n - lat
+        return (min_gps_x, min_gps_y, max_gps_x, max_gps_y)
 
     def draw_clicked_pos(self, event):
-        # get the clicked coordinate
+        # get and set the clicked coordinate
         self.get_clicked_coord(event)
-
-        # check if any mapobject was clicked (isch)
+        # get the bounds to look for objects to mark in
+        min_gps_x, min_gps_y, max_gps_x, max_gps_y = self.get_clicked_bounds(event)
+        # check if any mapobject was clicked
+        found = False # only mark one object
         for obj in self.mapdata.objects.values():
+            obj.picture.marked = False
             data = obj.map_object_data
-            if (data.coordx >= self.gps_x-0.001 and 
-                data.coordx <= self.gps_x+0.001 and 
-                data.coordy >= self.gps_y-0.001 and
-                data.coordy <= self.gps_y+0.001 and not data.name == "sign"):
+            if (data.coordx >= min_gps_x and 
+                data.coordx <= max_gps_x and 
+                data.coordy >= max_gps_y and
+                data.coordy <= min_gps_y and 
+                not data.name == "sign" and
+                not found):
                 clicked_object = data
+                obj.picture.marked = True
                 for m in self.db.get_all_missions():
                     if data.id == m.poi.id:
                         clicked_object = m
+                found = True
                 # tell clientgui to show the correct view if something cool was clicked!
-                self.emit("show-object", clicked_object)
+#                self.emit("show-object", clicked_object)
+        self.queue_draw()
 
         # if sign should be drawn, do it!
         if self.sign:
             self.draw_sign()
 
-gobject.type_register(MapScreen)
-gobject.signal_new("show-object", MapScreen, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
+#gobject.type_register(MapScreen)
+#gobject.signal_new("show-object", MapScreen, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))

@@ -143,7 +143,7 @@ class ClientGui(hildon.Program):
 
         # add the map screen
         self.map = MapScreen(self.db)
-        self.map.connect("show-object", self.show_object) 
+#        self.map.connect("show-object", self.show_object)
         vbox_right.pack_start(self.map, True, True, 0)
         self.screens["map"] = self.map
 
