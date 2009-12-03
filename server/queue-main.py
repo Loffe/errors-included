@@ -113,9 +113,16 @@ class ServerNetworkHandler(dbus.service.Object):
         for u in users:
             self.outqueues[u.name] = NetworkOutQueue(None, self.db, u.name)
 
-        if config.server.primary == False:
-            self.primary_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.poll()
+        if config.server.primary:
+            print "starting heartbeat"
+            self.heartbeat_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            if 'arm' not in sys.version.lower():
+                self.heartbeat_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.heartbeat_socket.bind((self.host, config.primary.heartbeatport))
+            self.heartbeat_socket.listen(5)
+            self.input.append(self.heartbeat_socket)
+        else:
+            self.ping()
         print self.outqueues
 
     def _accept_client(self, socket, port):
@@ -182,6 +189,18 @@ class ServerNetworkHandler(dbus.service.Object):
                     if junk.startswith("q"):
                         print "got quit"
                         running = False
+                elif s == self.heartbeat_socket:
+                    print "got heartbeat"
+                    data = None
+                    (pinger, port) = s.accept()
+                    try:
+                        data = pinger.recv(4)
+                        if data == "ping":
+                            print "got ping => pong"
+                        pinger.send("pong")
+                    except socket.error, e:
+                        print e
+                    pinger.close()
                 else:
                     # read and parse content length
                     length = 0
@@ -218,20 +237,26 @@ class ServerNetworkHandler(dbus.service.Object):
         
         self.close()
 
-    def poll(self):
+    def ping(self):
         print "Sent heatbeat, duh-duh..."
         response = None
         try:
+            self.primary_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.primary_socket.connect((config.primary.ip, config.primary.heartbeatport))
+            print "sending ping"
             self.primary_socket.send("ping")
-            response = self.primary_socket.recv(4, timeout=5)
-        except:
-            print "Exception during heartbeat"
+            print "recv"
+            response = self.primary_socket.recv(4)
+            print "closing"
+            self.primary_socket.close()
+        except Exception, e:
+            print "Exception during heartbeat", e
         self.primary_alive = response == "pong"
-        if not self.primary_alive:
-            gobject.timeout_add(config.primary.heartbeatinterval, self.poll)
-        else:
+        if self.primary_alive:
             print "Primary is alive"
+        else:
+            print "Primary is dead"
+        gobject.timeout_add(config.primary.heartbeatinterval, self.ping)
 
     def dbusloop(self):
         #import signal
