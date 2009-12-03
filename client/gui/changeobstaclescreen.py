@@ -39,6 +39,7 @@ class ChangeObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         
         # create and pack combobox
         self.combo_box = gtk.combo_box_new_text()
+        self.selected_type = None
         #combo_box.set_size_request(300,50)
         right_box.pack_start(self.combo_box, True, False, 0)
         

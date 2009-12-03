@@ -61,6 +61,19 @@ class ChangeMissionScreen(gtk.ScrolledWindow, gui.Screen):
         self.name_entry.set_text(mission.contact_person)
         self.number_entry.set_text(mission.contact_number)
         self.random_entry.set_text(mission.other)
+        ids = []
+        for unit in mission.units:
+            ids.append(unit.id)
+        self.select_unit_button.selected_ids = ids
+        selected_units = self.db.get_units(ids)
+        names = [u.name for u in selected_units][:3]
+        text = ", ".join(names)
+        if len(selected_units) > 3:
+            text += "..."
+        if text == "":
+            self.select_unit_button.unit_label.set_text("Inga valda enheter...")
+        else:
+            self.select_unit_button.unit_label.set_text(text)
         
     def delete_button_function(self, event):
         self.db.delete(self.mission)
@@ -83,7 +96,7 @@ class ChangeMissionScreen(gtk.ScrolledWindow, gui.Screen):
                 other=unicode(self.random_entry.get_text()),
                 timestamp=datetime.datetime.now(),
                 poi=poi_data,
-                units=self.mission.units,
+                units=self.db.get_units(self.select_unit_button.select_dialog.selected_units),
                 id=self.mission.id)
         self.db.change(mission_data)
 

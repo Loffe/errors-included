@@ -118,7 +118,6 @@ class Database(gobject.GObject):
             print "This cannot happen in reality"
         else:
             Packable.copy(object, result)
-            session.add(result)
 
         session.commit()
         session.close()
@@ -748,19 +747,16 @@ if __name__ == '__main__':
 #    print alarm
 #    db.add(alarm)
 
-    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.obstacle, POISubType.tree)
-#    
+#    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.obstacle, POISubType.tree)
+    s = db._Session()
+    poi = s.query(POIData).first()
+    poi.name = "bajs"
+    s.commit()
+    s.close()
 ##    print poi_data, poi_data.to_dict()
-    db.add(poi_data)
-    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
-    db.add(unit_data)
-    unit_data2 = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
-    db.add(unit_data2)
-    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data, unit_data2])
-##    print mission_data.to_dict()
-    db.add(mission_data)
+#    db.add(poi_data)
 
-    print db.get_all_missions()
+#    print db.get_all_missions()
 ##    print mission_data.to_changed_list(db)
 #    
 #    units = []
