@@ -319,18 +319,10 @@ class ClientGui(hildon.Program):
         print "*****************"
         print "GOT NEW MESSAGE!!"
         print "*****************"
-#        try:
-#            shared.util.set_color(0,255,0)
-#        except:
-#            print "Couldnt find led"
-            
+        
+        shared.util.set_color(0,255,0) 
         label = self.messages_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("green"))
-
-
-        
-
-             
 
     def sending_voip(self, event):
         msg = shared.data.Message(self.controller.name, 
@@ -616,6 +608,10 @@ class ClientGui(hildon.Program):
         self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här ska bara inkomna meddelande finnas")
         
         self.update_messagesbox(event)
+        shared.util.set_color(0,0,0)
+          
+        label = self.messages_button.get_child()
+        label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
 
     def show_alarms(self, event):
         self.show(["alarms", "message_menu"])
@@ -639,13 +635,7 @@ class ClientGui(hildon.Program):
         self.toggle_show("messages", ["notifications", "map","message_menu"], "Här visas dina meddelanden")
 
         self.update_messagesbox(event)
-#        try:
-#            shared.util.set_color(0,0,0)
-#        except:
-#            print "Couldnt find led"
-            
-        label = self.messages_button.get_child()
-        label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
+
             
     def update_messagesbox(self, event):
         combo = self.screens["message"].combo_box

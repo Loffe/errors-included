@@ -23,13 +23,20 @@ def get_ip():
     return ip
 
 def set_color(r,g,b):
-    set_mode("direct")
-    value = "%X:%X:%X" % (r,g,b)
-    FILE = open("/sys/devices/platform/i2c_omap.2/i2c-0/0-0032/color","w")
-    FILE.write(value)
-    FILE.close()
+    try:
+        set_mode("direct")
+        value = "%X:%X:%X" % (r,g,b)
+        FILE = open("/sys/devices/platform/i2c_omap.2/i2c-0/0-0032/color","w")
+        FILE.write(value)
+        FILE.close()
+    except:
+        "Couldnt find led"
 
 def set_mode(mode):
-    FILE = open("/sys/devices/platform/i2c_omap.2/i2c-0/0-0032/mode","w")
-    FILE.write(mode)
-    FILE.close()
+    try:
+        FILE = open("/sys/devices/platform/i2c_omap.2/i2c-0/0-0032/mode","w")
+        FILE.write(mode)
+        FILE.close()
+    except:
+        print "Couldnt fint led"
+        
