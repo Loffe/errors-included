@@ -22,6 +22,7 @@ from gui.mapscreen import MapScreen
 from gui.alarmscreen import AlarmScreen
 from gui.inboxscreen import InboxScreen
 from gui.obstaclescreen import ObstacleScreen
+from gui.changeobstaclescreen import ChangeObstacleScreen
 from gui.missionscreen import MissionScreen
 from gui.newmessagescreen import NewMessageScreen
 from gui.outboxscreen import OutboxScreen
@@ -143,7 +144,7 @@ class ClientGui(hildon.Program):
 
         # add the map screen
         self.map = MapScreen(self.db)
-#        self.map.connect("show-object", self.show_object)
+        self.map.connect("object-clicked", self.change_object)
         vbox_right.pack_start(self.map, True, True, 0)
         self.screens["map"] = self.map
 
@@ -176,6 +177,12 @@ class ClientGui(hildon.Program):
         self.obstacle_screen.connect("okbutton-obstacle-clicked", self.back_button_function)
         vbox_right.pack_start(self.obstacle_screen, True, True, 0)
         self.screens["obstacle"] = self.obstacle_screen
+        
+        # add the change obstacle screen
+        self.change_obstacle_screen = ChangeObstacleScreen(self.db)
+#        self.change_obstacle_screen.connect("okbutton-obstacle-clicked", self.back_button_function)
+        vbox_right.pack_start(self.change_obstacle_screen, True, True, 0)
+        self.screens["change_obstacle"] = self.change_obstacle_screen
         
         # add the create_mission screen
         self.mission_screen = MissionScreen(self.db)
@@ -302,6 +309,27 @@ class ClientGui(hildon.Program):
         back_button2.connect("clicked", self.back_button_function)
         
         vbox_right.pack_start(self.back_button_box, False, False, 0)
+        
+        # add back-, change- and delete-button (used in ChangeObstacleScreen etc)
+        self.change_buttons = gtk.HBox(False, 10)
+        self.change_buttons.set_size_request(0, 60)
+        self.screens["change_buttons"] = self.change_buttons
+        
+        change_back_button = gtk.Button("Bakåt")
+        self.change_buttons.pack_start(change_back_button)
+        change_back_button.connect("clicked", self.back_button_function)
+        
+        delete_button = gtk.Button("Ta bort")
+#        delete_button("clicked", self.change_obstacle)
+        delete_button.set_flags(gtk.CAN_DEFAULT)
+        self.change_buttons.pack_start(delete_button)
+
+        change_button = gtk.Button("Spara ändringar")
+#        change_button.connect("clicked", self.change_obstacle)
+        change_button.set_flags(gtk.CAN_DEFAULT)
+        self.change_buttons.pack_start(change_button)
+        
+        vbox_right.pack_start(self.change_buttons, False, False, 0)
 
         self.window.connect("destroy", lambda event: self.mainloop.quit())
         self.window.connect("key-press-event", self.on_key_press)
@@ -311,11 +339,22 @@ class ClientGui(hildon.Program):
         self.window_in_fullscreen = False
         log.info("ClientGui created")
         
-    def show_object(self, event, object): 
+    def change_object(self, event, object):
+        print object
         if object.__class__ == POIData:
-#            self.show(["map"])
-            self.create_obstacle(event)
+            self.show(["map"])
+            self.change_obstacle(object)
+        elif object.__class__ == MissionData:
+            self.show(["map"])
+            self.change_mission(object)
             
+    def change_obstacle(self, poi):
+        self.show(["change_obstacle", "change_buttons"])
+        self.screens["change_obstacle"].poi = poi
+        
+    def change_mission(self, mission):
+        self.show(["change_mission", "change_buttons"])
+        self.screens["change_mission"].mission = mission
 
     def sending_voip(self, event):
         msg = shared.data.Message(self.controller.name, 
@@ -474,8 +513,6 @@ class ClientGui(hildon.Program):
         self.controller.interface.connect_to_signal("signal_changed_service_level", self.update_service_level)
         self.message_dispatcher.connect_to_type(shared.data.MessageType.vvoip, self.check_if_ok)
         self.message_dispatcher.connect_to_type(shared.data.MessageType.voip, self.check_if_ok)
-        
-
 
     def run(self):
         '''

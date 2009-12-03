@@ -7,7 +7,7 @@ import map.map_xml_reader
 import map
 from map.mapdata import *
 from datetime import datetime
-#import gobject
+import gobject
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
     db = None
@@ -299,7 +299,6 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         # check if any mapobject was clicked
         found = False # only mark one object
         for obj in self.mapdata.objects.values():
-            obj.picture.marked = False
             data = obj.map_object_data
             if (data.coordx >= min_gps_x and 
                 data.coordx <= max_gps_x and 
@@ -308,18 +307,23 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                 not data.name == "sign" and
                 not found):
                 clicked_object = data
-                obj.picture.marked = True
+                if obj.picture.marked:
+                    print "signal"
+                    # tell clientgui to show the correct view if something cool was clicked!
+                    self.emit("object-clicked", clicked_object)
+                else:
+                    obj.picture.marked = True
                 for m in self.db.get_all_missions():
                     if data.id == m.poi.id:
                         clicked_object = m
                 found = True
-                # tell clientgui to show the correct view if something cool was clicked!
-#                self.emit("show-object", clicked_object)
+            else:
+                obj.picture.marked = False
         self.queue_draw()
 
         # if sign should be drawn, do it!
         if self.sign:
             self.draw_sign()
 
-#gobject.type_register(MapScreen)
-#gobject.signal_new("show-object", MapScreen, gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
+gobject.type_register(MapScreen)
+gobject.signal_new("object-clicked", MapScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
