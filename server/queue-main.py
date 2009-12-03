@@ -191,7 +191,7 @@ class ServerNetworkHandler(dbus.service.Object):
                         running = False
                 elif s == self.heartbeat_socket:
                     print "got ping => pong"
-                    s.write("pong")
+                    s.send("pong")
                 else:
                     # read and parse content length
                     length = 0
@@ -235,6 +235,7 @@ class ServerNetworkHandler(dbus.service.Object):
             self.primary_socket.connect((config.primary.ip, config.primary.heartbeatport))
             self.primary_socket.send("ping")
             response = self.primary_socket.recv(4, timeout=5)
+            self.primary_socket.close()
         except:
             print "Exception during heartbeat"
         self.primary_alive = response == "pong"
