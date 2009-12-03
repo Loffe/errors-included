@@ -33,10 +33,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         # modellen anropar redraw när något ändras så att vyn uppdateras
         self.mapdata.redraw_function = self.queue_draw
         self.pos = {"x":0, "y":0}
-        self.origin_position = None
         self.cols = 0
         self.rows = 0
-        self.gps_data = None
         self.movement_from = {"x": 0, "y":0}
         self.allow_movement = False
         self.last_movement_timestamp = 0.0
@@ -44,11 +42,14 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
 
         self.gps_x = self.mapdata.focus["longitude"]
         self.gps_y = self.mapdata.focus["latitude"]
+        self.origin_position = self.mapdata.focus
 
         # events ;O
         self.set_flags(gtk.CAN_FOCUS)
         self.connect("expose_event", self.handle_expose_event)
+
         self.connect("button_press_event", self.handle_button_press_event)
+        
         self.connect("button_release_event", self.handle_button_release_event)
         self.connect("motion_notify_event", self.handle_motion_notify_event)
 #        self.connect("key_press_event", self.handle_key_press_event)
@@ -122,8 +123,12 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.movement_from["y"] = event.y
         self.origin_position = self.mapdata.focus
         self.last_movement_timestamp = time.time()
-        self.allow_movement = True
-        self.draw_clicked_pos(event)
+        self.set_clicked_coord(widget, event)
+        self.draw_clicked_pos(widget, event)
+        result = self.draw_marked_object(widget, event)
+        
+        if result:
+            self.allow_movement = True
         return True
 
     def handle_button_release_event(self, widget, event):
@@ -145,10 +150,10 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                 lon, lat = self.pixel_to_gps(self.movement_from["x"] - x,
                                              self.movement_from["y"] - y)
                 self.mapdata.set_focus(self.origin_position["longitude"] + lon,
-                                     self.origin_position["latitude"] - lat)
+                                       self.origin_position["latitude"] - lat)
                 self.movement_from["x"] = x
                 self.movement_from["y"] = y
-            
+
                 # Ritar om kartan
                 self.queue_draw()
 
@@ -166,11 +171,6 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         self.draw()
 
         return False
-
-#    # skicka in skiten här linus, gogo!
-#    def set_gps_data(self, gps_data):
-#        self.gps_data = gps_data
-#        self.queue_draw()
 
     def draw(self):
         # Hämtar alla tiles för en nivå
@@ -250,14 +250,14 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         return [gps_per_pix_width * movement_x,
                 gps_per_pix_height * movement_y]
         
-    def get_clicked_coord(self, event):
+    def set_clicked_coord(self, widget, event):
         r = self.get_allocation()        
         x, y, state = event.window.get_pointer()
         (lon,lat) = self.pixel_to_gps(x,y)        
         (m,n) = self.pixel_to_gps(r.width/2, r.height/2)
         self.gps_x = self.origin_position["longitude"] - m + lon
         self.gps_y = self.origin_position["latitude"] + n - lat
-        
+
     def draw_sign(self):  
         poi_data = shared.data.POIData(self.gps_x, self.gps_y, "sign", datetime.now(), shared.data.POIType.flag)
         self.mapdata.objects["add-sign"] = POI(poi_data)
@@ -291,9 +291,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         max_gps_y = self.origin_position["latitude"] + n - lat
         return (min_gps_x, min_gps_y, max_gps_x, max_gps_y)
 
-    def draw_clicked_pos(self, event):
-        # get and set the clicked coordinate
-        self.get_clicked_coord(event)
+    def draw_marked_object(self, widget, event):
+        self.allow_movement = False
         # get the bounds to look for objects to mark in
         min_gps_x, min_gps_y, max_gps_x, max_gps_y = self.get_clicked_bounds(event)
         # check if any mapobject was clicked
@@ -320,7 +319,11 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
             else:
                 obj.picture.marked = False
         self.queue_draw()
+        if found:
+            return False
+        return True
 
+    def draw_clicked_pos(self, widget, event):
         # if sign should be drawn, do it!
         if self.sign:
             self.draw_sign()
