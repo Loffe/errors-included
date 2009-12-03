@@ -44,6 +44,8 @@ class ServerNetworkHandler(dbus.service.Object):
         self._init_queues()
         self.mainloop = None
         self.message_handler = handler.MessageHandler(self)
+        if config.server.primary == False:
+            self.primary_alive = False
 
     @dbus.service.method(dbus_interface='included.errors.Server',
                          in_signature='ssi', out_signature='s')
@@ -111,6 +113,17 @@ class ServerNetworkHandler(dbus.service.Object):
         for u in users:
             self.outqueues[u.name] = NetworkOutQueue(None, self.db, u.name)
 
+        if config.server.primary:
+            print "starting heartbeat"
+            self.heartbeat_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            if 'arm' not in sys.version.lower():
+                self.heartbeat_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.heartbeat_socket.bind((self.host, config.primary.heartbeatport))
+            self.heartbeat_socket.listen(5)
+            self.input.append(self.heartbeat_socket)
+        else:
+            self.heartbeat_socket = None
+            self.ping()
         print self.outqueues
 
     def _accept_client(self, socket, port):
@@ -128,6 +141,18 @@ class ServerNetworkHandler(dbus.service.Object):
     def _login_client(self, socket, message):
         m = message
         id = m.sender
+        if config.server.primary == False and self.primary_alive:
+            log.info("login denied")
+            nack = shared.data.Message("server", id, response_to=m.message_id,
+                                       type=shared.data.MessageType.ack,
+                                       unpacked_data={"result": "try_primary", "class": "dict"})
+            # Don't send via database queue
+            data = nack.packed_data
+            content_length = '0x%04x' % len(data)
+            socket.send(content_length)
+            socket.send(data)
+            print "Login failed because primary is alive"
+            return
         if self.db.is_valid_login(m.sender, m.unpacked_data["password"]):
             self.outqueues[id].replace_socket(socket)
             
@@ -165,6 +190,18 @@ class ServerNetworkHandler(dbus.service.Object):
                     if junk.startswith("q"):
                         print "got quit"
                         running = False
+                elif s == self.heartbeat_socket:
+                    print "got heartbeat"
+                    data = None
+                    (pinger, port) = s.accept()
+                    try:
+                        data = pinger.recv(4)
+                        if data == "ping":
+                            print "got ping => pong"
+                        pinger.send("pong")
+                    except socket.error, e:
+                        print e
+                    pinger.close()
                 else:
                     # read and parse content length
                     length = 0
@@ -200,6 +237,24 @@ class ServerNetworkHandler(dbus.service.Object):
                         self._disconnect_client(s)
         
         self.close()
+
+    def ping(self):
+        print "Sent heatbeat, duh-duh..."
+        response = None
+        try:
+            self.primary_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.primary_socket.connect((config.primary.ip, config.primary.heartbeatport))
+            self.primary_socket.send("ping")
+            response = self.primary_socket.recv(4)
+            self.primary_socket.close()
+        except Exception, e:
+            print "Exception during heartbeat", e
+        self.primary_alive = response == "pong"
+        if self.primary_alive:
+            print "Primary is alive"
+        else:
+            print "Primary is dead"
+        gobject.timeout_add(config.primary.heartbeatinterval, self.ping)
 
     def dbusloop(self):
         #import signal

@@ -99,9 +99,16 @@ class ClientNetworkHandler(dbus.service.Object):
             print "got a login ack"
             data = self.input.get(local_id)
             ack = shared.data.Message.unpack(data, self.db)
-            if ack.unpacked_data["result"] == "no":
+            if ack.unpacked_data["result"] == "yes":
+                print "Login ok"
+            elif ack.unpacked_data["result"] == "no":
                 print "Couldn't login. Please check username/password"
                 self.close()
+            elif ack.unpacked_data["result"] == "try_primary":
+                print "Primary is still alive"
+                self.close()
+            else:
+                print "Other random login failure"
         return
 
     def run(self):

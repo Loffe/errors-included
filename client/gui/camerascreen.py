@@ -37,6 +37,24 @@ class CamScreen(gtk.ScrolledWindow, gui.Screen):
 
         hbox.add(gtk.Label())
         self.show_all()
+        
+        '''
+        THIS IS FOR SENDING BOTH AUDIO AND VIDEO IN ONE LAUNCH!
+        
+        Sender:
+        HOST=$1
+        VIDEOPORT=$2
+        AUDIOPORT=$3
+
+        gst-launch v4l2src ! queue ! video/x-raw-yuv,width=320,height=240,framerate=\(fraction\)4/1 ! videorate ! videoscale ! ffmpegcolorspace ! queue ! smokeenc ! queue ! udpsink host=${HOST} port=${VIDEOPORT} alsasrc ! queue ! audio/x-raw-int,rate=8000,channels=1,depth=8 ! audioconvert ! speexenc ! queue ! tcpserversink host=${HOST} port=${AUDIOPORT}
+
+        Receiver:
+        HOST=$1
+        VIDEOPORT=$2
+        AUDIOPORT=$3
+
+        gst-launch-0.10 udpsrc port=$VIDEOPORT ! queue ! oggdemux name=demux ! queue ! smokedec ! ffmpegcolorspace ! videoscale ! ximagesink demux. ! queue ! autovideosink tcpclientsrc host=$HOST port=$AUDIOPORT ! queue ! speexdec ! queue ! alsasink sync=false
+        '''
 
     def start_audio_send(self,ip,port):
 
