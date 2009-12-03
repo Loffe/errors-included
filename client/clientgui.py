@@ -320,7 +320,8 @@ class ClientGui(hildon.Program):
         print "GOT NEW MESSAGE!!"
         print "*****************"
         
-        shared.util.set_color(0,255,0) 
+        shared.util.set_color(0,255,0)
+        shared.util.play_sound()
         label = self.messages_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("green"))
 

@@ -1,6 +1,7 @@
 import logging
 import subprocess
 import re
+import time, wave, pymedia.audio.sound as sound
 
 def getLogger(filename="log.txt"):
     logger = logging.getLogger(filename)
@@ -39,4 +40,18 @@ def set_mode(mode):
         FILE.close()
     except:
         print "Couldnt fint led"
+        
+#Parsing wave header is a simple thing using wave module:
+def play_sound():
+    try:
+        f= wave.open( '/snd/mail3b.wav', 'rb' )
+        sampleRate= f.getframerate()
+        channels= f.getnchannels()
+    
+        snd= sound.Output( sampleRate, channels, format )
+        s= f.readframes( 300000 )
+        snd.play( s )
+        while snd.isPlaying(): time.sleep( 0.05 )
+    except:
+        print "Couldnt play sound"
         
