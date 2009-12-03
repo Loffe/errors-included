@@ -16,6 +16,7 @@ log.debug("clientgui imported log")
 from map.mapdata import *
 import controller
 import config
+import shared.util
 from database import ClientDatabase
 from gui.gui import Screen
 from gui.mapscreen import MapScreen
@@ -316,6 +317,13 @@ class ClientGui(hildon.Program):
         print "*****************"
         print "GOT NEW MESSAGE!!"
         print "*****************"
+        #shared.util.set_color(0,255,0)
+        label = self.messages_button.get_child()
+        label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("green"))
+
+
+        
+
              
 
     def sending_voip(self, event):

@@ -21,3 +21,15 @@ def get_ip():
     regexp = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"
     ip = re.findall(regexp, result)[1]
     return ip
+
+def set_color(r,g,b):
+    set_mode("direct")
+    value = "%X:%X:%X" % (r,g,b)
+    FILE = open("/sys/devices/platform/i2c_omap.2/i2c-0/0-0032/color","w")
+    FILE.write(value)
+    FILE.close()
+
+def set_mode(mode):
+    FILE = open("/sys/devices/platform/i2c_omap.2/i2c-0/0-0032/mode","w")
+    FILE.write(mode)
+    FILE.close()
