@@ -113,9 +113,16 @@ class ServerNetworkHandler(dbus.service.Object):
         for u in users:
             self.outqueues[u.name] = NetworkOutQueue(None, self.db, u.name)
 
-        if config.server.primary == False:
+        if config.server.primary:
+            self.heartbeat_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            if 'arm' not in sys.version.lower():
+                self.heartbeat_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.heartbeat_socket.bind((self.host, config.primary.heartbeatport))
+            self.heartbeat_socket.listen(5)
+            self.input.append(self.heartbeat_socket)
+        else:
             self.primary_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.poll()
+            self.ping()
         print self.outqueues
 
     def _accept_client(self, socket, port):
@@ -182,6 +189,9 @@ class ServerNetworkHandler(dbus.service.Object):
                     if junk.startswith("q"):
                         print "got quit"
                         running = False
+                elif s == self.heartbeat_socket:
+                    print "got ping => pong"
+                    s.write("pong")
                 else:
                     # read and parse content length
                     length = 0
@@ -218,7 +228,7 @@ class ServerNetworkHandler(dbus.service.Object):
         
         self.close()
 
-    def poll(self):
+    def ping(self):
         print "Sent heatbeat, duh-duh..."
         response = None
         try:
@@ -229,7 +239,7 @@ class ServerNetworkHandler(dbus.service.Object):
             print "Exception during heartbeat"
         self.primary_alive = response == "pong"
         if not self.primary_alive:
-            gobject.timeout_add(config.primary.heartbeatinterval, self.poll)
+            gobject.timeout_add(config.primary.heartbeatinterval, self.ping)
         else:
             print "Primary is alive"
 
