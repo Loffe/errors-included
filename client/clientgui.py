@@ -693,6 +693,7 @@ class ClientGui(hildon.Program):
         combo.set_active(0)
          
         for textmessages in self.db.textmessages():
+            
             if config.client.name == textmessages.sender:
                 combo.append_text(textmessages.receiverandsubject)
        
@@ -726,7 +727,7 @@ class ClientGui(hildon.Program):
     def show_messages(self, event):
         #self.toggle_show("messages", ["notifications", "map","message_menu"], "Här visas dina meddelanden")
         
-        self.show(["act", "map"])
+        self.show(["map", "message_menu"])
         
         self.update_messagesbox(event)
 
