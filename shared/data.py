@@ -55,11 +55,12 @@ class Packable(object):
                             list.append(unit.id)
                         dict[var] = list
                     elif var == "poi_id":
-                        dict["poi"] = v
+                        pass
                     else:
                         dict[var] = v
                 elif var == "poi":
-                        print "replaced POI:", self.__dict__["poi"], "with id:", self.__dict__["poi"].id
+                        if self.__dict__[var].id is None:
+                            print "poi to replace with id has no id, add it to database first"
                         dict["poi"] = self.__dict__[var].id
         dict["class"] = self.__class__.__name__
         return dict
@@ -673,6 +674,8 @@ class Message(object):
                             s = database._Session()
                             for uid in unit_ids:
                                 data = s.query(UnitData).filter_by(id=uid).first()
+                                if data is None:
+                                    print "No unit with specified id found in database, sync error!"
                                 units.append(data)
                             s.commit()
                             s.close()
@@ -685,7 +688,8 @@ class Message(object):
                             poi_id = dict["poi"]
                             s = database._Session()
                             poi = s.query(POIData).filter_by(id=poi_id).first()
-                            print "poi_id:", poi_id, "poi:", poi
+                            if poi is None:
+                                print "No poi with specified id found in database, sync error!"
                             dict["poi"] = poi
                             s.commit()
                             s.close()
@@ -751,7 +755,7 @@ if __name__ == '__main__':
     db.add(mission_data)
     message = Message("ragnar", "server", unpacked_data = mission_data)
     print message.packed_data
-    Message.unpack(message.packed_data)
+    Message.unpack(message.packed_data, db)
 #    db.add(mission_data)
 #    poi_data2 = POIData(122,333, u"goal", datetime(2013,10,10), POIType.obstacle, POISubType.tree)
 #    db.add(poi_data2)
