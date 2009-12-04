@@ -509,6 +509,7 @@ class ClientGui(hildon.Program):
                 self.start_voip(msg)
             elif msg.type == shared.data.MessageType.vvoip:
                 self.start_vvoip(msg)
+            inc_dialog.destroy()
         answer_button.connect("clicked", answer)
         
         inc_dialog.vbox.pack_start(who)
@@ -525,7 +526,7 @@ class ClientGui(hildon.Program):
 #        elif result == 666:
 #            # @todo: return nack if we dont want to answer
 #            print "upptaget"
-        inc_dialog.destroy()
+        
         
     def out_call_popup(self, msg):
         print "Utgående samtal = popup"
