@@ -95,7 +95,11 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         elif data.__class__ == shared.data.MissionData:
             del self.mapdata.objects[data.poi.id]
         else:
-            del self.mapdata.objects[data.id]
+            try:
+                del self.mapdata.objects[data.id]
+            except KeyError:
+                # object allready deleted or not existing
+                pass
 
         self.queue_draw()
 

@@ -14,12 +14,11 @@ class MapObjectHandler(object):
         object = message.unpacked_data
         if subtype == ActionType.change:
             self.database.add(object)
-            if object.__class__ == UnitData:
-                for u in self.database.get_all_users():
-                    msg = Message(u"server", u.name, MessageType.object,
-                                  ActionType.change, unpacked_data=object)
-                    self.queue.enqueue(u.name, msg.packed_data, msg.prio)
-                    print "sharing new map object"
+            for u in self.database.get_all_users():
+                msg = Message(u"server", u.name, MessageType.object,
+                              ActionType.change, unpacked_data=object)
+                self.queue.enqueue(u.name, msg.packed_data, msg.prio)
+                print "sharing new map object"
 
         elif subtype == ActionType.add:
             self.database.add(object)
