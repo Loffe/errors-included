@@ -162,6 +162,7 @@ class Database(gobject.GObject):
         textmessages = []
         for t in session.query(TextMessage):
             textmessages.append(t)
+            t.units
         session.close()
         return textmessages
     
@@ -373,21 +374,17 @@ class TextMessage(Base, Packable):
     message_content = Column(UnicodeText)
     timestamp = Column(DateTime)
     sender = Column(UnicodeText)
-    senderandsubject = Column(UnicodeText)
-    receiverandsubject = Column(UnicodeText)
-    
     
     prio = 5
     
-    def __init__(self, subject, message_content, units, sender, senderandsubject, receiverandsubject, timestamp = datetime.now(), id = None):
+    def __init__(self, subject, message_content, units, sender, timestamp = datetime.now(), id = None):
         self.subject = subject
         self.message_content = message_content
         self.timestamp = timestamp
         self.units = units
         self.id = id
         self.sender = sender
-        self.senderandsubject= senderandsubject
-        self.receiverandsubject = receiverandsubject
+        
         
     def add_unit(self, unit):
         self.units.append(unit)

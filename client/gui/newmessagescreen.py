@@ -72,33 +72,14 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
 
 
         selected = self.select_unit_button.select_dialog.selected_units
-        print "-----________------"
-        print selected
-        print "-----------"
         units = self.db.get_units(selected)   
-        print units
-        print "-----------"
-        names = [u.name for u in units][:3]
-        print names
-        print "-----------"
-        unitnames = ", ".join(names)
-        if len(units) > 3:
-            unitnames += "..."
-        if unitnames == "":
-            self.select_unit_button.unit_label.set_text("Inga valda enheter...")
-        else:
-            self.select_unit_button.unit_label.set_text(unitnames)
-        
         text = shared.data.TextMessage(subject=unicode(self.subject_entry.get_text()), 
                                        message_content=unicode(self.buffer.get_text(self.buffer.get_start_iter(), self.buffer.get_end_iter(), True)),
                                        units=units, 
                                        sender=config.client.name,
-                                       senderandsubject= "Från: " + str(config.client.name) + "    Ämne: " + str(self.subject_entry.get_text()),
-                                       receiverandsubject = "Till: " + str(unitnames) + "    Ämne: " + str(self.subject_entry.get_text()), 
                                        timestamp=datetime.datetime.now())
 
         self.db.add(text)
-                
         self.emit("okbutton_clicked_new_message")
         
 gobject.type_register(NewMessageScreen)

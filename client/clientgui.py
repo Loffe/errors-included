@@ -693,9 +693,17 @@ class ClientGui(hildon.Program):
         combo.set_active(0)
          
         for textmessages in self.db.textmessages():
+            list = []
+            for unit in textmessages.units:
+                list.append(unit)
+            names = [u.name for u in list][:3]
+            unitnames = ", ".join(names)
+            if len(list) > 3:
+                unitnames += "..."
+            receiverandsubject = "Till: " + str(unitnames) + "    Ämne: " + str(textmessages.subject)
             
             if config.client.name == textmessages.sender:
-                combo.append_text(textmessages.receiverandsubject)
+                combo.append_text(receiverandsubject)
        
     def show_inbox(self, event):
         self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här ska bara inkomna meddelande finnas")
