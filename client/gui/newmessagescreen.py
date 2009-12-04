@@ -72,9 +72,15 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
 
 
         selected = self.select_unit_button.select_dialog.selected_units
+        print "-----________------"
+        print selected
+        print "-----------"
         units = self.db.get_units(selected)   
-        
+        print units
+        print "-----------"
         names = [u.name for u in units][:3]
+        print names
+        print "-----------"
         unitnames = ", ".join(names)
         if len(units) > 3:
             unitnames += "..."
