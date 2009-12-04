@@ -720,9 +720,9 @@ class Message(object):
     unpack = classmethod(unpack)
 
     def __repr__(self):
-        repr = ("<%s: sender=%s, receiver=%s, prio=%s, type=%s, %s; packed=%s, unpacked=%s>" % 
+        repr = ("<%s: sender=%s, receiver=%s, prio=%s,\n    type=%s, sub=%s, ts=%s;\n    packed=%s>" %
                 (self.__class__.__name__, self.sender, self.reciever, self.prio,
-                 self.type, self.timestamp, self.packed_data, self.unpacked_data))
+                 self.type, self.subtype, self.timestamp, self.packed_data))
         try:
             return repr.encode('utf-8')
         except:
