@@ -507,9 +507,10 @@ class ClientGui(hildon.Program):
         def answer(event):
             if msg.type == shared.data.MessageType.voip:
                 self.start_voip(msg)
+                inc_dialog.destroy()
             elif msg.type == shared.data.MessageType.vvoip:
                 self.start_vvoip(msg)
-            inc_dialog.destroy()
+                inc_dialog.destroy()
         answer_button.connect("clicked", answer)
         
         inc_dialog.vbox.pack_start(who)
