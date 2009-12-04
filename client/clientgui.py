@@ -383,7 +383,7 @@ class ClientGui(hildon.Program):
         
         self.messages_button.set_attention(True)
         shared.util.set_color(0,255,0)
-        shared.util.play_uri('snd/mail3b.wav')
+        shared.util.play_sound(u"snd/mail3b.wav")
         label = self.messages_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("green"))
 
@@ -695,9 +695,17 @@ class ClientGui(hildon.Program):
         combo.set_active(0)
          
         for textmessages in self.db.textmessages():
+            list = []
+            for unit in textmessages.units:
+                list.append(unit)
+            names = [u.name for u in list][:3]
+            unitnames = ", ".join(names)
+            if len(list) > 3:
+                unitnames += "..."
+            receiverandsubject = "Till: " + str(unitnames) + "    Ämne: " + str(textmessages.subject)
             
             if config.client.name == textmessages.sender:
-                combo.append_text(textmessages.receiverandsubject)
+                combo.append_text(receiverandsubject)
        
     def show_inbox(self, event):
         self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här ska bara inkomna meddelande finnas")
@@ -728,9 +736,7 @@ class ClientGui(hildon.Program):
 
     # messages view event handlers
     def show_messages(self, event):
-        #self.toggle_show("messages", ["notifications", "map","message_menu"], "Här visas dina meddelanden")
-        
-        self.show(["map", "message_menu"])
+        self.toggle_show("messages", ["notifications", "map","message_menu"], "Här visas dina meddelanden")
         
         self.update_messagesbox(event)
 

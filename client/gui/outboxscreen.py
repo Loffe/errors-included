@@ -51,9 +51,6 @@ class OutboxScreen(gtk.ScrolledWindow, gui.Screen):
 
         vbox = gtk.VBox(False,0)
         self.add_with_viewport(vbox)
-
-        # create entries
-        #label, self.to_entry = new_entry("Till",vbox)
         
         self.combo_box = gtk.combo_box_new_text()
         self.combo_box.set_size_request(300,50)
@@ -100,7 +97,15 @@ class OutboxScreen(gtk.ScrolledWindow, gui.Screen):
         messages = self.db.textmessages()
         
         for message in messages:
-            if message.receiverandsubject == self.selected_m:
+            list = []
+            for unit in message.units:
+                list.append(unit)
+            names = [u.name for u in list][:3]
+            unitnames = ", ".join(names)
+            if len(list) > 3:
+                unitnames += "..."
+            receiverandsubject = "Till: " + str(unitnames) + "    Ämne: " + str(message.subject)
+            if receiverandsubject == self.selected_m:
                 self.subject_entry.set_text(message.subject)
                 self.buffer.set_text(message.message_content)
 
