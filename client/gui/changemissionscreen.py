@@ -88,15 +88,16 @@ class ChangeMissionScreen(gtk.ScrolledWindow, gui.Screen):
                 subtype=self.mission.poi.subtype,
                 id=self.mission.poi.id)
         self.db.change(poi_data)
+        
         mission_data = shared.data.MissionData(
-                event_type=unicode(self.event_entry.get_text()),
-                number_of_wounded=unicode(self.hurted_entry.get_text()),
-                contact_person=unicode(self.name_entry.get_text()),
-                contact_number=unicode(self.number_entry.get_text()),
-                other=unicode(self.random_entry.get_text()),
+                unicode(self.event_entry.get_text()),
+                poi_data,
+                unicode(self.hurted_entry.get_text()),
+                unicode(self.name_entry.get_text()),
+                unicode(self.number_entry.get_text()),
+                unicode(self.random_entry.get_text()),
+                self.db.get_units(self.select_unit_button.select_dialog.selected_units),
                 timestamp=datetime.datetime.now(),
-                poi=poi_data,
-                units=self.db.get_units(self.select_unit_button.select_dialog.selected_units),
                 id=self.mission.id)
         self.db.change(mission_data)
 
