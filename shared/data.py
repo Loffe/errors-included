@@ -662,31 +662,33 @@ class Message(object):
                         dict["timestamp"] = datetime.fromtimestamp(float(dict["timestamp"]))
                     except:
                         pass
-                    try:
-                        # replace timestamp string with a real datetime
-                        unit_ids = dict["units"]
-                        units = []
-                        s = database._Session()
-                        for uid in unit_ids:
-                            data = s.query(UnitData).filter_by(id=uid).first()
-                            units.append(data)
-                        s.commit()
-                        s.close()
-                        dict["units"] = units
-                    except:
-                        # object doesn't contain a list of units
-                        print "Failed to load UnitDatas from database"
-                    try:
-                        poi_id = dict["poi"]
-                        s = database._Session()
-                        poi = s.query(POIData).filter_by(id=poi_id).first()
-                        print "poi_id:", poi_id, "poi:", poi
-                        dict["poi"] = poi
-                        s.commit()
-                        s.close()
-                    except:
-                         # object doesn't contain a poi 
-                        print "Failed to load POI from database"
+                    if "units" in dict:
+                        try:
+                            # replace timestamp string with a real datetime
+                            unit_ids = dict["units"]
+                            units = []
+                            s = database._Session()
+                            for uid in unit_ids:
+                                data = s.query(UnitData).filter_by(id=uid).first()
+                                units.append(data)
+                            s.commit()
+                            s.close()
+                            dict["units"] = units
+                        except:
+                            # object doesn't contain a list of units
+                            print "Failed to load UnitDatas from database"
+                    if "poi" in dict:
+                        try:
+                            poi_id = dict["poi"]
+                            s = database._Session()
+                            poi = s.query(POIData).filter_by(id=poi_id).first()
+                            print "poi_id:", poi_id, "poi:", poi
+                            dict["poi"] = poi
+                            s.commit()
+                            s.close()
+                        except:
+                             # object doesn't contain a poi
+                            print "Failed to load POI from database"
                     # create and return an instance of the object
                     if classname == "dict":
                         return dict
