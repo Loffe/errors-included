@@ -4,32 +4,43 @@ import math
 
 class BlinkButton(gtk.Button):
 
-    active_color = gtk.gdk.color_parse("#F8F")
-    interval = 10
-    direction = 1
+    color1 = gtk.gdk.color_parse("#FA0")
+    color2 = gtk.gdk.color_parse("#FFF")
+    interval = 20
+    speed = 0.05
     t = 0
+    attention = False
     def __init__(self, label):
         gtk.Button.__init__(self, label)
 
 
     def set_attention(self, attention=True):
+        self.attention = attention
         if attention:
+            self.t = 0
             gobject.timeout_add(self.interval, self.pulse)
         else:
             self.clear()
 
+    def blend(self, c1, c2, t):
+        return gtk.gdk.Color( int(c1.red * (1-t) + c2.red * t),
+                              int(c1.green * (1-t) + c2.green * t),
+                              int(c1.blue * (1-t) + c2.blue * t))
+
     def pulse(self):
-        self.t += 0.1
-        a = 0.75 + 0.25*(math.sin(self.t)+1)/2
-        c = self.active_color
-        new_color = gtk.gdk.Color(int(c.red*a), int(c.green*a), int(c.blue*a))
+        self.t += 0.05
+        a = (math.sin(self.t)+1)/2
+        new_color = self.blend(self.color1, self.color2, a)
         self.modify_bg(gtk.STATE_NORMAL, new_color)
         self.modify_bg(gtk.STATE_PRELIGHT, new_color)
         self.modify_bg(gtk.STATE_ACTIVE, new_color)
-        gobject.timeout_add(self.interval, self.pulse)
+        if self.attention:
+            gobject.timeout_add(self.interval, self.pulse)
+        else:
+            self.clear()
 
     def clear(self):
-        pass
+        self.modify_bg(gtk.STATE_NORMAL, self.color1)
 
 
 
@@ -39,6 +50,11 @@ if __name__ == "__main__":
 
     button = BlinkButton("HellO")
     button.set_attention()
+    def stop(event):
+        print "clicked"
+        button.set_attention(not button.attention)
+
+    button.connect("clicked", stop)
     win.add(button)
     win.show_all()
     win.resize(200, 100)
