@@ -525,7 +525,7 @@ class ClientGui(hildon.Program):
 #        elif result == 666:
 #            # @todo: return nack if we dont want to answer
 #            print "upptaget"
-#        inc_dialog.destroy()
+        inc_dialog.destroy()
         
     def out_call_popup(self, msg):
         print "Utgående samtal = popup"
