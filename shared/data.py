@@ -58,6 +58,9 @@ class Packable(object):
                         dict["poi"] = v
                     else:
                         dict[var] = v
+                elif var == "poi":
+                        print "replaced POI:", self.__dict__["poi"], "with id:", self.__dict__["poi"].id
+                        dict["poi"] = self.__dict__[var].id
         dict["class"] = self.__class__.__name__
         return dict
 
@@ -662,33 +665,28 @@ class Message(object):
                         dict["timestamp"] = datetime.fromtimestamp(float(dict["timestamp"]))
                     except:
                         pass
-                    if "units" in dict:
-                        try:
-                            # replace timestamp string with a real datetime
-                            unit_ids = dict["units"]
-                            units = []
-                            s = database._Session()
-                            for uid in unit_ids:
-                                data = s.query(UnitData).filter_by(id=uid).first()
-                                units.append(data)
-                            s.commit()
-                            s.close()
-                            dict["units"] = units
-                        except:
-                            # object doesn't contain a list of units
-                            print "Failed to load UnitDatas from database"
-                    if "poi" in dict:
-                        try:
-                            poi_id = dict["poi"]
-                            s = database._Session()
-                            poi = s.query(POIData).filter_by(id=poi_id).first()
-                            print "poi_id:", poi_id, "poi:", poi
-                            dict["poi"] = poi
-                            s.commit()
-                            s.close()
-                        except:
-                             # object doesn't contain a poi
-                            print "Failed to load POI from database"
+                    if "units" in dict.keys():
+                        if database is None:
+                            print "No database to unpack units from"
+                        unit_ids = dict["units"]
+                        units = []
+                        s = database._Session()
+                        for uid in unit_ids:
+                            data = s.query(UnitData).filter_by(id=uid).first()
+                            units.append(data)
+                        s.commit()
+                        s.close()
+                        dict["units"] = units
+                    if "poi" in dict.keys():
+                        if database is None:
+                            print "No database to unpack poi from"
+                        poi_id = dict["poi"]
+                        s = database._Session()
+                        poi = s.query(POIData).filter_by(id=poi_id).first()
+                        print "poi_id:", poi_id, "poi:", poi
+                        dict["poi"] = poi
+                        s.commit()
+                        s.close()
                     # create and return an instance of the object
                     if classname == "dict":
                         return dict
@@ -740,8 +738,17 @@ def create_database(db = Database()):
 if __name__ == '__main__':
     print "Testing db"
     db = create_database()
-#    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.obstacle, POISubType.tree)
-#    db.add(poi_data)
+    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.event, POISubType.accident)
+    db.add(poi_data)
+    unit_data = UnitData(1,1, u"Freddie", datetime(2012,12,12), UnitType.ambulance)
+    db.add(unit_data)
+    mission_data = MissionData(u"Olycka", poi_data, 7, u"Freddie", u"12345",
+                 u"Inget annat", [unit_data])
+    db.add(mission_data)
+    message = Message("ragnar", "server", unpacked_data = mission_data)
+    print message.packed_data
+    Message.unpack(message.packed_data, db)
+#    db.add(mission_data)
 #    poi_data2 = POIData(122,333, u"goal", datetime(2013,10,10), POIType.obstacle, POISubType.tree)
 #    db.add(poi_data2)
 #    alarm = Alarm(u"räv", u"Linköping", poi_data, u"Klasse", u"11111", 7, u"nada")
@@ -754,11 +761,11 @@ if __name__ == '__main__':
 #    db.add(alarm)
 
 #    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.obstacle, POISubType.tree)
-    s = db._Session()
-    poi = s.query(POIData).first()
-    poi.name = "bajs"
-    s.commit()
-    s.close()
+#    s = db._Session()
+#    poi = s.query(POIData).first()
+#    poi.name = "bajs"
+#    s.commit()
+#    s.close()
 ##    print poi_data, poi_data.to_dict()
 #    db.add(poi_data)
 
