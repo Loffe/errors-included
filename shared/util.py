@@ -3,8 +3,10 @@ import subprocess
 import re
 import time
 import wave
+
 try:
     import pygst
+    import audio
     pygst.require("0.10")
     import gst
 except:
@@ -51,17 +53,20 @@ def set_mode(mode):
     except:
         print "Couldnt fint led"
         
-#Parsing wave header is a simple thing using wave module:
-def play_sound():
+#Parsing wave header is a simple thing using wave module: 
+def play_sound(f):
     try:
-        f= wave.open( 'snd/mail3b.wav', 'rb' )
-        sampleRate= f.getframerate()
-        channels= f.getnchannels()
-    
-        snd= sound.Output( sampleRate, channels, format )
-        s= f.readframes( 300000 )
-        snd.play( s )
-        while snd.isPlaying(): time.sleep( 0.05 )
+        global s
+        s = audio.Sound.open(f)
+        s.play()
+#        f= wave.open( 'snd/mail3b.wav', 'rb' )
+#        sampleRate= f.getframerate()
+#        channels= f.getnchannels()
+#    
+#        snd= sound.Output( sampleRate, channels, format )
+#        s= f.readframes( 300000 )
+#        snd.play( s )
+#        while snd.isPlaying(): time.sleep( 0.05 )
     except:
         print "Couldnt play sound"
         

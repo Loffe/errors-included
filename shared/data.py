@@ -670,19 +670,23 @@ class Message(object):
                         for uid in unit_ids:
                             data = s.query(UnitData).filter_by(id=uid).first()
                             units.append(data)
+                        s.commit()
+                        s.close()
                         dict["units"] = units
                     except:
                         # object doesn't contain a list of units
-                        pass
+                        print "Failed to load UnitDatas from database"
                     try:
                         poi_id = dict["poi"]
                         s = database._Session()
                         poi = s.query(POIData).filter_by(id=poi_id).first()
                         print "poi_id:", poi_id, "poi:", poi
                         dict["poi"] = poi
+                        s.commit()
+                        s.close()
                     except:
                          # object doesn't contain a poi 
-                        pass
+                        print "Failed to load POI from database"
                     # create and return an instance of the object
                     if classname == "dict":
                         return dict
