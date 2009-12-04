@@ -16,6 +16,14 @@ class MapObjectHandler(object):
         if subtype == ActionType.change:
             Database.change(self.database, object)
             self.database.emit("mapobject-changed", object)
+            # if my mission was changed, change my mission
+            if object.__class__ == MissionData:                
+                for unit in object.units:
+                    if self.controller is not None:
+                        if unit.id == self.controller.unit_data.id:
+                            for mission in self.controller.missions:
+                                if mission.id == object.id:
+                                    mission = object
 
         elif subtype == ActionType.add:
             Database.add(self.database, object)
@@ -27,7 +35,6 @@ class MapObjectHandler(object):
             if object.__class__ == MissionData:                
                 for unit in object.units:
                     if self.controller is not None:
-                        print "unit.id", unit.id, "controller.id", self.controller.unit_data.id 
                         if unit.id == self.controller.unit_data.id:
                             self.controller.add_mission(object)
                             
