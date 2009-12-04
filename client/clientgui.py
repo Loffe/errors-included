@@ -442,6 +442,7 @@ class ClientGui(hildon.Program):
                 self.out_dialog.destroy()
                 self.show_voice(ip=data["ip"], port=data["port"])
             if subtype == shared.data.VOIPType.request:
+                shared.util.set_color(0,0,255)
                 print "voip request"
                 self.inc_call_popup(msg)
         elif type == shared.data.MessageType.vvoip:
@@ -450,6 +451,7 @@ class ClientGui(hildon.Program):
                 self.out_dialog.destroy()
                 self.show_cam(ip=data["ip"], port1=data["port1"], port2=data["port2"])
             elif subtype == shared.data.VVOIPType.request:
+                shared.util.set_color(0,0,255)
                 print "vvoip request"
                 self.inc_call_popup(msg)
     
@@ -497,6 +499,7 @@ class ClientGui(hildon.Program):
         hang_up_button = gtk.Button("  Lägg på  ")
         inc_dialog.action_area.pack_start(hang_up_button)
         def hang_up(event):
+            shared.util.set_color(0,0,0)
             # @todo: return nack if we dont want to answer
             print "upptaget"
             inc_dialog.destroy()
@@ -505,6 +508,7 @@ class ClientGui(hildon.Program):
         answer_button = gtk.Button("     Svara     ")
         inc_dialog.action_area.pack_start(answer_button)
         def answer(event):
+            shared.util.set_color(0,0,0)
             if msg.type == shared.data.MessageType.voip:
                 self.start_voip(msg)
                 inc_dialog.destroy()
