@@ -13,7 +13,6 @@ class BlinkToggleButton(gtk.ToggleButton):
     def __init__(self, label):
         gtk.Button.__init__(self, label)
         self.default_bg = self.get_style().bg
-        print dir(self.get_style().bg)
 
 
     def set_attention(self, attention=True):
