@@ -666,27 +666,31 @@ class Message(object):
                     except:
                         pass
                     if "units" in dict.keys():
-                        if database is None:
+                        try:
+                            assert database is not None
+                            unit_ids = dict["units"]
+                            units = []
+                            s = database._Session()
+                            for uid in unit_ids:
+                                data = s.query(UnitData).filter_by(id=uid).first()
+                                units.append(data)
+                            s.commit()
+                            s.close()
+                            dict["units"] = units
+                        except AssertionError:
                             print "No database to unpack units from"
-                        unit_ids = dict["units"]
-                        units = []
-                        s = database._Session()
-                        for uid in unit_ids:
-                            data = s.query(UnitData).filter_by(id=uid).first()
-                            units.append(data)
-                        s.commit()
-                        s.close()
-                        dict["units"] = units
                     if "poi" in dict.keys():
-                        if database is None:
+                        try:
+                            assert database is not None
+                            poi_id = dict["poi"]
+                            s = database._Session()
+                            poi = s.query(POIData).filter_by(id=poi_id).first()
+                            print "poi_id:", poi_id, "poi:", poi
+                            dict["poi"] = poi
+                            s.commit()
+                            s.close()
+                        except AssertionError:
                             print "No database to unpack poi from"
-                        poi_id = dict["poi"]
-                        s = database._Session()
-                        poi = s.query(POIData).filter_by(id=poi_id).first()
-                        print "poi_id:", poi_id, "poi:", poi
-                        dict["poi"] = poi
-                        s.commit()
-                        s.close()
                     # create and return an instance of the object
                     if classname == "dict":
                         return dict
@@ -747,7 +751,7 @@ if __name__ == '__main__':
     db.add(mission_data)
     message = Message("ragnar", "server", unpacked_data = mission_data)
     print message.packed_data
-    Message.unpack(message.packed_data, db)
+    Message.unpack(message.packed_data)
 #    db.add(mission_data)
 #    poi_data2 = POIData(122,333, u"goal", datetime(2013,10,10), POIType.obstacle, POISubType.tree)
 #    db.add(poi_data2)
