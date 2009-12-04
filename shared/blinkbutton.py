@@ -41,7 +41,7 @@ class BlinkToggleButton(gtk.ToggleButton):
             self.clear()
 
     def clear(self):
-        self.modify_bg(gtk.STATE_NORMAL, self.default_bg[0])
+        self.modify_bg(gtk.STATE_NORMAL, self.default_bg[2])
         self.modify_bg(gtk.STATE_ACTIVE, self.default_bg[1])
         self.modify_bg(gtk.STATE_PRELIGHT, self.default_bg[2])
 
