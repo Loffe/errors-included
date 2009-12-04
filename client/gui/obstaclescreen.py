@@ -42,17 +42,21 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         
         # create and pack combobox
         combo_box = gtk.combo_box_new_text()
+        combo_box.set_size_request(300,50)
         #combo_box.set_size_request(300,50)
         right_box.pack_start(combo_box, True, False, 0)
         
+        self.new_section("Plats (POI)", left_box, right_box)
+        
         self.location_entry = self.new_entry("Händelse:", left_box, right_box)
         
-        self.location_entry2 = self.new_coordlabel("Skadeplats GPS-lon:", left_box, right_box)      
+        self.new_section("Position:", left_box, right_box)
+        
+        self.location_entry2 = self.new_coordlabel("Longitud:", left_box, right_box)      
                 
-        self.location_entry3 = self.new_coordlabel("Skadeplats GPS-lat:", left_box, right_box)
+        self.location_entry3 = self.new_coordlabel("Latitud:", left_box, right_box)
 
         # add selectable types
-
         types = {}
         i = 0
         types = ["tree", "bridge", "other"]

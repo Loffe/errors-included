@@ -118,7 +118,6 @@ class Database(gobject.GObject):
             print "This cannot happen in reality"
         else:
             Packable.copy(object, result)
-            session.add(result)
 
         session.commit()
         session.close()
@@ -130,8 +129,10 @@ class Database(gobject.GObject):
         @param object: the object to delete.
         '''
         session = self._Session()
-        session.delete(object)
-        session.commit()
+        result = session.query(object.__class__).filter_by(id=object.id).first()
+        if result is not None:
+            session.delete(result)
+            session.commit()
         session.close()
         self.emit("mapobject-deleted", object)
         
@@ -672,19 +673,23 @@ class Message(object):
                         for uid in unit_ids:
                             data = s.query(UnitData).filter_by(id=uid).first()
                             units.append(data)
+                        s.commit()
+                        s.close()
                         dict["units"] = units
                     except:
                         # object doesn't contain a list of units
-                        pass
+                        print "Failed to load UnitDatas from database"
                     try:
                         poi_id = dict["poi"]
                         s = database._Session()
                         poi = s.query(POIData).filter_by(id=poi_id).first()
                         print "poi_id:", poi_id, "poi:", poi
                         dict["poi"] = poi
+                        s.commit()
+                        s.close()
                     except:
                          # object doesn't contain a poi 
-                        pass
+                        print "Failed to load POI from database"
                     # create and return an instance of the object
                     if classname == "dict":
                         return dict
@@ -749,19 +754,16 @@ if __name__ == '__main__':
 #    print alarm
 #    db.add(alarm)
 
-    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.obstacle, POISubType.tree)
-#    
+#    poi_data = POIData(12,113, u"goal", datetime(2012,12,12), POIType.obstacle, POISubType.tree)
+    s = db._Session()
+    poi = s.query(POIData).first()
+    poi.name = "bajs"
+    s.commit()
+    s.close()
 ##    print poi_data, poi_data.to_dict()
-    db.add(poi_data)
-    unit_data = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
-    db.add(unit_data)
-    unit_data2 = UnitData(1,1, u"enhet 1337", datetime.now(), UnitType.commander)
-    db.add(unit_data2)
-    mission_data = MissionData(u"accidänt", poi_data, 7, u"Me Messen", u"det gör jävligt ont i benet på den dära killen dårå", [unit_data, unit_data2])
-##    print mission_data.to_dict()
-    db.add(mission_data)
+#    db.add(poi_data)
 
-    print db.get_all_missions()
+#    print db.get_all_missions()
 ##    print mission_data.to_changed_list(db)
 #    
 #    units = []

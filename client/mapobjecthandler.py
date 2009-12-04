@@ -32,7 +32,8 @@ class MapObjectHandler(object):
                             self.controller.add_mission(object)
                             
         elif subtype == ActionType.delete:
-            pass
+            Database.delete(self.database, object)
+            self.database.emit("mapobject-deleted", object)
         else:
             raise Error("Invalid subtype")
 
