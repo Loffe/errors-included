@@ -10,5 +10,5 @@ def play_uri(uri):
     player.set_property('uri', uri)
     player.set_state(gst.STATE_PLAYING)
     
-play_uri("/snd/mail3b.wav")
+play_uri("../client/snd/mail3b.wav")
 gtk.main()
