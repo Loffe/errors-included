@@ -17,6 +17,7 @@ from map.mapdata import *
 import controller
 import config
 import shared.util
+from shared.blinkbutton import BlinkToggleButton
 from database import ClientDatabase
 from gui.gui import Screen
 from gui.mapscreen import MapScreen
@@ -126,7 +127,7 @@ class ClientGui(hildon.Program):
         contacts_button.connect("clicked", self.show_contacts)
         self.menu_buttons["contacts"] = contacts_button
 
-        self.messages_button = gtk.ToggleButton("Meddelande")
+        self.messages_button = BlinkToggleButton("Meddelande")
         self.messages_button.connect("clicked", self.show_messages) 
         self.textmessagehandler.connect("got-new-message", self.new_message)
         self.menu_buttons["messages"] = self.messages_button
@@ -380,6 +381,7 @@ class ClientGui(hildon.Program):
         print "GOT NEW MESSAGE!!"
         print "*****************"
         
+        self.messages_button.set_attention(True)
         shared.util.set_color(0,255,0)
         shared.util.play_uri('snd/mail3b.wav')
         label = self.messages_button.get_child()
@@ -703,6 +705,7 @@ class ClientGui(hildon.Program):
         self.update_messagesbox(event)
         shared.util.set_color(0,0,0)
           
+        self.messages_button.set_attention(False)
         label = self.messages_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
 
