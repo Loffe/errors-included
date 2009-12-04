@@ -230,6 +230,7 @@ class ClientGui(hildon.Program):
         
         # Videocamera
         self.cam_screen = CamScreen(self.db)
+        self.cam_screen.button.connect("clicked", self.back_button_function)
         vbox_right.pack_start(self.cam_screen, True, True, 0)
         self.screens["camera"] = self.cam_screen
         
