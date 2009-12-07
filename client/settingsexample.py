@@ -10,6 +10,10 @@ server.port = 50000
 server.localport = 50001
 server.ssh = False
 
+server.backup = Config()
+server.backup.ip = 'localhost'
+server.backup.port = 60000
+
 queue = Config()
 queue.reconnect_interval = 10*1000
 
