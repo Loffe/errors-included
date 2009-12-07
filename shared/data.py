@@ -94,7 +94,8 @@ class Database(gobject.GObject):
         if result is None:
             session.add(object)
         else:
-            Packable.copy(object, result)
+            print "This cannot happen even in an alternate reality"
+            self.copy(object, result)
             
         session.commit()
         session.close()
@@ -114,7 +115,7 @@ class Database(gobject.GObject):
             session.add(object)
             print "This cannot happen in reality"
         else:
-            self.copy(object, result, session)
+            self.copy(object, result)
 
         session.commit()
         session.close()
@@ -133,7 +134,8 @@ class Database(gobject.GObject):
         session.close()
         self.emit("mapobject-deleted", object)
         
-    def copy(self, origin, target, session):
+    def copy(self, origin, target):
+        session = self._Session()
         attrs = {}
         for k in origin.__dict__.keys():
             if not k.startswith("_"):
@@ -154,7 +156,8 @@ class Database(gobject.GObject):
                 pass
             else:
                 setattr(target, key, attrs[key])
-        print target
+        session.commit()
+        session.close()
 
     def get_all_alarms(self):
         session = self._Session()
