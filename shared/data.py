@@ -70,18 +70,6 @@ class Packable(object):
         dict["class"] = self.__class__.__name__
         return dict
 
-    def copy(cls, origin, target):
-        attrs = {}
-        for k in origin.__dict__.keys():
-            if not k.startswith("_"):
-                attrs[k] = origin.__dict__[k]
-
-        print attrs
-        for key in attrs.keys():
-            setattr(target, key, attrs[key])
-        print target
-
-    copy = classmethod(copy)
 
 class Database(gobject.GObject):
     '''
@@ -106,7 +94,10 @@ class Database(gobject.GObject):
         if result is None:
             session.add(object)
         else:
-            Packable.copy(object, result)
+            import traceback
+            traceback.print_stack()
+            print "This cannot happen even in an alternative reality"
+            self.copy(object, result)
             
         session.commit()
         session.close()
@@ -118,15 +109,19 @@ class Database(gobject.GObject):
         @param object: the object that has changed.
         '''
         if object is None:
+            import traceback
+            traceback.print_stack()
             print "Stop being stupid!"
         session = self._Session()
         object.timestamp = datetime.now()
         result = session.query(object.__class__).filter_by(id=object.id).first()
         if result is None:
             session.add(object)
+            import traceback
+            traceback.print_stack()
             print "This cannot happen in reality"
         else:
-            Packable.copy(object, result)
+            self.copy(object, result)
 
         session.commit()
         session.close()
@@ -145,6 +140,27 @@ class Database(gobject.GObject):
         session.close()
         self.emit("mapobject-deleted", object)
         
+    def copy(self, origin, target):
+        session = self._Session()
+        attrs = {}
+        for k in origin.__dict__.keys():
+            if not k.startswith("_"):
+                attrs[k] = origin.__dict__[k]
+
+        for key in attrs.keys():
+            if key == "poi":
+                # poi_id is already copied
+                pass
+            elif key == "units":
+                session.execute("DELETE FROM UnitsInMissions WHERE mission_id = %d" % origin.id)
+                for unit in attrs["units"]:
+                    sql = "INSERT INTO UnitsInMissions (mission_id, unit_id) VALUES (%s, %s)" % (attrs["id"], unit.id)
+                    session.execute(sql)
+            else:
+                setattr(target, key, attrs[key])
+        session.commit()
+        session.close()
+
     def get_all_alarms(self):
         session = self._Session()
         alarms = []
@@ -530,11 +546,12 @@ class MissionData(Base, Packable):
     contact_number = Column(UnicodeText)
     timestamp = Column(DateTime)
     other = Column(UnicodeText)
+    status = Column(UnicodeText)
     
     prio = 7
 
     def __init__(self, event_type, poi, number_of_wounded, contact_person, contact_number,
-                 other, units, timestamp = datetime.now(), id = None):
+                 other, units, status, timestamp = datetime.now(), id = None):
         self.event_type = event_type
         self.poi = poi
         self.number_of_wounded = number_of_wounded
@@ -544,6 +561,7 @@ class MissionData(Base, Packable):
         self.timestamp = timestamp
         self.units = units
         self.id = id
+        self.status = status
         
     def add_unit(self, unit):
         self.units.append(unit)

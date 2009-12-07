@@ -109,7 +109,9 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
             self.db.add(poi_data)
         else:
             poi_data = alarm.poi
-        mission_data = shared.data.MissionData(unicode(self.event_entry.get_text()), poi_data, self.hurted_entry.get_text(), unicode(self.name_entry.get_text()), unicode(self.number_entry.get_text()), unicode(self.random_entry.get_text()), units)
+        mission_data = shared.data.MissionData(unicode(self.event_entry.get_text()), poi_data, self.hurted_entry.get_text(), 
+                                               unicode(self.name_entry.get_text()), unicode(self.number_entry.get_text()), 
+                                               unicode(self.random_entry.get_text()), units, status = "Oklart")
 
         self.select_unit_button.clear_selected()
         self.select_unit_button.unit_label.set_text("Inga valda enheter...")
