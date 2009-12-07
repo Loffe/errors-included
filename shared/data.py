@@ -73,7 +73,7 @@ class Packable(object):
 
         print attrs
         for key in attrs.keys():
-            target.__dict__[key] = attrs[key]
+            setattr(target, key, attrs[key])
         print target
 
     copy = classmethod(copy)
