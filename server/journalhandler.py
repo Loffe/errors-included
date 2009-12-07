@@ -16,7 +16,7 @@ class JournalHandler(object):
                 print "Sending to", u.name
                 message.unpacked_data["class"] = "dict"
                 msg = Message(message.sender, u.name, MessageType.journal,
-                              JournalType.confirmation_request, 
+                              JournalType.request, 
                               unpacked_data = message.unpacked_data, prio = message.prio)
                 self.queue.enqueue(u.name, msg.packed_data, msg.prio)
                 return True

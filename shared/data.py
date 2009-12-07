@@ -633,9 +633,7 @@ class IDType(object):
 
 class JournalType(object):
     request = "request"
-    confirmation_response = "confirmation_response"
-    confirmation_request = "confirmation_request"
-    transfer = "transfer"
+    response = "response"
 
 class Message(object):
     '''
