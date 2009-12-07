@@ -23,7 +23,6 @@ units_in_PJMessages = Table('UnitsInPJMessages', Base.metadata,
                     Column('pjmessages_id', Integer, ForeignKey('PJMessages.id')),
                     Column('unit_id', Integer, ForeignKey('UnitData.id')))
 
-
 class Packable(object):
     '''
     Extend this class to be able to pack/unpack a message containing it.
@@ -418,8 +417,7 @@ class TextMessage(Base, Packable):
         self.units = units
         self.id = id
         self.sender = sender
-        
-        
+     
     def add_unit(self, unit):
         self.units.append(unit)
         
@@ -442,18 +440,13 @@ class TextMessage(Base, Packable):
         try:
             return repr.encode('utf-8')
         except:
-            return repr
+            return repr        
         
-        
-        
-class PatientJournalMessage(Base, Packable):
+class Journal(Base, Packable):
     __tablename__ = 'PJMessages'
     id = Column(Integer, primary_key = True)
-    
-    units = relation('UnitData', secondary=units_in_PJMessages)
-    
-    why_entry = Column(UnicodeText)
-    social_security_number = Column(UnicodeText)
+    why = Column(UnicodeText)
+    ssn = Column(UnicodeText)
     timestamp = Column(DateTime)
     sender = Column(UnicodeText)
     
@@ -812,7 +805,6 @@ class Message(object):
         except:
             return repr
 
-
 def create_database(db = Database()):
     '''
     Create the database.
@@ -821,7 +813,6 @@ def create_database(db = Database()):
     # create tables and columns
     Base.metadata.create_all(db.engine)
     return db
-
 
 if __name__ == '__main__':
     print "Testing db"
@@ -872,7 +863,6 @@ if __name__ == '__main__':
 #                  unpacked_data=poi_data)
 #    print msg.packed_data
 #    print Message.unpack(msg.packed_data, db)
-
 
 #    alarm.event = "kuk"
 #    db.change(alarm)

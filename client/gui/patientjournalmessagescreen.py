@@ -17,14 +17,6 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
     The screen in which you create a new alarm.
     '''
     # the entries
-    event_entry = None
-    location_entry = None
-    location_entry2 = None
-    location_entry3 = None
-    hurted_entry = None
-    name_entry = None
-    number_entry = None
-    random_entry = None
     db = None
 
     def __init__(self, db):
@@ -48,18 +40,13 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
             hbox.add(entry)
             parent.add(hbox)
             return (label, entry)
-        
-        
-        
 
         vbox = gtk.VBox(False,0)
         self.add_with_viewport(vbox)
-        
-        
 
         self.combo_box = gtk.combo_box_new_text()
         self.combo_box.set_size_request(300,50)
-        self.combo_box.append_text("Välj Meddelande...")
+        self.combo_box.append_text("Välj patientjournalförfrågan")
         vbox.pack_start(self.combo_box, True,True, 0)
         
         label, self.why_Entry = new_entry("Varför",vbox)
@@ -91,7 +78,11 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
             if patientjournalMessage == self.selected_m:
                 self.why_Entry.set_text(message.why_entry)
                 self.social_security_Number.set_text(message.social_security_number)
-
+                
+    def add_request(self, request_dict):
+        why = request_dict["why"]
+        ssn = request_dict["ssn"]
+        print "Add request to list plx", why, snn
                 
     def ok_button_function(self, event):
         pass

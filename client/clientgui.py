@@ -38,6 +38,7 @@ from gui.contactscreen import ContactScreen
 from gui.camerascreen import CamScreen
 from mapobjecthandler import MapObjectHandler
 from textmessagehandler import TextMessageHandler
+from journalhandler import JournalHandler
 from gui.notificationscreen import NotificationScreen
 from gui.selectunit import SelectUnitButton
 from gui.selectunit import SelectUnitDialog
@@ -91,7 +92,9 @@ class ClientGui(hildon.Program):
 
         self.message_dispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
         self.message_dispatcher.connect_to_type(MessageType.text, self.textmessagehandler.handle)
-
+        
+        self.journalhandler = JournalHandler(self.db, self.queue)
+        self.message_dispatcher.connect_to_type(MessageType.journal, self.journalhandler.handle)
 
         # create gui
         self.create_gui()
@@ -289,7 +292,8 @@ class ClientGui(hildon.Program):
         self.message_menu.add(inbox)
         self.message_menu.add(outbox)
         
-        self.patient_journal_message_screen = PatientJournalMessageScreen(self.db)               
+        self.patient_journal_message_screen = PatientJournalMessageScreen(self.db)
+        self.journalhandler.connect("got-new-journal-request", self.patient_journal_message_screen.add_request)
         vbox_right.pack_start(self.patient_journal_message_screen, True, True, 0)
         self.screens["patient_journal_message_screen"] = self.patient_journal_message_screen
         
