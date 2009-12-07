@@ -65,18 +65,6 @@ class Packable(object):
         dict["class"] = self.__class__.__name__
         return dict
 
-    def copy(cls, origin, target):
-        attrs = {}
-        for k in origin.__dict__.keys():
-            if not k.startswith("_"):
-                attrs[k] = origin.__dict__[k]
-
-        print attrs
-        for key in attrs.keys():
-            setattr(target, key, attrs[key])
-        print target
-
-    copy = classmethod(copy)
 
 class Database(gobject.GObject):
     '''
@@ -121,7 +109,7 @@ class Database(gobject.GObject):
             session.add(object)
             print "This cannot happen in reality"
         else:
-            Packable.copy(object, result)
+            self.copy(object, result, session)
 
         session.commit()
         session.close()
@@ -140,6 +128,29 @@ class Database(gobject.GObject):
         session.close()
         self.emit("mapobject-deleted", object)
         
+    def copy(self, origin, target, session):
+        attrs = {}
+        for k in origin.__dict__.keys():
+            if not k.startswith("_"):
+                attrs[k] = origin.__dict__[k]
+
+        print attrs
+        for key in attrs.keys():
+            if key == "poi":
+                # poi_id is already copied
+                pass
+            elif key == "units":
+                session.execute("DELETE FROM UnitsInMissions WHERE mission_id = %d" % origin.id)
+                for unit in attrs["units"]:
+                    sql = "INSERT INTO UnitsInMissions (mission_id, unit_id) VALUES (%s, %s)" % (attrs["id"], unit.id)
+                    print sql
+                    session.execute(sql)
+
+                pass
+            else:
+                setattr(target, key, attrs[key])
+        print target
+
     def get_all_alarms(self):
         session = self._Session()
         alarms = []
