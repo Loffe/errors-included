@@ -94,7 +94,9 @@ class Database(gobject.GObject):
         if result is None:
             session.add(object)
         else:
-            print "This cannot happen even in an alternate reality"
+            import traceback
+            traceback.print_stack()
+            print "This cannot happen even in an alternative reality"
             self.copy(object, result)
             
         session.commit()
@@ -107,12 +109,16 @@ class Database(gobject.GObject):
         @param object: the object that has changed.
         '''
         if object is None:
+            import traceback
+            traceback.print_stack()
             print "Stop being stupid!"
         session = self._Session()
         object.timestamp = datetime.now()
         result = session.query(object.__class__).filter_by(id=object.id).first()
         if result is None:
             session.add(object)
+            import traceback
+            traceback.print_stack()
             print "This cannot happen in reality"
         else:
             self.copy(object, result)
@@ -141,7 +147,6 @@ class Database(gobject.GObject):
             if not k.startswith("_"):
                 attrs[k] = origin.__dict__[k]
 
-        print attrs
         for key in attrs.keys():
             if key == "poi":
                 # poi_id is already copied
