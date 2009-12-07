@@ -1,4 +1,5 @@
-from shared.data import Message, MessageType, ActionType
+from shared.data import Message, MessageType, ActionType, UnitType
+from shared.util import print_color
 
 class JournalHandler(object):
     database = None
@@ -10,12 +11,15 @@ class JournalHandler(object):
 
     def handle(self, message):
         print "handles journalrequest", message
-        for u in database.get_all_units():
-            if u.UnitType == user.UnitType.commander:
-                self.reciever = u.name
-                break
-        msg = Message(message.sender, self.reciever, shared.data.MessageType.journal, JournalType.confirmation_request, message.id, message.unpacked_data, message.prio)
-        return True
+        for u in self.database.get_all_units():
+            if u.type == UnitType.commander:
+                print "Sending to", u.name
+                msg = Message(message.sender, u.name, shared.data.MessageType.journal,
+                              JournalType.confirmation_request, message.id,
+                              message.unpacked_data, message.prio)
+                return True
+        print_color("Found no commander", 'red')
+        return False
 #        subtype = message.subtype
 #        object = message.unpacked_data
 #        for u in message.unpacked_data.units:
