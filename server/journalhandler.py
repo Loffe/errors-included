@@ -16,7 +16,7 @@ class JournalHandler(object):
                 print "Sending to", u.name
                 msg = Message(message.sender, u.name, MessageType.journal,
                               JournalType.confirmation_request, 
-                              unpacked_data = message.unpacked_data, message.prio)
+                              unpacked_data = message.unpacked_data, prio = message.prio)
                 id = self.queue.enqueue(msg.packed_data, msg.prio)
                 print id
                 return True
