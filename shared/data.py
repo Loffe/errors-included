@@ -544,11 +544,12 @@ class MissionData(Base, Packable):
     contact_number = Column(UnicodeText)
     timestamp = Column(DateTime)
     other = Column(UnicodeText)
+    status = Column(UnicodeText)
     
     prio = 7
 
     def __init__(self, event_type, poi, number_of_wounded, contact_person, contact_number,
-                 other, units, timestamp = datetime.now(), id = None):
+                 other, units, status, timestamp = datetime.now(), id = None):
         self.event_type = event_type
         self.poi = poi
         self.number_of_wounded = number_of_wounded
@@ -558,6 +559,7 @@ class MissionData(Base, Packable):
         self.timestamp = timestamp
         self.units = units
         self.id = id
+        self.status = status
         
     def add_unit(self, unit):
         self.units.append(unit)
