@@ -82,7 +82,7 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
     def add_request(self, event, request_dict):
         why = request_dict["why"]
         ssn = request_dict["ssn"]
-        print "Add request to list plx", why, snn
+        print "Add request to list plx", why, ssn
                 
     def ok_button_function(self, event):
         pass
