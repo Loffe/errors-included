@@ -150,10 +150,7 @@ class Database(gobject.GObject):
                 session.execute("DELETE FROM UnitsInMissions WHERE mission_id = %d" % origin.id)
                 for unit in attrs["units"]:
                     sql = "INSERT INTO UnitsInMissions (mission_id, unit_id) VALUES (%s, %s)" % (attrs["id"], unit.id)
-                    print sql
                     session.execute(sql)
-
-                pass
             else:
                 setattr(target, key, attrs[key])
         session.commit()
