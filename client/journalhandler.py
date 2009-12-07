@@ -1,5 +1,5 @@
 import gobject
-from shared.data import Message, MessageType, UnitData, MissionData, Alarm, ActionType, Database, JournalType
+from shared.data import Message, MessageType, UnitData, MissionData, Alarm, ActionType, Database, JournalType, JournalRequest
 
 class JournalHandler(gobject.GObject):
     database = None
@@ -14,8 +14,11 @@ class JournalHandler(gobject.GObject):
     def handle(self, message):
         if message.subtype == JournalType.request:
             print "got new journal request", message
-            self.emit("got-new-journal-request", message.unpacked_data)
+            msg = message.unpacked_data
+            journal_request = JournalRequest(msg["why"], msg["ssn"], message.sender)
+            self.database.add(journal_request)
+            self.emit("got-new-journal-request")
             return True
     
 gobject.type_register(JournalHandler)
-gobject.signal_new("got-new-journal-request", JournalHandler, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
+gobject.signal_new("got-new-journal-request", JournalHandler, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())

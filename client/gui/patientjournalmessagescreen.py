@@ -18,6 +18,7 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
     '''
     # the entries
     db = None
+    
 
     def __init__(self, db):
         '''
@@ -49,8 +50,8 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
         self.combo_box.append_text("Välj patientjournalförfrågan")
         vbox.pack_start(self.combo_box, True,True, 0)
         
-        label, self.why_Entry = new_entry("Varför",vbox)
-        label, self.social_security_Number = new_entry("Personnummer",vbox)
+        label, self.why_entry = new_entry("Varför",vbox)
+        label, self.ssn_entry = new_entry("Personnummer",vbox)
         
 #        # add event handler
         self.combo_box.connect('changed', self.select_m)
@@ -72,17 +73,14 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
         '''
         # set the selected type
         self.selected_m = self.combo_box.get_active_text()
-        messages = self.db.patientjournalmessage()
-        for message in messages:
-            patientjournalMessage = "varför: " + str(message.why_entry) + "    personumer: " + str(message.social_security_number)
-            if patientjournalMessage == self.selected_m:
-                self.why_Entry.set_text(message.why_entry)
-                self.social_security_Number.set_text(message.social_security_number)
+        for request in self.db.get_journal_requests():
+            text = "varför: " + str(request.why) + "    personumer: " + str(request.ssn)
+            if text == self.selected_m:
+                self.why_entry.set_text(request.why)
+                self.ssn_entry.set_text(request.ssn)
                 
-    def add_request(self, event, request_dict):
-        why = request_dict["why"]
-        ssn = request_dict["ssn"]
-        print "Add request to list plx", why, ssn
+    def add_request(self, event):
+        print "new request added, start blinkin'!"
                 
     def ok_button_function(self, event):
         pass

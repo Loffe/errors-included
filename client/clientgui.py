@@ -823,13 +823,10 @@ class ClientGui(hildon.Program):
         combo.append_text("Välj textmeddelande...")
         combo.set_active(0)
         
-        for patientjournalmessage in self.db.patientjournalmessage():
-            #print textmessages.senderandsubject
-            patientjournalMessage = "varför: " + str(patientjournalmessage.why_entry) + "    personumer: " + str(patientjournalmessage.social_security_number)
-            #textmessages.
-            combo.append_text(patientjournalMessage)
-    
-        #print "------------------------------------------------------------------------------------------------"
+        for request in self.db.get_journal_requests():
+            text = "varför: " + str(request.why) + "    personumer: " + str(request.ssn)
+            combo.append_text(text)
+
     # show certain screen methods
     def toggle_show(self, button_key, screen_keys, notification_text = ""):
         '''
