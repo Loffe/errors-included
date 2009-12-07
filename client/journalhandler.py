@@ -14,7 +14,7 @@ class JournalHandler(gobject.GObject):
     def handle(self, message):
         if message.subtype == JournalType.request:
             print "got new journal request", message
-            self.emit("got-new-journal", message.unpacked_data)
+            self.emit("got-new-journal-request", message.unpacked_data)
             return True
     
 gobject.type_register(JournalHandler)
