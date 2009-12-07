@@ -17,6 +17,7 @@ from map.mapdata import *
 import controller
 import config
 import shared.util
+from shared.blinkbutton import BlinkToggleButton
 from database import ClientDatabase
 from gui.gui import Screen
 from gui.mapscreen import MapScreen
@@ -127,7 +128,7 @@ class ClientGui(hildon.Program):
         contacts_button.connect("clicked", self.show_contacts)
         self.menu_buttons["contacts"] = contacts_button
 
-        self.messages_button = gtk.ToggleButton("Meddelande")
+        self.messages_button = BlinkToggleButton("Meddelande")
         self.messages_button.connect("clicked", self.show_messages) 
         self.textmessagehandler.connect("got-new-message", self.new_message)
         self.menu_buttons["messages"] = self.messages_button
@@ -238,6 +239,7 @@ class ClientGui(hildon.Program):
         
         # Videocamera
         self.cam_screen = CamScreen(self.db)
+        self.cam_screen.button.connect("clicked", self.back_button_function)
         vbox_right.pack_start(self.cam_screen, True, True, 0)
         self.screens["camera"] = self.cam_screen
         
@@ -415,8 +417,9 @@ class ClientGui(hildon.Program):
         print "GOT NEW MESSAGE!!"
         print "*****************"
         
+        self.messages_button.set_attention(True)
         shared.util.set_color(0,255,0)
-        shared.util.play_sound(u"snd/mail3b.wav")
+        shared.util.play_uri("snd/mail3b.wav")
         label = self.messages_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("green"))
 
@@ -475,6 +478,7 @@ class ClientGui(hildon.Program):
                 self.out_dialog.destroy()
                 self.show_voice(ip=data["ip"], port=data["port"])
             if subtype == shared.data.VOIPType.request:
+                shared.util.set_color(0,0,255)
                 print "voip request"
                 self.inc_call_popup(msg)
         elif type == shared.data.MessageType.vvoip:
@@ -483,6 +487,7 @@ class ClientGui(hildon.Program):
                 self.out_dialog.destroy()
                 self.show_cam(ip=data["ip"], port1=data["port1"], port2=data["port2"])
             elif subtype == shared.data.VVOIPType.request:
+                shared.util.set_color(0,0,255)
                 print "vvoip request"
                 self.inc_call_popup(msg)
     
@@ -530,6 +535,7 @@ class ClientGui(hildon.Program):
         hang_up_button = gtk.Button("  Lägg på  ")
         inc_dialog.action_area.pack_start(hang_up_button)
         def hang_up(event):
+            shared.util.set_color(0,0,0)
             # @todo: return nack if we dont want to answer
             print "upptaget"
             inc_dialog.destroy()
@@ -538,10 +544,13 @@ class ClientGui(hildon.Program):
         answer_button = gtk.Button("     Svara     ")
         inc_dialog.action_area.pack_start(answer_button)
         def answer(event):
+            shared.util.set_color(0,0,0)
             if msg.type == shared.data.MessageType.voip:
                 self.start_voip(msg)
+                inc_dialog.destroy()
             elif msg.type == shared.data.MessageType.vvoip:
                 self.start_vvoip(msg)
+                inc_dialog.destroy()
         answer_button.connect("clicked", answer)
         
         inc_dialog.vbox.pack_start(who)
@@ -558,7 +567,7 @@ class ClientGui(hildon.Program):
 #        elif result == 666:
 #            # @todo: return nack if we dont want to answer
 #            print "upptaget"
-#        inc_dialog.destroy()
+        
         
     def out_call_popup(self, msg):
         print "Utgående samtal = popup"
@@ -754,6 +763,7 @@ class ClientGui(hildon.Program):
         self.update_messagesbox(event)
         shared.util.set_color(0,0,0)
           
+        self.messages_button.set_attention(False)
         label = self.messages_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
 
@@ -781,7 +791,6 @@ class ClientGui(hildon.Program):
         self.update_messagesbox(event)
         
         
-
             
     def update_messagesbox(self, event):
         combo = self.screens["message"].combo_box

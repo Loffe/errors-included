@@ -85,6 +85,7 @@ class ServerNetworkHandler(dbus.service.Object):
                 self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.server.bind((self.host, self.port))
             self.server.listen(5)
+            self.input.append(self.server)
             print "Listening on port %s" % self.port
         except socket.error, (value, message):
             if self.server:
@@ -93,8 +94,8 @@ class ServerNetworkHandler(dbus.service.Object):
             sys.exit()
 
     def start(self):
-        self.open_socket()
-        self.input.append(self.server)
+        if config.server.primary:
+            self.open_socket()
         threading.Thread(target=self.run).start()
         #gobject.idle_add(self.run)
         self.dbusloop()
@@ -141,22 +142,9 @@ class ServerNetworkHandler(dbus.service.Object):
     def _login_client(self, socket, message):
         m = message
         id = m.sender
-        if config.server.primary == False and self.primary_alive:
-            log.info("login denied")
-            nack = shared.data.Message("server", id, response_to=m.message_id,
-                                       type=shared.data.MessageType.ack,
-                                       unpacked_data={"result": "try_primary", "class": "dict"})
-            # Don't send via database queue
-            data = nack.packed_data
-            content_length = '0x%04x' % len(data)
-            socket.send(content_length)
-            socket.send(data)
-            print "Login failed because primary is alive"
-            return
         if self.db.is_valid_login(m.sender, m.unpacked_data["password"]):
             self.outqueues[id].replace_socket(socket)
             
-#                self.set_ip(m.sender, socket.getpeername()[0])
             log.info("%s logged in and now has a named queue" % id)
             ack = shared.data.Message("server", id, response_to=m.message_id,
                                       type=shared.data.MessageType.ack,
@@ -252,9 +240,10 @@ class ServerNetworkHandler(dbus.service.Object):
         self.primary_alive = response == "pong"
         if self.primary_alive:
             print "Primary is alive"
+            gobject.timeout_add(config.primary.heartbeatinterval, self.ping)
         else:
-            print "Primary is dead"
-        gobject.timeout_add(config.primary.heartbeatinterval, self.ping)
+            print "Primary is dead! I'm in command!"
+            self.open_socket()
 
     def dbusloop(self):
         #import signal

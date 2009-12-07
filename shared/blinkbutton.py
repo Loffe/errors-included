@@ -2,7 +2,7 @@ import gtk
 import gobject
 import math
 
-class BlinkButton(gtk.Button):
+class BlinkToggleButton(gtk.ToggleButton):
 
     color1 = gtk.gdk.color_parse("#FA0")
     color2 = gtk.gdk.color_parse("#FFF")
@@ -12,6 +12,7 @@ class BlinkButton(gtk.Button):
     attention = False
     def __init__(self, label):
         gtk.Button.__init__(self, label)
+        self.default_bg = self.get_style().bg
 
 
     def set_attention(self, attention=True):
@@ -40,7 +41,9 @@ class BlinkButton(gtk.Button):
             self.clear()
 
     def clear(self):
-        self.modify_bg(gtk.STATE_NORMAL, self.color1)
+        self.modify_bg(gtk.STATE_NORMAL, self.default_bg[2])
+        self.modify_bg(gtk.STATE_ACTIVE, self.default_bg[1])
+        self.modify_bg(gtk.STATE_PRELIGHT, self.default_bg[2])
 
 
 
@@ -48,7 +51,7 @@ class BlinkButton(gtk.Button):
 if __name__ == "__main__":
     win = gtk.Window()
 
-    button = BlinkButton("HellO")
+    button = BlinkToggleButton("HellO")
     button.set_attention()
     def stop(event):
         print "clicked"

@@ -27,7 +27,10 @@ class MessageDispatcher(object):
         print "dispatching:", local_id, response_to
         data = self.queue.peek(local_id)
         print data
-        msg = Message.unpack(data, self.db)
+        try:
+            msg = Message.unpack(data, self.db)
+        except Exception, e:
+            print "Couldn't unpack", data
         type = msg.type
         # execute the callbacks
         if self.connected_ids.has_key(response_to):
