@@ -144,6 +144,14 @@ class ServerNetworkHandler(dbus.service.Object):
         id = m.sender
         if self.db.is_valid_login(m.sender, m.unpacked_data["password"]):
             self.outqueues[id].replace_socket(socket)
+
+            if 'unit_type' in m.unpacked_data.keys():
+                session = self.db._Session()
+                unit = session.query(shared.data.UnitData).filter_by(name=id).first()
+                unit.type = m.unpacked_data['unit_type']
+                print "login", unit.type
+                session.commit()
+                session.close()
             
             log.info("%s logged in and now has a named queue" % id)
             ack = shared.data.Message("server", id, response_to=m.message_id,
