@@ -42,6 +42,7 @@ from gui.notificationscreen import NotificationScreen
 from gui.selectunit import SelectUnitButton
 from gui.selectunit import SelectUnitDialog
 from gui.activities import Activities
+from gui.patientjournalmessagescreen import PatientJournalMessageScreen
 
 
 try:
@@ -131,11 +132,17 @@ class ClientGui(hildon.Program):
         self.messages_button.connect("clicked", self.show_messages) 
         self.textmessagehandler.connect("got-new-message", self.new_message)
         self.menu_buttons["messages"] = self.messages_button
+        
+        patient_journal_message = gtk.ToggleButton("Patient Journal")
+        patient_journal_message.connect("clicked", self.show_patient_journal_message) 
+        #self.textmessagehandler.connect("got-new-message", self.new_message)
+        self.menu_buttons["patient_journal_message"] = patient_journal_message
 
         vbox.add(mission_button)
         vbox.add(add_object_button)
         vbox.add(contacts_button)
         vbox.add(self.messages_button)
+        vbox.add(patient_journal_message)
 
         # Right panel
         vbox_right = gtk.VBox(False, 0)
@@ -191,7 +198,6 @@ class ClientGui(hildon.Program):
         
         # add the change obstacle screen
         self.change_obstacle_screen = ChangeObstacleScreen(self.db)
-#        self.change_obstacle_screen.connect("okbutton-obstacle-clicked", self.back_button_function)
         vbox_right.pack_start(self.change_obstacle_screen, True, True, 0)
         self.screens["change_obstacle"] = self.change_obstacle_screen
         
@@ -201,8 +207,10 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
         
+                
         # add the change mission screen
         self.change_mission_screen = ChangeMissionScreen(self.db)
+        
 #        self.change_mission_screen.connect("okbutton-mission-clicked", self.back_button_function)
         vbox_right.pack_start(self.change_mission_screen, True, True, 0)
         self.screens["change_mission"] = self.change_mission_screen
@@ -219,7 +227,8 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.status_screen, True, True, 0)
         self.screens["status"] = self.status_screen
 
-        self.patient_journal_screen = PatientJournalScreen(self.db)               
+        self.patient_journal_screen = PatientJournalScreen(self.db)
+        self.patient_journal_screen.connect("okbutton_clicked_PatientJournalScreen", self.back_button_function)               
         vbox_right.pack_start(self.patient_journal_screen, True, True, 0)
         self.screens["patient_journal"] = self.patient_journal_screen        
 
@@ -282,6 +291,13 @@ class ClientGui(hildon.Program):
         self.message_menu.add(new_mess)
         self.message_menu.add(inbox)
         self.message_menu.add(outbox)
+        
+        self.patient_journal_message_screen = PatientJournalMessageScreen(self.db)               
+        vbox_right.pack_start(self.patient_journal_message_screen, True, True, 0)
+        self.screens["patient_journal_message_screen"] = self.patient_journal_message_screen
+        
+        patient_journal_message
+        
         #fyller ingen funktion
         #self.message_menu.add(in_alarms)
         
@@ -347,6 +363,25 @@ class ClientGui(hildon.Program):
         back_button2.connect("clicked", self.back_button_function)
         
         vbox_right.pack_start(self.back_button_box, False, False, 0)
+        
+        self.pj_button_box = gtk.HBox(False, 10)
+        self.pj_button_box.set_size_request(0, 60)
+        self.screens["pj_button_box"] = self.pj_button_box
+        
+        
+        no_button = gtk.Button("Neka")
+        no_button.connect("clicked", self.ok_button_function)
+        no_button.set_flags(gtk.CAN_DEFAULT)
+        self.pj_button_box.pack_start(no_button)
+        
+        ok_button = gtk.Button("Bevilja")
+        ok_button.connect("clicked", self.ok_button_function)
+        ok_button.set_flags(gtk.CAN_DEFAULT)
+        self.pj_button_box.pack_start(ok_button)
+        
+        
+        
+        vbox_right.pack_start(self.pj_button_box, False, False, 0)
         
         # add back-, change- and delete-button (used in ChangeObstacleScreen etc)
         self.change_buttons = gtk.HBox(False, 10)
@@ -602,11 +637,19 @@ class ClientGui(hildon.Program):
     ''' 
     def back_button_function(self, event):
         self.show(self.prev_page[-2])
+        
 
     def ok_button_function(self, event):
         for screen in self.screens.values():
             if screen.props.visible and isinstance(screen, Screen):
                 screen.ok_button_function(event)
+                
+    def no_button_function(self, event):
+        for screen in self.screens.values():
+            if screen.props.visible and isinstance(screen, Screen):
+                screen.no_button_function(event)
+                
+    
                 
     def change_button_function(self, event):
         for screen in self.screens.values():
@@ -744,7 +787,10 @@ class ClientGui(hildon.Program):
     # messages view event handlers
     def show_messages(self, event):
         self.toggle_show("messages", ["notifications", "map","message_menu"], "Här visas dina meddelanden")
-
+        
+        self.update_messagesbox(event)
+        
+        
             
     def update_messagesbox(self, event):
         combo = self.screens["message"].combo_box
@@ -759,7 +805,22 @@ class ClientGui(hildon.Program):
             #textmessages.
             if config.client.name != textmessages.sender:
                 combo.append_text(senderandsubject)
-
+                
+    def show_patient_journal_message(self, event):
+        self.toggle_show("patient_journal_message", ["notifications", "patient_journal_message_screen","pj_button_box"], "Här visas dina meddelanden")
+        
+        combo = self.screens["patient_journal_message_screen"].combo_box
+        combo.get_model().clear()
+        combo.append_text("Välj textmeddelande...")
+        combo.set_active(0)
+        
+        for patientjournalmessage in self.db.patientjournalmessage():
+            #print textmessages.senderandsubject
+            patientjournalMessage = "varför: " + str(patientjournalmessage.why_entry) + "    personumer: " + str(patientjournalmessage.social_security_number)
+            #textmessages.
+            combo.append_text(patientjournalMessage)
+    
+        #print "------------------------------------------------------------------------------------------------"
     # show certain screen methods
     def toggle_show(self, button_key, screen_keys, notification_text = ""):
         '''
@@ -795,21 +856,7 @@ class ClientGui(hildon.Program):
         for key in keys:
             self.screens[key].show_all()
             
-    def show2(self, keys):
-        '''
-        Show specified screens.
-        @param keys: a list with keys to the screens to show. 
-        '''
-        self.prev_page.append(keys)
-
-        for key in self.screens.keys():
-            self.screens[key].hide_all()
-        for key in keys:
-            self.screens[key].show_all()
-        for key in keys:
-            self.screens[key].show_all()
-        for key in keys:
-            self.screens[key].show_all()
+    
             
     def show_default(self):
         '''
