@@ -11,6 +11,7 @@ from idprovider import IDProvider
 from voiphandler import VoipHandler
 from mapobjecthandler import MapObjectHandler
 from textmessagehandler import TextMessageHandler
+from journalhandler import JournalHandler
 
 from database import ServerDatabase
 from shared.data import Message,MessageType,ActionType
