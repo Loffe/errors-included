@@ -684,6 +684,14 @@ class ClientGui(hildon.Program):
         self.toggle_show("mission", ["notifications", "status", "buttons"], 
                          "Här kan du välj en status")
     
+        combo = self.screens["status"].combo_box
+        combo.get_model().clear()
+        combo.append_text("Välj uppdrag...")
+        combo.set_active(0)
+        for mission in self.controller.missions:
+            combo.append_text(mission.event_type)
+    
+    
     def show_journals(self, event):
         self.toggle_show("mission", ["notifications", "patient_journal", "buttons"], 
                          "Här kan du hämta patient journaler")
