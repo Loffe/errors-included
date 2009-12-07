@@ -98,7 +98,8 @@ class ChangeMissionScreen(gtk.ScrolledWindow, gui.Screen):
                 unicode(self.random_entry.get_text()),
                 self.db.get_units(self.select_unit_button.select_dialog.selected_units),
                 timestamp=datetime.datetime.now(),
-                id=self.mission.id)
+                id=self.mission.id,
+                status="Oklart")
         self.db.change(mission_data)
 
 #        self.emit("okbutton-mission-clicked")
