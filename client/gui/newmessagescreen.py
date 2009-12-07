@@ -80,6 +80,8 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
                                        timestamp=datetime.datetime.now())
 
         self.db.add(text)
+
+        
         self.emit("okbutton_clicked_new_message")
         
 gobject.type_register(NewMessageScreen)

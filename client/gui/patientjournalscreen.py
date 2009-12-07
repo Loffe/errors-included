@@ -1,33 +1,80 @@
 # -*- coding: utf-8 -*-
 
 import gtk
-import gobject
 import map.mapdata
 import shared.data
-import datetime
 import gui
 import pango
+import datetime
+import gobject
+from selectunit import SelectUnitButton
+from selectunit import SelectUnitDialog
+import config
 
 class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
     '''
-    The screen in which you create a new alarm.
+    The screen in which you create a new 
     '''
-    # the entries
-    event_entry = None
-    location_entry = None
-    location_entry2 = None
-    location_entry3 = None
-    hurted_entry = None
-    name_entry = None
-    number_entry = None
-    random_entry = None
+   # the entries
+    to_entry = None
+    subject_entry = None
+    message_entry = None
     db = None
+
 
     def __init__(self, db):
         '''
-        Constructor. Create the patientjournalscreen and its entries.
+        Constructor. Create the alarmscreen and its entries.
         '''
         gtk.ScrolledWindow.__init__(self)
-        self.db = db 
+        self.db = db
+
+        # set automatic horizontal and vertical scrolling
+        self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         
-        self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        # method used internally to create new entries
+        def new_entry(labeltext, parent):
+            hbox = gtk.HBox(True,0)
+            label = gtk.Label(labeltext)
+            label.set_alignment(0, 0.5)
+            entry = gtk.Entry()
+            entry.set_max_length(300)
+            entry.set_text("")
+            entry.select_region(0, len(entry.get_text()))
+            hbox.add(label)
+            hbox.add(entry)
+            parent.add(hbox)
+            return (label, entry)
+
+        vbox = gtk.VBox(False,0)
+        self.add_with_viewport(vbox)
+        label, self.why_entry2 = new_entry("Varför",vbox)
+        label, self.social_security_number2 = new_entry("Personnummer",vbox)
+
+
+        
+        
+        self.select_unit_button = SelectUnitButton(self.db)
+        vbox.add(self.select_unit_button)
+
+        self.show_all()
+       
+    def ok_button_function(self, event):
+
+        print datetime.datetime.now()
+        selected = self.select_unit_button.select_dialog.selected_units
+        units = self.db.get_units(selected)   
+        text = shared.data.PatientJournalMessage(why_entry=unicode(self.why_entry2.get_text()), 
+                                       social_security_number=unicode(self.social_security_number2.get_text()),
+                                       timestamp=datetime.datetime.now(),
+                                       units=units, 
+                                       sender=config.client.name
+                                       )
+
+        self.db.add(text)
+        #datetime.datetime.now()
+        
+        self.emit("okbutton_clicked_PatientJournalScreen")
+        
+gobject.type_register(PatientJournalScreen)
+gobject.signal_new("okbutton_clicked_PatientJournalScreen", PatientJournalScreen, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
