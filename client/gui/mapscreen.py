@@ -91,15 +91,14 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
 
     def delete_map_object(self, database, data):
         if data.__class__ == shared.data.Alarm:
-            del self.mapdata.objects[data.poi.id]  
+            if data.poi.id in self.mapdata.objects.keys():
+                del self.mapdata.objects[data.poi.id]  
         elif data.__class__ == shared.data.MissionData:
-            del self.mapdata.objects[data.poi.id]
+            if data.poi.id in self.mapdata.objects.keys():
+                del self.mapdata.objects[data.poi.id]
         else:
-            try:
+            if data.id in self.mapdata.objects.keys():
                 del self.mapdata.objects[data.id]
-            except KeyError:
-                # object allready deleted or not existing
-                pass
 
         self.queue_draw()
 
