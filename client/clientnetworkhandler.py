@@ -21,15 +21,15 @@ class ClientNetworkHandler(dbus.service.Object):
     socket = None
     connected = False
     closing = False
+    use_backup = False
 
-    def __init__(self, host, port):
+    def __init__(self):
         log.info("Queue startin up")
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         self.session_bus = dbus.SessionBus()
         self.name = dbus.service.BusName("included.errors.Client", self.session_bus)
         dbus.service.Object.__init__(self, self.session_bus,
                                      '/Queue')
-        self.server = (host, port)
         self.db = shared.data.create_database()
         self.output = NetworkOutQueue(self.socket, self.db, config.client.name)
         self.input = NetworkInQueue(self.socket, self.db)
@@ -53,10 +53,13 @@ class ClientNetworkHandler(dbus.service.Object):
         return "queue closing"
 
     def connect_to_server(self):
-        if not self.server:
-            raise Exception("No server is set. Cannot connect")
-        log.info("Connecting...")
-        host, port = self.server
+        log.info("Connecting to %s..." % ("primary", "backup")[self.use_backup])
+        if self.use_backup:
+            host = config.server.backup.ip
+            port = config.server.backup.port
+        else:
+            host = config.server.ip
+            port = config.server.port
 
         if config.server.ssh == True:
             ssh_options = ["ssh",
@@ -155,7 +158,7 @@ class ClientNetworkHandler(dbus.service.Object):
                 self.close()
 
     def _check_connection(self):
-#        print "_check_connection"
+        #print "_check_connection"
         if self.closing == True:
             return False
         if self.connected == True:
@@ -180,8 +183,8 @@ class ClientNetworkHandler(dbus.service.Object):
 
     def _handle_error(self, errno, errmsg=None):
         if errno == 111:
-            pass
-#            print "Connection refused"
+            print "Connection refused"
+            self.use_backup = not self.use_backup
         else:
             print errno, errmsg
 

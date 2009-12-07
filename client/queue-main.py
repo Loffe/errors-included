@@ -13,7 +13,7 @@ if __name__ == "__main__":
         remote_object.dbus_close()
         sys.exit(0)
 
-    q = clientnetworkhandler.ClientNetworkHandler(config.server.ip,config.server.port)
+    q = clientnetworkhandler.ClientNetworkHandler()
 
     try:
         q.mainloop()
