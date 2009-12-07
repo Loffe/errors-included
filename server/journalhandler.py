@@ -14,7 +14,7 @@ class JournalHandler(object):
         for u in self.database.get_all_units():
             if u.type == UnitType.commander:
                 print "Sending to", u.name
-                msg = Message(message.sender, u.name, shared.data.MessageType.journal,
+                msg = Message(message.sender, u.name, MessageType.journal,
                               JournalType.confirmation_request, message.id,
                               message.unpacked_data, message.prio)
                 return True
