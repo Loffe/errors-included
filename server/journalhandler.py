@@ -11,7 +11,7 @@ class JournalHandler(object):
     def handle(self, message):
         print "handles journalrequest", message
         for u in database.get_all_units():
-            if u.UnitType = user.UnitType.commander:
+            if u.UnitType == user.UnitType.commander:
                 self.reciever = u.name
                 break
         msg = Message(message.sender, self.reciever, shared.data.MessageType.journal, JournalType.confirmation_request, message.id, message.unpacked_data, message.prio)
