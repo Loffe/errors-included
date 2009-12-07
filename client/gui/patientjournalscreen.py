@@ -22,12 +22,13 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
     db = None
 
 
-    def __init__(self, db):
+    def __init__(self, db, queue):
         '''
         Constructor. Create the alarmscreen and its entries.
         '''
         gtk.ScrolledWindow.__init__(self)
         self.db = db
+        self.queue = queue
 
         # set automatic horizontal and vertical scrolling
         self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
@@ -48,32 +49,21 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
 
         vbox = gtk.VBox(False,0)
         self.add_with_viewport(vbox)
-        label, self.why_entry2 = new_entry("Varför",vbox)
-        label, self.social_security_number2 = new_entry("Personnummer",vbox)
-
-
-        
-        
-        self.select_unit_button = SelectUnitButton(self.db)
-        vbox.add(self.select_unit_button)
+        label, self.why_entry = new_entry("Varför",vbox)
+        label, self.ssn_entry = new_entry("Personnummer",vbox)
 
         self.show_all()
        
     def ok_button_function(self, event):
-
-        print datetime.datetime.now()
-        selected = self.select_unit_button.select_dialog.selected_units
-        units = self.db.get_units(selected)   
-        text = shared.data.PatientJournalMessage(why_entry=unicode(self.why_entry2.get_text()), 
-                                       social_security_number=unicode(self.social_security_number2.get_text()),
-                                       timestamp=datetime.datetime.now(),
-                                       units=units, 
-                                       sender=config.client.name
-                                       )
-
-        self.db.add(text)
-        #datetime.datetime.now()
-        
+        data = {"why": self.why_entry.get_text(), "ssn": self.ssn_entry.get_text(), "class": "dict"}
+        msg = shared.data.Message(config.client.name, "server", shared.data.MessageType.journal, shared.data.JournalType.request, unpacked_data = data,  prio = 8)
+        self.queue.enqueue(msg.packed_data, msg.prio)
+#        text = shared.data.PatientJournalMessage(why_entry=unicode(self.why_entry2.get_text()), 
+#                                       social_security_number=unicode(self.social_security_number2.get_text()),
+#                                       timestamp=datetime.datetime.now(),
+#                                       units=units, 
+#                                       sender=config.client.name
+#                                       ) 
         self.emit("okbutton_clicked_PatientJournalScreen")
         
 gobject.type_register(PatientJournalScreen)

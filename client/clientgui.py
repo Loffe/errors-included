@@ -162,9 +162,6 @@ class ClientGui(hildon.Program):
         self.map.connect("object-clicked", self.change_object)
         vbox_right.pack_start(self.map, True, True, 0)
         self.screens["map"] = self.map
-        
-        
-        
 
         # add the alarm screen
         self.alarm_screen = AlarmScreen(self.db)
@@ -227,7 +224,7 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.status_screen, True, True, 0)
         self.screens["status"] = self.status_screen
 
-        self.patient_journal_screen = PatientJournalScreen(self.db)
+        self.patient_journal_screen = PatientJournalScreen(self.db, self.queue)
         self.patient_journal_screen.connect("okbutton_clicked_PatientJournalScreen", self.back_button_function)               
         vbox_right.pack_start(self.patient_journal_screen, True, True, 0)
         self.screens["patient_journal"] = self.patient_journal_screen        

@@ -159,8 +159,7 @@ class ServerNetworkHandler(dbus.service.Object):
             # queue is not named because login failed
             self.enqueue(m.sender, nack.packed_data, 9)
             print "Login failed"
-            #self._disconnect_client(socket)
-            
+            #self._disconnect_client(socket)   
 
     def run(self):
         running = True
@@ -223,7 +222,6 @@ class ServerNetworkHandler(dbus.service.Object):
                             self.message_received(local_id, m.response_to)
                     else:
                         self._disconnect_client(s)
-        
         self.close()
 
     def ping(self):
@@ -258,7 +256,6 @@ class ServerNetworkHandler(dbus.service.Object):
                 self.mainloop.run()
             except KeyboardInterrupt:
                 self.mainloop.quit()
-
 
 if __name__ == "__main__":
     serverhandler = ServerNetworkHandler()
