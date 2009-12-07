@@ -10,6 +10,7 @@ class JournalHandler(object):
 
     def handle(self, message):
         print "handles journalrequest", message
+        return True
 #        subtype = message.subtype
 #        object = message.unpacked_data
 #        for u in message.unpacked_data.units:
