@@ -35,6 +35,14 @@ def get_ip():
     ip = re.findall(regexp, result)[1]
     return ip
 
+def print_color(text, color='black'):
+    colors = {'grey': '30', 'black': '', 'red': '38'}
+    if color in colors.keys():
+        c = colors[color]
+    else:
+        c = colors['black']
+    print '\033[1;' + c + 'm' + text + '\033[1;m'
+
 def set_color(r,g,b):
     try:
         set_mode("direct")

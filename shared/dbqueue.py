@@ -2,7 +2,7 @@ import Queue
 import data as data
 import simplejson as json
 from data import NetworkInQueueItem, NetworkOutQueueItem
-from shared.util import getLogger
+from shared.util import getLogger, print_color
 log = getLogger("server.log")
 
 class DatabaseQueue(Queue.Queue):
@@ -90,7 +90,7 @@ class DatabaseInQueue(DatabaseQueue):
         session.close()
 
     def mark_as_failed(self, id, error_code = 2):
-        print "marking %d as failed" % id
+        print_color("marking %d as failed" % id, 'red')
         # @TODO: acuire lock maybe?
         session = self.db._Session()
         q = session.query(data.NetworkInQueueItem).filter_by(id = id)
