@@ -91,7 +91,6 @@ class ClientGui(hildon.Program):
         self.message_dispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
         self.message_dispatcher.connect_to_type(MessageType.text, self.textmessagehandler.handle)
 
-
         # create gui
         self.create_gui()
     
@@ -104,6 +103,8 @@ class ClientGui(hildon.Program):
 
         # A dict containing all the buttons to show/hide
         self.menu_buttons = {}
+
+        self.service_level = 'ad-hoc'
 
         # Panels
         panels = gtk.HBox(False, 0)
@@ -286,24 +287,12 @@ class ClientGui(hildon.Program):
         #self.message_menu.add(in_alarms)
         
         #Istället för popup så kopper en panel upp vid sidan.         
-
-       
         vbox2 = gtk.VBox(False,0)
-        #panels.pack_start(vbox2, False, False, 0)
         vbox2.set_size_request(150,0)
-        
-
-
         
 #        self.activities = gtk.VBox(False,0)
         self.activities = Activities(self.db)
         vbox2.pack_start(self.activities, False, False, 0)
-        self.screens["act"] = self.activities 
-#        self.activities = Activities(self.db)
-             
-#        self.ac = Activities(self.db)
-#        self.activities.add(self.ac)  
-
 
         # Add object buttons and their menu
         self.add_object_menu = gtk.HBox(False, 0)
@@ -322,7 +311,6 @@ class ClientGui(hildon.Program):
             create_mission_button.connect("clicked", self.create_mission)
             self.add_object_menu.add(create_mission_button)
 
-        # add back- and ok-button (used in alarmscreen, obstaclescreen etc)
         self.buttons_box = gtk.HBox(False, 10)
         self.buttons_box.set_size_request(0, 60)
         self.screens["buttons"] = self.buttons_box
@@ -332,6 +320,12 @@ class ClientGui(hildon.Program):
         back_button.connect("clicked", self.back_button_function)
 
         ok_button = gtk.Button("OK")
+        if self.service_level == "mega-low" or self.service_level == "ad-hoc":
+            #offline
+            ok_button.set_sensitive(False) 
+        else:
+            #online
+            ok_button.set_sensitive(True)
         ok_button.connect("clicked", self.ok_button_function)
         ok_button.set_flags(gtk.CAN_DEFAULT)
         self.buttons_box.pack_start(ok_button)
@@ -596,7 +590,9 @@ class ClientGui(hildon.Program):
         self.mapobjecthandler.controller = self.controller
 
     def update_service_level(self, service_level):
-        self.screens["notifications"].update_label(service_level)
+        self.service_level = service_level
+        self.screens["notifications"].update_label(self.service_level)
+
 
     ''' Handle events
     ''' 
