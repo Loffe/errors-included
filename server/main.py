@@ -11,6 +11,7 @@ from idprovider import IDProvider
 from voiphandler import VoipHandler
 from mapobjecthandler import MapObjectHandler
 from textmessagehandler import TextMessageHandler
+from journalhandler import JournalHandler
 
 from database import ServerDatabase
 from shared.data import Message,MessageType,ActionType
@@ -36,6 +37,7 @@ class ServerManager(object):
 
         self.mapobjecthandler = MapObjectHandler(self.database, self.queue)
         self.textmessagehandler = TextMessageHandler(self.database, self.queue)
+        self.journalhandler = JournalHandler(self.database, self.queue)
 
         self.messagedispatcher = shared.messagedispatcher.MessageDispatcher(bus,
                 self.database,
@@ -48,6 +50,7 @@ class ServerManager(object):
 
         self.messagedispatcher.connect_to_type(shared.data.MessageType.text, self.textmessagehandler.handle)
         self.messagedispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
+        self.messagedispatcher.connect_to_type(MessageType.journal, self.journalhandler.handle)
 
     def _user_login(self, username):
         print "User %s logged in to queue" % username

@@ -144,6 +144,14 @@ class ServerNetworkHandler(dbus.service.Object):
         id = m.sender
         if self.db.is_valid_login(m.sender, m.unpacked_data["password"]):
             self.outqueues[id].replace_socket(socket)
+
+            if 'unit_type' in m.unpacked_data.keys():
+                session = self.db._Session()
+                unit = session.query(shared.data.UnitData).filter_by(name=id).first()
+                unit.type = m.unpacked_data['unit_type']
+                print "login", unit.type
+                session.commit()
+                session.close()
             
             log.info("%s logged in and now has a named queue" % id)
             ack = shared.data.Message("server", id, response_to=m.message_id,
@@ -159,8 +167,7 @@ class ServerNetworkHandler(dbus.service.Object):
             # queue is not named because login failed
             self.enqueue(m.sender, nack.packed_data, 9)
             print "Login failed"
-            #self._disconnect_client(socket)
-            
+            #self._disconnect_client(socket)   
 
     def run(self):
         running = True
@@ -223,7 +230,6 @@ class ServerNetworkHandler(dbus.service.Object):
                             self.message_received(local_id, m.response_to)
                     else:
                         self._disconnect_client(s)
-        
         self.close()
 
     def ping(self):
@@ -258,7 +264,6 @@ class ServerNetworkHandler(dbus.service.Object):
                 self.mainloop.run()
             except KeyboardInterrupt:
                 self.mainloop.quit()
-
 
 if __name__ == "__main__":
     serverhandler = ServerNetworkHandler()

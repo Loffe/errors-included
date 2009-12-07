@@ -30,5 +30,3 @@ class NotificationScreen(gtk.HBox, Screen):
         else:
             text = "Online"
         self.right_label.set_label(text)
-#    def show(self):
-#        self.hbox.show()

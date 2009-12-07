@@ -192,6 +192,7 @@ class ClientNetworkHandler(dbus.service.Object):
         login_msg = shared.data.Message(config.client.name, "server",
                                         type=shared.data.MessageType.login,
                                         unpacked_data={"class": "dict",
+                                            "unit_type":config.client.type,
                                             "password":config.client.password})
         self.login_msg_id = self.enqueue(login_msg.packed_data, 5)
 
