@@ -1,4 +1,4 @@
-from shared.data import Message, MessageType, ActionType, UnitType
+from shared.data import Message, MessageType, ActionType, UnitType, JournalType
 from shared.util import print_color
 
 class JournalHandler(object):
