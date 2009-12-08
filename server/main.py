@@ -57,6 +57,7 @@ class ServerManager(object):
         service_level = message.unpacked_data["service_level"]
         sender = message.sender
         self.queue.set_service_level(sender, service_level)
+        return True
 
     def _user_login(self, username):
         print "User %s logged in to queue" % username

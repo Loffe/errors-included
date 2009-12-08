@@ -141,7 +141,7 @@ class DatabaseOutQueue(DatabaseQueue):
     # Get an item from the queue
     def _get(self):
         # @TODO
-        if self.service_level == "send_few" or self.service_level == "energy_saving":
+        if self.service_level == "send-few" or self.service_level == "energysaving":
             print "sending few (no) messages!"
         else:
             session = self.db._Session()
