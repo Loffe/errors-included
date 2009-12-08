@@ -21,7 +21,7 @@ import data
 class ServerNetworkHandler(dbus.service.Object):
     input = [sys.stdin]
     output = []
-    message_handler = None
+    
 
     def __init__(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -43,7 +43,6 @@ class ServerNetworkHandler(dbus.service.Object):
         self.outqueues = {}
         self._init_queues()
         self.mainloop = None
-        self.message_handler = handler.MessageHandler(self)
         if config.server.primary == False:
             self.primary_alive = False
 
