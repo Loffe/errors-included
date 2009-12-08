@@ -583,6 +583,7 @@ class MessageType(object):
     ack = u"ack"
     text = u"text"
     id = u"id"
+    service_level = "service_level"
 
     # @TODO: Remove?
     mission = "mission"

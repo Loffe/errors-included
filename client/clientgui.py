@@ -633,6 +633,9 @@ class ClientGui(hildon.Program):
 
     def update_service_level(self, service_level):
         self.screens["notifications"].update_label(service_level)
+        unpacked_data = {"class": "dict", "service_level": service_level}
+        msg = Message(self.controller.name, "server", shared.data.MessageType.service_level, unpacked_data = unpacked_data)
+        self.queue.enqueue(msg)
 
     ''' Handle events
     ''' 

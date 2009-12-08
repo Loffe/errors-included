@@ -69,8 +69,6 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
         self.show_all()
        
     def ok_button_function(self, event):
-
-
         selected = self.select_unit_button.select_dialog.selected_units
         units = self.db.get_units(selected)   
         text = shared.data.TextMessage(subject=unicode(self.subject_entry.get_text()), 
@@ -81,7 +79,6 @@ class NewMessageScreen(gtk.ScrolledWindow, gui.Screen):
 
         self.db.add(text)
 
-        
         self.emit("okbutton_clicked_new_message")
         
 gobject.type_register(NewMessageScreen)
