@@ -126,7 +126,12 @@ class DatabaseOutQueue(DatabaseQueue):
 
     def _empty(self):
         session = self.db._Session()
-        result = session.query(NetworkOutQueueItem).filter_by(sent = 0).filter_by(name=self.name).count() == 0
+        result = None
+        if self.service_level == "send-few" or self.service_level == "energysaving":
+            row = session.execute("SELECT COUNT(*) AS num FROM OutQueue WHERE name = '%s' AND sent = 0 AND prio >= 5" % (self.name)).fetchone()
+            result = row[0] == 0
+        else:
+            result = session.query(NetworkOutQueueItem).filter_by(sent = 0).filter_by(name=self.name).count() == 0
         session.close()
         return result
 
@@ -143,6 +148,7 @@ class DatabaseOutQueue(DatabaseQueue):
         # @TODO
         if self.service_level == "send-few" or self.service_level == "energysaving":
             print "sending few (no) messages!"
+            return None, None
         else:
             session = self.db._Session()
             print "_get"
