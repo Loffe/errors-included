@@ -52,23 +52,21 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         self.combo_box.set_active(0)
 
         # create entries
+        self.new_section("Nytt larm", left_box, right_box)
         self.event_entry = self.new_entry("Händelse:", left_box, right_box)
-        
         self.location_entry = self.new_entry("Skadeplats ort:", left_box, right_box)
-        
-        self.coordx_entry = self.new_coordlabel("Skadeplats lon-Gps:", left_box, right_box)
-        
-        self.coordy_entry = self.new_coordlabel("Skadeplats lat-Gps:", left_box, right_box)
-
         self.wounded_entry = self.new_entry("Antal skadade:", left_box, right_box)
+        self.other_entry = self.new_entry("Övrigt:", left_box, right_box)
+        
+        self.new_section("Position", left_box, right_box)
+        self.coordx_entry = self.new_coordlabel("Longitud:", left_box, right_box)
+        self.coordy_entry = self.new_coordlabel("Latitud:", left_box, right_box)
 
         self.new_section("Kontaktperson:", left_box, right_box)
         
         self.contact_person_entry = self.new_entry("Namn:", left_box, right_box)     
 
         self.contact_number_entry = self.new_entry("Nummer:", left_box, right_box)
-
-        self.other_entry = self.new_entry("Övrigt:", left_box, right_box)
 
         self.show_all()
         
