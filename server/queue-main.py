@@ -68,7 +68,7 @@ class ServerNetworkHandler(dbus.service.Object):
     @dbus.service.method(dbus_interface='included.errors.Server',
                          in_signature='ss', out_signature='s')
     def set_service_level(self, sender, service_level):
-        self.outqueues[sender].queue.service_level = service_level
+        self.outqueues[sender].queue.set_service_level(service_level)
         return "Set new service_level"
 
     @dbus.service.signal(dbus_interface='included.errors.Server',
