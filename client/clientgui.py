@@ -710,8 +710,8 @@ class ClientGui(hildon.Program):
     # add object buttons event handlers
     def create_alarm(self, event):
         self.show(["alarm", "buttons"])
-        self.screens["alarm"].location_entry2.set_text(str(self.screens["map"].gps_x))
-        self.screens["alarm"].location_entry3.set_text(str(self.screens["map"].gps_y))
+        self.screens["alarm"].coordx_entry.set_text(str(self.screens["map"].gps_x))
+        self.screens["alarm"].coordy_entry.set_text(str(self.screens["map"].gps_y))
             
     def create_obstacle(self, event):
         self.show(["obstacle", "buttons"])
