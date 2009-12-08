@@ -9,6 +9,9 @@ class Screen(gtk.Widget):
     def ok_button_function(self, event):
         pass
 
+    def no_button_function(self, event):
+        pass
+
     def new_entry(self, labeltext, left_box, right_box):
         label = gtk.Label(labeltext)
         label.set_alignment(0, 0.5)

@@ -391,7 +391,7 @@ class ClientGui(hildon.Program):
         
         
         no_button = gtk.Button("Neka")
-        no_button.connect("clicked", self.ok_button_function)
+        no_button.connect("clicked", self.no_button_function)
         no_button.set_flags(gtk.CAN_DEFAULT)
         self.pj_button_box.pack_start(no_button)
         
