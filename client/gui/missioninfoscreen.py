@@ -37,7 +37,7 @@ class MissionInfoScreen(gtk.ScrolledWindow, gui.Screen):
         vbox.pack_start(hbox)
 
         if many_missions:
-            # create label
+            # create my missions label
             type_label = gtk.Label("Mina uppdrag:")
             type_label.modify_font(pango.FontDescription("sans 12"))
             type_label.set_alignment(0, 0.5)
@@ -57,7 +57,18 @@ class MissionInfoScreen(gtk.ScrolledWindow, gui.Screen):
         self.event_entry = self.new_entry("     Händelse:", left_box, right_box)
         self.wounded_entry = self.new_entry("     Antal skadade:", left_box, right_box)
         self.other_entry = self.new_entry("     Information:", left_box, right_box)
-        self.status_entry = self.new_entry("     Status:", left_box, right_box)
+        
+        # create status label
+        type_label = gtk.Label("Status:")
+        type_label.modify_font(pango.FontDescription("sans 12"))
+        type_label.set_alignment(0, 0.5)
+        left_box.pack_start(type_label, True, True, 0)
+        # create and pack combobox
+        self.status_combo_box = gtk.combo_box_new_text()
+        self.status_combo_box.set_size_request(300,50)
+        self.selected_status = None
+        self.status_combo_box.connect('changed', self.select_status)
+        right_box.pack_start(self.status_combo_box)
 
         # position entries
         self.new_section("Position", left_box, right_box)
@@ -87,7 +98,14 @@ class MissionInfoScreen(gtk.ScrolledWindow, gui.Screen):
         self.contact_person_entry.set_text(mission.contact_person)
         self.contact_number_entry.set_text(mission.contact_number)
         self.other_entry.set_text(mission.other)
-        self.status_entry.set_text(mission.status)
+
+        self.status_combo_box.get_model().clear()
+        self.status_combo_box.append_text(mission.status)
+        statuslist = [u"active", u"done", u"alarm", u"aborted"]
+        for status in statuslist:
+            if status != mission.status:
+                self.status_combo_box.append_text(status)
+        self.status_combo_box.set_active(0)
         ids = []
         for unit in mission.units:
             ids.append(unit.id)
@@ -128,7 +146,7 @@ class MissionInfoScreen(gtk.ScrolledWindow, gui.Screen):
                 unicode(self.contact_number_entry.get_text()),
                 unicode(self.other_entry.get_text()),
                 self.db.get_units(self.select_unit_button.select_dialog.selected_units),
-                status=self.status_entry.get_text(),
+                status=unicode(self.selected_status),
                 timestamp=datetime.datetime.now(),
                 id=self.mission.id)
         self.db.change(mission_data)
@@ -143,3 +161,11 @@ class MissionInfoScreen(gtk.ScrolledWindow, gui.Screen):
         for mission in self.db.get_all_missions():
             if mission.event_type == self.selected_mission:
                 self.set_entries(mission)
+                
+    def select_status(self, combobox):
+        '''
+        Call when combobox changes to switch selected status.
+        @param combobox: the changed combobox
+        '''
+        # set the selected type
+        self.selected_status = combobox.get_active_text()
