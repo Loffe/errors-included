@@ -49,7 +49,7 @@ class StatusScreen(gtk.ScrolledWindow, gui.Screen):
         vbox.pack_start(hbox)
         
         # create type label
-        type_label = gtk.Label("Inkomna uppdrag:")
+        type_label = gtk.Label("Mina uppdrag:")
         type_label.modify_font(pango.FontDescription("sans 12"))
         type_label.set_alignment(0, 0.5)
         left_box.pack_start(type_label, True, True, 0)
@@ -89,10 +89,14 @@ class StatusScreen(gtk.ScrolledWindow, gui.Screen):
         
         
     def ok_button_function(self, event):
-        pass
-        #self.mission.status = "klart"
+        self.selected_mission = self.combo_box.get_active_text()
+        for mission in self.db.get_all_missions():
+            if mission.event_type == self.selected_mission:
                 
-        #self.db.change(mission_data)
+                print mission.status
+                mission.status = "klart"
+                print mission.status
+                #self.db.change(mission_data)
 
     def select_mission(self, combobox):
         '''

@@ -61,6 +61,7 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
         self.number_entry = self.new_entry("     Nummer:", left_box, right_box)
         self.new_section("Övrigt", left_box, right_box)
         self.random_entry = self.new_entry("     Information:", left_box, right_box)
+        self.status_entry = self.new_entry("     Status:", left_box, right_box)
 
         self.combo_box.connect('changed', self.select_mission)
 
@@ -89,3 +90,4 @@ class InfoScreen(gtk.ScrolledWindow, gui.Screen):
                 self.name_entry.set_text(mission.contact_person)
                 self.number_entry.set_text(mission.contact_number)
                 self.random_entry.set_text(mission.other)
+                self.status_entry.set_text(mission.status)

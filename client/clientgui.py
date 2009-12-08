@@ -674,6 +674,7 @@ class ClientGui(hildon.Program):
         combo.append_text("Välj uppdrag...")
         combo.set_active(0)
         for mission in self.controller.missions:
+            #if mission.status != "done":
             combo.append_text(mission.event_type)
     
     def show_status(self, event):
