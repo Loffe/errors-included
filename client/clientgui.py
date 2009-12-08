@@ -98,6 +98,16 @@ class ClientGui(hildon.Program):
         # create gui
         self.create_gui()
     
+    def build_icon(self, label, icon):
+        image = gtk.Image()
+        image.set_from_file(icon)
+
+        vbox = gtk.VBox()
+        vbox.add(image)
+        vbox.add(gtk.Label(label))
+
+        return vbox
+
     def create_gui(self):
         # Creates a empty list that contains previous screens
         self.prev_page = []
@@ -118,24 +128,34 @@ class ClientGui(hildon.Program):
         vbox.set_size_request(150,350)
 
         # Buttons (menu)
-        mission_button = gtk.ToggleButton("Uppdrag")
+        mission_button = gtk.ToggleButton()
+        mission_button.add(self.build_icon("Uppdrag",
+                                           "icons/emblem-important.png"))
         mission_button.connect("clicked", self.show_mission)
         self.menu_buttons["mission"] = mission_button
 
-        add_object_button = gtk.ToggleButton("Skapa")
+        add_object_button = gtk.ToggleButton()
+        add_object_button.add(self.build_icon("Skapa",
+                                              "icons/list-add.png"))
         add_object_button.connect("clicked", self.show_add_object)
         self.menu_buttons["add_object"] = add_object_button
 
-        contacts_button = gtk.ToggleButton("Kontakter")
+        contacts_button = gtk.ToggleButton()
+        contacts_button.add(self.build_icon("Kontakter",
+                                            "icons/x-office-address-book.png"))
         contacts_button.connect("clicked", self.show_contacts)
         self.menu_buttons["contacts"] = contacts_button
 
-        self.messages_button = BlinkToggleButton("Meddelande")
+        self.messages_button = BlinkToggleButton()
+        self.messages_button.add(self.build_icon("Meddelande",
+                                                 "icons/internet-mail.png"))
         self.messages_button.connect("clicked", self.show_messages) 
         self.textmessagehandler.connect("got-new-message", self.new_message)
         self.menu_buttons["messages"] = self.messages_button
         
-        patient_journal_message = gtk.ToggleButton("Patient Journal")
+        patient_journal_message = gtk.ToggleButton()
+        patient_journal_message.add(self.build_icon("Patient Journal",
+                                                    "icons/text-x-generic.png"))
         patient_journal_message.connect("clicked", self.show_patient_journal_message) 
         #self.textmessagehandler.connect("got-new-message", self.new_message)
         self.menu_buttons["patient_journal_message"] = patient_journal_message
@@ -351,7 +371,7 @@ class ClientGui(hildon.Program):
         
         
         no_button = gtk.Button("Neka")
-        no_button.connect("clicked", self.ok_button_function)
+        no_button.connect("clicked", self.no_button_function)
         no_button.set_flags(gtk.CAN_DEFAULT)
         self.pj_button_box.pack_start(no_button)
         
@@ -613,6 +633,9 @@ class ClientGui(hildon.Program):
 
     def update_service_level(self, service_level):
         self.screens["notifications"].update_label(service_level)
+        unpacked_data = {"class": "dict", "service_level": service_level}
+        msg = Message(self.controller.name, "server", shared.data.MessageType.service_level, unpacked_data = unpacked_data)
+        self.queue.enqueue(msg)
 
     ''' Handle events
     ''' 

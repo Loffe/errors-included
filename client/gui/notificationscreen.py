@@ -17,7 +17,6 @@ class NotificationScreen(gtk.HBox, Screen):
         self.right_label.show()
         self.pack_start(self.right_label, False)
         
-        
     def set_label(self, text):
         self.left_label.set_label(text)
     

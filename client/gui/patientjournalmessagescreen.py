@@ -53,10 +53,10 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
         label, self.why_entry = new_entry("Varför",vbox)
         label, self.ssn_entry = new_entry("Personnummer",vbox)
         
-#        # add event handler
+        # add event handler
         self.combo_box.connect('changed', self.select_m)
-#
-#        # set the first item added as active
+
+        # set the first item added as active
         self.combo_box.set_active(0)
 
         # show 'em all! (:
@@ -83,8 +83,10 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
         print "new request added, start blinkin'!"
                 
     def ok_button_function(self, event):
+        print "OK"
         pass
     
     def no_button_function(self, event):
+        print "NO"
         pass
-    
+
