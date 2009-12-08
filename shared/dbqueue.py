@@ -22,6 +22,7 @@ class DatabaseQueue(Queue.Queue):
     def _empty(self):
         session = self.db._Session()
         if self.item_type == data.NetworkOutQueueItem:
+            print "sending few (no) messages!"
             return session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.sent == 0).count() == 0
         if self.item_type == data.NetworkInQueueItem:
             return session.query(data.NetworkInQueueItem).filter(data.NetworkInQueueItem.sent == 0).count() == 0
@@ -133,6 +134,7 @@ class DatabaseOutQueue(DatabaseQueue):
         else:
             result = session.query(NetworkOutQueueItem).filter_by(sent = 0).filter_by(name=self.name).count() == 0
         session.close()
+        print "_empty() says", result
         return result
 
     # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
