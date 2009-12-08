@@ -118,6 +118,8 @@ class DatabaseInQueue(DatabaseQueue):
 
 class DatabaseOutQueue(DatabaseQueue):
     name = None
+    service_level = None
+    
     def __init__(self, database, name):
         DatabaseQueue.__init__(self, database, DatabaseQueue.direction_out)
         self.name = name
@@ -139,17 +141,19 @@ class DatabaseOutQueue(DatabaseQueue):
     # Get an item from the queue
     def _get(self):
         # @TODO
-        session = self.db._Session()
-        print "_get"
-        q = session.query(NetworkOutQueueItem).filter_by(sent = False) \
-                .filter_by(name = self.name) \
-                .order_by(NetworkOutQueueItem.prio.desc()) \
-                .order_by(NetworkOutQueueItem.id.asc())
-                #.order_by(NetworkOutQueueItem.timestamp.desc())
-        item = q.first()
-        session.close()
-        return item.data, item.id
-
+        if self.service_level == "send_few" or self.service_level == "energy_saving":
+            print "sending few (no) messages!"
+        else:
+            session = self.db._Session()
+            print "_get"
+            q = session.query(NetworkOutQueueItem).filter_by(sent = False) \
+                    .filter_by(name = self.name) \
+                    .order_by(NetworkOutQueueItem.prio.desc()) \
+                    .order_by(NetworkOutQueueItem.id.asc())
+                    #.order_by(NetworkOutQueueItem.timestamp.desc())
+            item = q.first()
+            session.close()
+            return item.data, item.id
 
 if __name__ == "__main__":
     import data

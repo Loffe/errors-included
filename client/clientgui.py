@@ -641,7 +641,6 @@ class ClientGui(hildon.Program):
     ''' 
     def back_button_function(self, event):
         self.show(self.prev_page[-2])
-        
 
     def ok_button_function(self, event):
         for screen in self.screens.values():
