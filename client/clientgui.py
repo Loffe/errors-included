@@ -154,7 +154,7 @@ class ClientGui(hildon.Program):
         self.menu_buttons["messages"] = self.messages_button
         
         patient_journal_message = gtk.ToggleButton()
-        patient_journal_message.add(self.build_icon("Patient Journal",
+        patient_journal_message.add(self.build_icon("Patient\nJournal",
                                                     "icons/text-x-generic.png"))
         patient_journal_message.connect("clicked", self.show_patient_journal_message) 
         #self.textmessagehandler.connect("got-new-message", self.new_message)
@@ -236,9 +236,10 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.info_screen, True, True, 0)
         self.screens["info"] = self.info_screen
         
-        self.status_screen = StatusScreen(self.db)               
-        vbox_right.pack_start(self.status_screen, True, True, 0)
-        self.screens["status"] = self.status_screen
+        # WE HAVE NO VALID AND USEFUL STATUSSCREEN
+#        self.status_screen = StatusScreen(self.db)               
+#        vbox_right.pack_start(self.status_screen, True, True, 0)
+#        self.screens["status"] = self.status_screen
 
         self.patient_journal_screen = PatientJournalScreen(self.db, self.queue)
         self.patient_journal_screen.connect("okbutton_clicked_PatientJournalScreen", self.back_button_function)               
@@ -276,14 +277,14 @@ class ClientGui(hildon.Program):
 
         info_button = gtk.Button("Info")
         info_button.connect("clicked", self.show_mission_info)
-        status_button = gtk.Button("Status")
-        status_button.connect("clicked", self.show_status)
+#        status_button = gtk.Button("Status")
+#        status_button.connect("clicked", self.show_status)
         journal_button = gtk.Button("Patient\nJournal")
         journal_button.connect("clicked", self.show_journals)
         faq_button = gtk.Button("FAQ")
         faq_button.connect("clicked", self.show_faq)
         self.mission_menu.add(info_button)
-        self.mission_menu.add(status_button)
+#        self.mission_menu.add(status_button)
         self.mission_menu.add(journal_button)
         self.mission_menu.add(faq_button)
         
