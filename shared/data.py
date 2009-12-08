@@ -467,7 +467,32 @@ class JournalRequest(Base, Packable):
             return repr.encode('utf-8')
         except:
             return repr
-        
+
+class JournalResponse(Base, Packable):
+    __tablename__ = 'JournalResponse'
+    id = Column(Integer, primary_key = True)
+    response_to = Column(Integer)
+    allowed = Column(Boolean)
+    why = Column(UnicodeText)
+    ssn = Column(UnicodeText)
+    journal = Column(UnicodeText)
+
+    def __init__(self, response_to, allowed, why, ssn, journal, id = None):
+        self.response_to = response_to
+        self.allowed = allowed
+        self.why = why
+        self.ssn = ssn
+        self.journal = journal
+        self.id = id
+
+    def __repr__(self):
+        repr = ("<%s: allowed=%s; ssn=%s, response_to=%s>" %
+                (self.__class__.__name__, self.allowed, self.ssn, self.response_to))
+        try:
+            return repr.encode('utf-8')
+        except:
+            return repr
+
 class Alarm(Base, Packable):
     __tablename__ = 'Alarm'
     id = Column(Integer, primary_key = True)

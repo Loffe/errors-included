@@ -29,7 +29,6 @@ from gui.missionscreen import MissionScreen
 from gui.changemissionscreen import ChangeMissionScreen
 from gui.newmessagescreen import NewMessageScreen
 from gui.outboxscreen import OutboxScreen
-from gui.alarminboxscreen import AlarmInboxScreen
 from gui.faqscreen import FAQScreen
 from gui.infoscreen import InfoScreen
 from gui.statusscreen import StatusScreen
@@ -99,6 +98,16 @@ class ClientGui(hildon.Program):
         # create gui
         self.create_gui()
     
+    def build_icon(self, label, icon):
+        image = gtk.Image()
+        image.set_from_file(icon)
+
+        vbox = gtk.VBox()
+        vbox.add(image)
+        vbox.add(gtk.Label(label))
+
+        return vbox
+
     def create_gui(self):
         # Creates a empty list that contains previous screens
         self.prev_page = []
@@ -119,24 +128,34 @@ class ClientGui(hildon.Program):
         vbox.set_size_request(150,350)
 
         # Buttons (menu)
-        mission_button = gtk.ToggleButton("Uppdrag")
+        mission_button = gtk.ToggleButton()
+        mission_button.add(self.build_icon("Uppdrag",
+                                           "icons/emblem-important.png"))
         mission_button.connect("clicked", self.show_mission)
         self.menu_buttons["mission"] = mission_button
 
-        add_object_button = gtk.ToggleButton("Skapa")
+        add_object_button = gtk.ToggleButton()
+        add_object_button.add(self.build_icon("Skapa",
+                                              "icons/list-add.png"))
         add_object_button.connect("clicked", self.show_add_object)
         self.menu_buttons["add_object"] = add_object_button
 
-        contacts_button = gtk.ToggleButton("Kontakter")
+        contacts_button = gtk.ToggleButton()
+        contacts_button.add(self.build_icon("Kontakter",
+                                            "icons/x-office-address-book.png"))
         contacts_button.connect("clicked", self.show_contacts)
         self.menu_buttons["contacts"] = contacts_button
 
-        self.messages_button = BlinkToggleButton("Meddelande")
+        self.messages_button = BlinkToggleButton()
+        self.messages_button.add(self.build_icon("Meddelande",
+                                                 "icons/internet-mail.png"))
         self.messages_button.connect("clicked", self.show_messages) 
         self.textmessagehandler.connect("got-new-message", self.new_message)
         self.menu_buttons["messages"] = self.messages_button
         
-        patient_journal_message = gtk.ToggleButton("Patient Journal")
+        patient_journal_message = gtk.ToggleButton()
+        patient_journal_message.add(self.build_icon("Patient Journal",
+                                                    "icons/text-x-generic.png"))
         patient_journal_message.connect("clicked", self.show_patient_journal_message) 
         #self.textmessagehandler.connect("got-new-message", self.new_message)
         self.menu_buttons["patient_journal_message"] = patient_journal_message
@@ -185,10 +204,6 @@ class ClientGui(hildon.Program):
         self.outbox_screen = OutboxScreen(self.db)
         vbox_right.pack_start(self.outbox_screen, True, True, 0)
         self.screens["output"] = self.outbox_screen
-        
-        self.alarm_inbox_screen = AlarmInboxScreen(self.db)               
-        vbox_right.pack_start(self.alarm_inbox_screen, True, True, 0)
-        self.screens["alarms"] = self.alarm_inbox_screen
 
         # add the obstacle screen
         self.obstacle_screen = ObstacleScreen(self.db)
@@ -286,8 +301,6 @@ class ClientGui(hildon.Program):
         inbox.connect("clicked", self.show_inbox)
         outbox = gtk.Button("Utkorg")
         outbox.connect("clicked", self.show_outbox)
-        in_alarms = gtk.Button("Inkomna larm")
-        in_alarms.connect("clicked", self.show_alarms)
         self.message_menu.add(new_mess)
         self.message_menu.add(inbox)
         self.message_menu.add(outbox)
@@ -297,20 +310,9 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.patient_journal_message_screen, True, True, 0)
         self.screens["patient_journal_message_screen"] = self.patient_journal_message_screen
         
-        patient_journal_message
-        
-        #fyller ingen funktion
-        #self.message_menu.add(in_alarms)
-        
-        #Istället för popup så kopper en panel upp vid sidan.         
-
-       
         vbox2 = gtk.VBox(False,0)
         #panels.pack_start(vbox2, False, False, 0)
         vbox2.set_size_request(150,0)
-        
-
-
         
 #        self.activities = gtk.VBox(False,0)
         self.activities = Activities(self.db)
@@ -371,7 +373,7 @@ class ClientGui(hildon.Program):
         
         
         no_button = gtk.Button("Neka")
-        no_button.connect("clicked", self.ok_button_function)
+        no_button.connect("clicked", self.no_button_function)
         no_button.set_flags(gtk.CAN_DEFAULT)
         self.pj_button_box.pack_start(no_button)
         
@@ -713,8 +715,8 @@ class ClientGui(hildon.Program):
     # add object buttons event handlers
     def create_alarm(self, event):
         self.show(["alarm", "buttons"])
-        self.screens["alarm"].location_entry2.set_text(str(self.screens["map"].gps_x))
-        self.screens["alarm"].location_entry3.set_text(str(self.screens["map"].gps_y))
+        self.screens["alarm"].coordx_entry.set_text(str(self.screens["map"].gps_x))
+        self.screens["alarm"].coordy_entry.set_text(str(self.screens["map"].gps_y))
             
     def create_obstacle(self, event):
         self.show(["obstacle", "buttons"])
@@ -779,9 +781,6 @@ class ClientGui(hildon.Program):
         self.messages_button.set_attention(False)
         label = self.messages_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
-
-    def show_alarms(self, event):
-        self.show(["alarms", "message_menu"])
         
     # contacts view event handlers
     def show_contacts(self,event):

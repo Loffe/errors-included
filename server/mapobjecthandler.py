@@ -15,7 +15,7 @@ class MapObjectHandler(object):
         if subtype == ActionType.change:
             self.database.change(object)
             for u in self.database.get_all_users():
-                if u.name != message.sender:
+                if u.name != message.sender or object.__class__ == "MissionData":
                     msg = Message(u"server", u.name, MessageType.object,
                                   ActionType.change, unpacked_data=object)
                     self.queue.enqueue(u.name, msg.packed_data, msg.prio)
@@ -23,7 +23,7 @@ class MapObjectHandler(object):
         elif subtype == ActionType.add:
             self.database.add(object)
             for u in self.database.get_all_users():
-                if u.name != message.sender:
+                if u.name != message.sender or object.__class__ == "MissionData":
                     msg = Message(u"server", u.name, MessageType.object,
                                   ActionType.add, unpacked_data=object)
                     self.queue.enqueue(u.name, msg.packed_data, msg.prio)
@@ -31,7 +31,7 @@ class MapObjectHandler(object):
         elif subtype == ActionType.delete:
             self.database.delete(object)
             for u in self.database.get_all_users():
-                if u.name != message.sender:
+                if u.name != message.sender or object.__class__ == "MissionData":
                     msg = Message(u"server", u.name, MessageType.object,
                                   ActionType.delete, unpacked_data=object)
                     self.queue.enqueue(u.name, msg.packed_data, msg.prio)
