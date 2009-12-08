@@ -313,6 +313,9 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
                     for m in self.db.get_all_missions():
                         if data.id == m.poi.id:
                             clicked_object = m
+                    for a in self.db.get_all_alarms():
+                        if data.id == a.poi.id:
+                            clicked_object = a
                     # tell clientgui to show the correct view if something cool was clicked!
                     self.emit("object-clicked", clicked_object)
                 else:

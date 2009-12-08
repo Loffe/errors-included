@@ -29,7 +29,6 @@ from gui.missionscreen import MissionScreen
 from gui.changemissionscreen import ChangeMissionScreen
 from gui.newmessagescreen import NewMessageScreen
 from gui.outboxscreen import OutboxScreen
-from gui.alarminboxscreen import AlarmInboxScreen
 from gui.faqscreen import FAQScreen
 from gui.infoscreen import InfoScreen
 from gui.statusscreen import StatusScreen
@@ -205,10 +204,6 @@ class ClientGui(hildon.Program):
         self.outbox_screen = OutboxScreen(self.db)
         vbox_right.pack_start(self.outbox_screen, True, True, 0)
         self.screens["output"] = self.outbox_screen
-        
-        self.alarm_inbox_screen = AlarmInboxScreen(self.db)               
-        vbox_right.pack_start(self.alarm_inbox_screen, True, True, 0)
-        self.screens["alarms"] = self.alarm_inbox_screen
 
         # add the obstacle screen
         self.obstacle_screen = ObstacleScreen(self.db)
@@ -306,8 +301,6 @@ class ClientGui(hildon.Program):
         inbox.connect("clicked", self.show_inbox)
         outbox = gtk.Button("Utkorg")
         outbox.connect("clicked", self.show_outbox)
-        in_alarms = gtk.Button("Inkomna larm")
-        in_alarms.connect("clicked", self.show_alarms)
         self.message_menu.add(new_mess)
         self.message_menu.add(inbox)
         self.message_menu.add(outbox)
@@ -317,20 +310,9 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.patient_journal_message_screen, True, True, 0)
         self.screens["patient_journal_message_screen"] = self.patient_journal_message_screen
         
-        patient_journal_message
-        
-        #fyller ingen funktion
-        #self.message_menu.add(in_alarms)
-        
-        #Istället för popup så kopper en panel upp vid sidan.         
-
-       
         vbox2 = gtk.VBox(False,0)
         #panels.pack_start(vbox2, False, False, 0)
         vbox2.set_size_request(150,0)
-        
-
-
         
 #        self.activities = gtk.VBox(False,0)
         self.activities = Activities(self.db)
@@ -730,8 +712,8 @@ class ClientGui(hildon.Program):
     # add object buttons event handlers
     def create_alarm(self, event):
         self.show(["alarm", "buttons"])
-        self.screens["alarm"].location_entry2.set_text(str(self.screens["map"].gps_x))
-        self.screens["alarm"].location_entry3.set_text(str(self.screens["map"].gps_y))
+        self.screens["alarm"].coordx_entry.set_text(str(self.screens["map"].gps_x))
+        self.screens["alarm"].coordy_entry.set_text(str(self.screens["map"].gps_y))
             
     def create_obstacle(self, event):
         self.show(["obstacle", "buttons"])
@@ -796,9 +778,6 @@ class ClientGui(hildon.Program):
         self.messages_button.set_attention(False)
         label = self.messages_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
-
-    def show_alarms(self, event):
-        self.show(["alarms", "message_menu"])
         
     # contacts view event handlers
     def show_contacts(self,event):
