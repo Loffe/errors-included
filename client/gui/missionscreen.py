@@ -87,7 +87,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
                 self.name_entry.set_text(alarm.contact_person)
                 self.wounded_entry.set_text(str(alarm.number_of_wounded))
                 self.number_entry.set_text(alarm.contact_number)
-                self.random_entry.set_text(alarm.other)
+                self.other_entry.set_text(alarm.other)
                 
     def ok_button_function(self, event):
         alarm = None
