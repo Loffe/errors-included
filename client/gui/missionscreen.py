@@ -47,7 +47,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         
         self.new_section("Nytt uppdrag", left_box, right_box)
         self.event_entry = self.new_entry("     Händelse:", left_box, right_box)
-        self.hurted_entry = self.new_entry("     Antal skadade:", left_box, right_box)
+        self.wounded_entry = self.new_entry("     Antal skadade:", left_box, right_box)
         self.other_entry = self.new_entry("     Information:", left_box, right_box)
         self.new_section("Position", left_box, right_box)
         self.coordx_entry = self.new_coordlabel("     Longitud:", left_box, right_box)
@@ -108,10 +108,10 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
             poi_data = alarm.poi
         mission_data = shared.data.MissionData(unicode(self.event_entry.get_text()), 
                                                poi_data, 
-                                               self.hurted_entry.get_text(), 
+                                               self.wounded_entry.get_text(), 
                                                unicode(self.name_entry.get_text()), 
                                                unicode(self.number_entry.get_text()), 
-                                               unicode(self.random_entry.get_text()), 
+                                               unicode(self.other_entry.get_text()), 
                                                units, u"active")
 
         self.select_unit_button.clear_selected()
