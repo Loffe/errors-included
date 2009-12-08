@@ -762,7 +762,7 @@ class Message(object):
                         except Exception, e:
                             print e
                             raise ValueError("Failed with class: %s, dict: %s"
-                                    % (classname, str(dict)))
+                                    % (classname, str(encodeddict)))
 
                 # create and set data
                 self.unpacked_data = create(self.packed_data)
