@@ -531,6 +531,12 @@ class Alarm(Base, Packable):
             return repr.encode('utf-8')
         except:
             return repr
+        
+class MissionStatus(object):
+    done = u"done" # genomfört, avslutat
+    active = u"active" # genomförs, under arbete,
+    alarm = u"alarm" # just larmad, ej påbörjat
+    aborted = u"aborted" # avbrutet 
 
 class MissionData(Base, Packable):
     '''

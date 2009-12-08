@@ -101,7 +101,11 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         poi_data = None
         if alarm == None:
             # @todo CHANGE POI-TYPE, SHOULDNT BE HARDCODED!
-            poi_data = shared.data.POIData(lon,lat, unicode(self.event_entry.get_text()), datetime.datetime.now(), shared.data.POIType.flag)
+            poi_data = shared.data.POIData(lon,lat,
+                                           unicode(self.event_entry.get_text()),
+                                           datetime.datetime.now(),
+                                           shared.data.POIType.event,
+                                           shared.data.POISubType.other)
             print "POI:", poi_data
             self.db.add(poi_data)
         else:
@@ -112,7 +116,7 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
                                                unicode(self.name_entry.get_text()), 
                                                unicode(self.number_entry.get_text()), 
                                                unicode(self.other_entry.get_text()), 
-                                               units, u"active")
+                                               units, shared.data.MissionStatus.active)
 
         self.select_unit_button.clear_selected()
         self.select_unit_button.unit_label.set_text("Inga valda enheter...")
