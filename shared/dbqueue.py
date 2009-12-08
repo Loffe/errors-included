@@ -125,6 +125,9 @@ class DatabaseOutQueue(DatabaseQueue):
         DatabaseQueue.__init__(self, database, DatabaseQueue.direction_out)
         self.name = name
 
+    def set_service_level(self, level):
+        self.service_level = level
+
     def _empty(self):
         session = self.db._Session()
         result = None
@@ -134,7 +137,6 @@ class DatabaseOutQueue(DatabaseQueue):
         else:
             result = session.query(NetworkOutQueueItem).filter_by(sent = 0).filter_by(name=self.name).count() == 0
         session.close()
-        print "_empty() says", result
         return result
 
     # shadow and wrap Queue.Queue's own `put' to allow a 'priority' argument
