@@ -45,19 +45,16 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         self.combo_box.append_text("Välj larm...")
         right_box.pack_start(self.combo_box, True,False, 0)
         
-        label = self.new_section("Nytt uppdrag", left_box, right_box)
-        
-        # create entries
+        self.new_section("Nytt uppdrag", left_box, right_box)
         self.event_entry = self.new_entry("     Händelse:", left_box, right_box)
-
-        self.location_entry2 = self.new_coordlabel("     Skadeplats: lon-Gps", left_box, right_box)
-        self.location_entry3 = self.new_coordlabel("     Skadeplats: lat-Gps", left_box, right_box)        
         self.hurted_entry = self.new_entry("     Antal skadade:", left_box, right_box)
+        self.other_entry = self.new_entry("     Information:", left_box, right_box)
+        self.new_section("Position", left_box, right_box)
+        self.coordx_entry = self.new_coordlabel("     Longitud:", left_box, right_box)
+        self.coordy_entry = self.new_coordlabel("     Latitud:", left_box, right_box)        
         self.new_section("Kontaktperson", left_box, right_box)
         self.name_entry = self.new_entry("     Namn:", left_box, right_box)
         self.number_entry = self.new_entry("     Nummer:", left_box, right_box)
-        self.new_section("Övrigt", left_box, right_box)
-        self.random_entry = self.new_entry("     Information:", left_box, right_box)
 
         self.select_unit_button = SelectUnitButton(self.db)
         vbox.add(self.select_unit_button)
@@ -85,10 +82,10 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         for alarm in alarms:
             if alarm.event == self.selected_alarm:
                 self.event_entry.set_text(alarm.event)
-                self.location_entry2.set_text(str(alarm.poi.coordx))
-                self.location_entry3.set_text(str(alarm.poi.coordy))                
+                self.coordx_entry.set_text(str(alarm.poi.coordx))
+                self.coordy_entry.set_text(str(alarm.poi.coordy))                
                 self.name_entry.set_text(alarm.contact_person)
-                self.hurted_entry.set_text(str(alarm.number_of_wounded))
+                self.wounded_entry.set_text(str(alarm.number_of_wounded))
                 self.number_entry.set_text(alarm.contact_number)
                 self.random_entry.set_text(alarm.other)
                 
@@ -97,8 +94,8 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
         for a in self.db.get_all_alarms():
             if a.event == self.selected_alarm:
                 alarm = a
-        lon = float(self.location_entry2.get_text())
-        lat = float(self.location_entry3.get_text())
+        lon = float(self.coordx_entry.get_text())
+        lat = float(self.coordy_entry.get_text())
         selected = self.select_unit_button.select_dialog.selected_units
         units = self.db.get_units(selected)
         poi_data = None
@@ -109,9 +106,13 @@ class MissionScreen(gtk.ScrolledWindow, gui.Screen):
             self.db.add(poi_data)
         else:
             poi_data = alarm.poi
-        mission_data = shared.data.MissionData(unicode(self.event_entry.get_text()), poi_data, self.hurted_entry.get_text(), 
-                                               unicode(self.name_entry.get_text()), unicode(self.number_entry.get_text()), 
-                                               unicode(self.random_entry.get_text()), units, status = "Available")
+        mission_data = shared.data.MissionData(unicode(self.event_entry.get_text()), 
+                                               poi_data, 
+                                               self.hurted_entry.get_text(), 
+                                               unicode(self.name_entry.get_text()), 
+                                               unicode(self.number_entry.get_text()), 
+                                               unicode(self.random_entry.get_text()), 
+                                               units, u"active")
 
         self.select_unit_button.clear_selected()
         self.select_unit_button.unit_label.set_text("Inga valda enheter...")

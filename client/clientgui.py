@@ -30,7 +30,7 @@ from gui.changemissionscreen import ChangeMissionScreen
 from gui.newmessagescreen import NewMessageScreen
 from gui.outboxscreen import OutboxScreen
 from gui.faqscreen import FAQScreen
-from gui.infoscreen import InfoScreen
+from gui.missioninfoscreen import MissionInfoScreen
 from gui.statusscreen import StatusScreen
 from gui.patientjournalscreen import PatientJournalScreen
 from gui.contactscreen import ContactScreen
@@ -225,8 +225,6 @@ class ClientGui(hildon.Program):
                 
         # add the change mission screen
         self.change_mission_screen = ChangeMissionScreen(self.db)
-        
-#        self.change_mission_screen.connect("okbutton-mission-clicked", self.back_button_function)
         vbox_right.pack_start(self.change_mission_screen, True, True, 0)
         self.screens["change_mission"] = self.change_mission_screen
 
@@ -234,7 +232,7 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.faq_screen, True, True, 0)
         self.screens["faq"] = self.faq_screen
         
-        self.info_screen = InfoScreen(self.db)               
+        self.info_screen = MissionInfoScreen(self.db)               
         vbox_right.pack_start(self.info_screen, True, True, 0)
         self.screens["info"] = self.info_screen
         
@@ -672,13 +670,12 @@ class ClientGui(hildon.Program):
     # mission view event handlers
     def show_mission(self, event):
         self.toggle_show("mission", ["notifications", "map", "mission_menu"], 
-                         "Här visas dina uppdrag")
+                         "Här visas information relaterade till dina uppdrag")
 
     # mission buttons event handlers
     def show_mission_info(self, event):
-        self.toggle_show("mission", ["notifications", "info", "buttons"], 
-                         "Här visas info om ditt uppdrag")
-        combo = self.screens["info"].combo_box
+        self.show(["info", "change_buttons"])
+        combo = self.screens["info"].mission_combo_box
         combo.get_model().clear()
         combo.append_text("Välj uppdrag...")
         combo.set_active(0)
@@ -725,8 +722,8 @@ class ClientGui(hildon.Program):
     
     def create_mission(self, event):
         self.show(["make_mission", "buttons"])
-        self.screens["make_mission"].location_entry2.set_text(str(self.screens["map"].gps_x))
-        self.screens["make_mission"].location_entry3.set_text(str(self.screens["map"].gps_y))
+        self.screens["make_mission"].coordx_entry.set_text(str(self.screens["map"].gps_x))
+        self.screens["make_mission"].coordy_entry.set_text(str(self.screens["map"].gps_y))
 
         combo = self.screens["make_mission"].combo_box
         combo.get_model().clear()
