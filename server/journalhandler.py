@@ -1,4 +1,4 @@
-from shared.data import Message, MessageType, ActionType, UnitType
+from shared.data import Message, MessageType, ActionType, UnitType, JournalType
 from shared.util import print_color
 
 class JournalHandler(object):
@@ -14,15 +14,11 @@ class JournalHandler(object):
         for u in self.database.get_all_units():
             if u.type == UnitType.commander:
                 print "Sending to", u.name
+                message.unpacked_data["class"] = "dict"
                 msg = Message(message.sender, u.name, MessageType.journal,
-                              JournalType.confirmation_request, message.id,
-                              message.unpacked_data, message.prio)
+                              JournalType.request, 
+                              unpacked_data = message.unpacked_data, prio = message.prio)
+                self.queue.enqueue(u.name, msg.packed_data, msg.prio)
                 return True
         print_color("Found no commander", 'red')
         return False
-#        subtype = message.subtype
-#        object = message.unpacked_data
-#        for u in message.unpacked_data.units:
-#            msg = Message(u"server", u.name, MessageType.text,
-#                      ActionType.add, unpacked_data=object)
-#            self.queue.enqueue(u.name, msg.packed_data, msg.prio)

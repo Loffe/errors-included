@@ -19,11 +19,6 @@ units_in_text = Table('UnitsInText', Base.metadata,
                     Column('textmessage_id', Integer, ForeignKey('TextMessage.id')),
                     Column('unit_id', Integer, ForeignKey('UnitData.id')))
 
-units_in_PJMessages = Table('UnitsInPJMessages', Base.metadata,
-                    Column('pjmessages_id', Integer, ForeignKey('PJMessages.id')),
-                    Column('unit_id', Integer, ForeignKey('UnitData.id')))
-
-
 class Packable(object):
     '''
     Extend this class to be able to pack/unpack a message containing it.
@@ -191,14 +186,22 @@ class Database(gobject.GObject):
         session.close()
         return textmessages
     
-    def patientjournalmessage(self):
+    def get_journal_requests(self):
         session = self._Session()
-        patientjournalmessage = []
-        for t in session.query(PatientJournalMessage):
-            patientjournalmessage.append(t)
-            t.units
+        requests = []
+        for request in session.query(JournalRequest):
+            requests.append(request)
         session.close()
-        return patientjournalmessage
+        return requests
+#    
+#    def patientjournalmessage(self):
+#        session = self._Session()
+#        patientjournalmessage = []
+#        for t in session.query(PatientJournalMessage):
+#            patientjournalmessage.append(t)
+#            t.units
+#        session.close()
+#        return patientjournalmessage
     
         #oanvänd
     def get_all_outboxmessages(self):
@@ -418,8 +421,7 @@ class TextMessage(Base, Packable):
         self.units = units
         self.id = id
         self.sender = sender
-        
-        
+     
     def add_unit(self, unit):
         self.units.append(unit)
         
@@ -442,51 +444,25 @@ class TextMessage(Base, Packable):
         try:
             return repr.encode('utf-8')
         except:
-            return repr
+            return repr        
         
-        
-        
-class PatientJournalMessage(Base, Packable):
-    __tablename__ = 'PJMessages'
+class JournalRequest(Base, Packable):
+    __tablename__ = 'JournalRequest'
     id = Column(Integer, primary_key = True)
-    
-    units = relation('UnitData', secondary=units_in_PJMessages)
-    
-    why_entry = Column(UnicodeText)
-    social_security_number = Column(UnicodeText)
-    timestamp = Column(DateTime)
+    why = Column(UnicodeText)
+    ssn = Column(UnicodeText)
     sender = Column(UnicodeText)
     
-    prio = 9
-    
-    def __init__(self, why_entry, social_security_number, units, sender, timestamp = datetime.now(), id = None):
-        self.why_entry = why_entry
-        self.social_security_number = social_security_number
-        self.timestamp = timestamp
-        self.units = units
-        self.id = id
+    def __init__(self, why, ssn, sender, id = None):
+        self.why = why
+        self.ssn = ssn
         self.sender = sender
-        
-        
-    def add_unit(self, unit):
-        self.units.append(unit)
-        
-    def add_units(self, units):
-        for unit in units:
-            self.add_unit(unit)
-    
-    def remove_unit(self, unit):
-        self.units.remove(unit)
-        
-    def remove_units(self, units):
-        for unit in units:
-            self.remove_unit(unit)
+        self.id = id
         
     def __repr__(self):
             
-        repr = ("<%s: why_entry=%s; social_security_number=%s, from=%s, to=%s, timestamp=%s, id=%s>" % 
-                (self.__class__.__name__, self.why_entry, self.social_security_number, self.sender, 
-                 self.units, self.timestamp , self.id))
+        repr = ("<%s: why_entry=%s; social_security_number=%s, from=%s, id=%s>" % 
+                (self.__class__.__name__, self.why, self.ssn, self.sender, self.id))
         try:
             return repr.encode('utf-8')
         except:
@@ -640,9 +616,7 @@ class IDType(object):
 
 class JournalType(object):
     request = "request"
-    confirmation_response = "confirmation_response"
-    confirmation_request = "confirmation_request"
-    transfer = "transfer"
+    response = "response"
 
 class Message(object):
     '''
@@ -812,7 +786,6 @@ class Message(object):
         except:
             return repr
 
-
 def create_database(db = Database()):
     '''
     Create the database.
@@ -821,7 +794,6 @@ def create_database(db = Database()):
     # create tables and columns
     Base.metadata.create_all(db.engine)
     return db
-
 
 if __name__ == '__main__':
     print "Testing db"
@@ -872,7 +844,6 @@ if __name__ == '__main__':
 #                  unpacked_data=poi_data)
 #    print msg.packed_data
 #    print Message.unpack(msg.packed_data, db)
-
 
 #    alarm.event = "kuk"
 #    db.change(alarm)

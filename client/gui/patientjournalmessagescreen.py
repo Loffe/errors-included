@@ -17,15 +17,8 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
     The screen in which you create a new alarm.
     '''
     # the entries
-    event_entry = None
-    location_entry = None
-    location_entry2 = None
-    location_entry3 = None
-    hurted_entry = None
-    name_entry = None
-    number_entry = None
-    random_entry = None
     db = None
+    
 
     def __init__(self, db):
         '''
@@ -48,22 +41,17 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
             hbox.add(entry)
             parent.add(hbox)
             return (label, entry)
-        
-        
-        
 
         vbox = gtk.VBox(False,0)
         self.add_with_viewport(vbox)
-        
-        
 
         self.combo_box = gtk.combo_box_new_text()
         self.combo_box.set_size_request(300,50)
-        self.combo_box.append_text("Välj Meddelande...")
+        self.combo_box.append_text("Välj patientjournalförfrågan")
         vbox.pack_start(self.combo_box, True,True, 0)
         
-        label, self.why_Entry = new_entry("Varför",vbox)
-        label, self.social_security_Number = new_entry("Personnummer",vbox)
+        label, self.why_entry = new_entry("Varför",vbox)
+        label, self.ssn_entry = new_entry("Personnummer",vbox)
         
 #        # add event handler
         self.combo_box.connect('changed', self.select_m)
@@ -85,13 +73,14 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
         '''
         # set the selected type
         self.selected_m = self.combo_box.get_active_text()
-        messages = self.db.patientjournalmessage()
-        for message in messages:
-            patientjournalMessage = "varför: " + str(message.why_entry) + "    personumer: " + str(message.social_security_number)
-            if patientjournalMessage == self.selected_m:
-                self.why_Entry.set_text(message.why_entry)
-                self.social_security_Number.set_text(message.social_security_number)
-
+        for request in self.db.get_journal_requests():
+            text = "varför: " + str(request.why) + "    personumer: " + str(request.ssn)
+            if text == self.selected_m:
+                self.why_entry.set_text(request.why)
+                self.ssn_entry.set_text(request.ssn)
+                
+    def add_request(self, event):
+        print "new request added, start blinkin'!"
                 
     def ok_button_function(self, event):
         pass
