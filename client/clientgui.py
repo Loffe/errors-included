@@ -152,11 +152,11 @@ class ClientGui(hildon.Program):
         self.messages_button.connect("clicked", self.show_messages) 
         self.textmessagehandler.connect("got-new-message", self.new_message)
         self.menu_buttons["messages"] = self.messages_button
-        
+
         vbox.add(mission_button)
         vbox.add(add_object_button)
         vbox.add(contacts_button)
-        vbox.add(self.messages_button)  
+        vbox.add(self.messages_button)
         
         if config.client.type == 'commander':
             patient_journal_message = gtk.ToggleButton()
@@ -188,7 +188,8 @@ class ClientGui(hildon.Program):
 
         # add the alarm screen
         self.alarm_screen = AlarmScreen(self.db)
-        self.alarm_screen.connect("okbutton-alarm-clicked", self.back_button_function) 
+        self.alarm_screen.connect("okbutton-alarm-clicked",
+                                  self.back_button_function) 
         vbox_right.pack_start(self.alarm_screen, True, True, 0)
         self.screens["alarm"] = self.alarm_screen
 
@@ -198,7 +199,8 @@ class ClientGui(hildon.Program):
         self.screens["message"] = self.message_screen
         
         self.new_message_screen = NewMessageScreen(self.db)
-        self.new_message_screen.connect("okbutton_clicked_new_message", self.back_button_function) 
+        self.new_message_screen.connect("okbutton_clicked_new_message",
+                                        self.back_button_function) 
         vbox_right.pack_start(self.new_message_screen, True, True, 0)
         self.screens["new_message"] = self.new_message_screen
         
@@ -208,7 +210,8 @@ class ClientGui(hildon.Program):
 
         # add the obstacle screen
         self.obstacle_screen = ObstacleScreen(self.db)
-        self.obstacle_screen.connect("okbutton-obstacle-clicked", self.back_button_function)
+        self.obstacle_screen.connect("okbutton-obstacle-clicked",
+                                     self.back_button_function)
         vbox_right.pack_start(self.obstacle_screen, True, True, 0)
         self.screens["obstacle"] = self.obstacle_screen
         
@@ -219,7 +222,8 @@ class ClientGui(hildon.Program):
         
         # add the create_mission screen
         self.mission_screen = MissionScreen(self.db)
-        self.mission_screen.connect("okbutton-mission-clicked", self.back_button_function)
+        self.mission_screen.connect("okbutton-mission-clicked",
+                                    self.back_button_function)
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
         
@@ -243,7 +247,8 @@ class ClientGui(hildon.Program):
 #        self.screens["status"] = self.status_screen
 
         self.patient_journal_screen = PatientJournalScreen(self.db, self.queue)
-        self.patient_journal_screen.connect("okbutton_clicked_PatientJournalScreen", self.back_button_function)               
+        self.patient_journal_screen.connect("okbutton_clicked_PatientJournalScreen",
+                                            self.back_button_function)               
         vbox_right.pack_start(self.patient_journal_screen, True, True, 0)
         self.screens["patient_journal"] = self.patient_journal_screen        
 
@@ -486,7 +491,8 @@ class ClientGui(hildon.Program):
             if subtype == shared.data.VVOIPType.response:
                 print "vvoip response"
                 self.out_dialog.destroy()
-                self.show_cam(ip=data["ip"], port1=data["port1"], port2=data["port2"])
+                self.show_cam(ip=data["ip"], port1=data["port1"],
+                              port2=data["port2"])
             elif subtype == shared.data.VVOIPType.request:
                 shared.util.set_color(0,0,255)
                 print "vvoip request"
@@ -635,9 +641,11 @@ class ClientGui(hildon.Program):
         self.mapobjecthandler.controller = self.controller
 
     def update_service_level(self, service_level):
-        if service_level == "ad-hoc" or service_level == "mega-low": 
-            self.screens["notifications"].update_label(service_level)
-            unpacked_data = {"class": "dict", "service_level": service_level}
+        self.screens["notifications"].update_label(service_level)
+        unpacked_data = {"class": "dict", "service_level": service_level}
+        if service_level == "ad-hoc" or service_level == "mega-low":
+            pass
+        else:
             msg = Message(self.controller.name, "server",
                           shared.data.MessageType.service_level,
                           unpacked_data = unpacked_data)
