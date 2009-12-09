@@ -443,7 +443,6 @@ class ClientGui(hildon.Program):
         
     def new_mission(self,event):
         self.mission_button.set_attention(True)
-        print "blinkin"
 
     def change_object(self, event, object):
         keys = []

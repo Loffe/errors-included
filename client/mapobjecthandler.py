@@ -36,12 +36,9 @@ class MapObjectHandler(gobject.GObject):
             if object.__class__ == MissionData:
                 print self.controller.unit_data.id        
                 for unit in object.units:
-                    print unit.id
                     if self.controller is not None:
                         if unit.id == self.controller.unit_data.id:
                             self.emit("got-new-mission")
-                            
-                            print "blinking?"
 
         elif subtype == ActionType.delete:
             Database.delete(self.database, object)
