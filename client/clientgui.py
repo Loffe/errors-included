@@ -98,15 +98,20 @@ class ClientGui(hildon.Program):
         # create gui
         self.create_gui()
     
-    def build_icon(self, label, icon):
+    def build_icon(self, label, icon, box_type = "v"):
         image = gtk.Image()
         image.set_from_file(icon)
 
-        vbox = gtk.VBox()
-        vbox.add(image)
-        vbox.add(gtk.Label(label))
-
-        return vbox
+        if box_type == "v":
+            vbox = gtk.VBox()
+            vbox.add(image)
+            vbox.add(gtk.Label(label))
+            return vbox
+        else:
+            hbox = gtk.HBox(True, 0)
+            hbox.add(image)
+            hbox.add(gtk.Label(label))
+            return hbox
 
     def create_gui(self):
         # Creates a empty list that contains previous screens
@@ -266,11 +271,16 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.mission_menu, False, False, 0)
         self.screens["mission_menu"] = self.mission_menu
 
-        info_button = gtk.Button("Mina Uppdrag")
+        info_button = gtk.Button()
+        info_button.add(self.build_icon("Mina Uppdrag",
+                                        "icons/emblem-important.png", "h"))
         info_button.connect("clicked", self.show_mission_info)
-        journal_button = gtk.Button("Patient-\njournal")
+        journal_button = gtk.Button()
+        journal_button.add(self.build_icon("Patient-\njournal",
+                                           "icons/text-x-generic.png", "h"))
         journal_button.connect("clicked", self.show_journals)
-        faq_button = gtk.Button("FAQ")
+        faq_button = gtk.Button()
+        faq_button.add(self.build_icon("FAQ","icons/text-x-generic.png", "h"))
         faq_button.connect("clicked", self.show_faq)
         self.mission_menu.add(info_button)
 #        self.mission_menu.add(status_button)
