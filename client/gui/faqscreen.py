@@ -32,8 +32,6 @@ class FAQScreen(gtk.ScrolledWindow, gui.Screen):
         self.svinis = gtk.TextBuffer()
         self.svinis.set_text(open('../shared/FAQ/svininfluensan.txt', 'r').read().encode('utf-8'))
         
-        
-        
         # create and pack combobox
         self.combo_box = gtk.combo_box_new_text()
         #combo_box.set_size_request(300,50)
