@@ -153,18 +153,19 @@ class ClientGui(hildon.Program):
         self.textmessagehandler.connect("got-new-message", self.new_message)
         self.menu_buttons["messages"] = self.messages_button
         
-        patient_journal_message = gtk.ToggleButton()
-        patient_journal_message.add(self.build_icon("Patient-\njournal",
-                                                    "icons/text-x-generic.png"))
-        patient_journal_message.connect("clicked", self.show_patient_journal_message) 
-        #self.textmessagehandler.connect("got-new-message", self.new_message)
-        self.menu_buttons["patient_journal_message"] = patient_journal_message
-
         vbox.add(mission_button)
         vbox.add(add_object_button)
         vbox.add(contacts_button)
-        vbox.add(self.messages_button)
-        vbox.add(patient_journal_message)
+        vbox.add(self.messages_button)  
+        
+        if config.client.type == 'commander':
+            patient_journal_message = gtk.ToggleButton()
+            patient_journal_message.add(self.build_icon("Patient-\njournal",
+                                                        "icons/text-x-generic.png"))
+            patient_journal_message.connect("clicked", self.show_patient_journal_message) 
+            #self.textmessagehandler.connect("got-new-message", self.new_message)
+            self.menu_buttons["patient_journal_message"] = patient_journal_message
+            vbox.add(patient_journal_message)      
 
         # Right panel
         vbox_right = gtk.VBox(False, 0)
@@ -380,8 +381,6 @@ class ClientGui(hildon.Program):
         ok_button.connect("clicked", self.ok_button_function)
         ok_button.set_flags(gtk.CAN_DEFAULT)
         self.pj_button_box.pack_start(ok_button)
-        
-        
         
         vbox_right.pack_start(self.pj_button_box, False, False, 0)
         
