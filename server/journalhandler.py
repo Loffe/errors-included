@@ -30,7 +30,7 @@ class JournalHandler(object):
             msg = Message(message.sender, receiver, MessageType.journal,
                           JournalType.response,
                           unpacked_data = message.unpacked_data, prio = message.prio)
-            print_color("forwarded response to %s %s" % (msg.reciever, msg.packed_data), 'green')
-            self.queue.enqueue(msg.reciever, msg.packed_data, msg.prio)
+            print_color("forwarded response to %s %s" % (msg.receiver, msg.packed_data), 'green')
+            self.queue.enqueue(msg.receiver, msg.packed_data, msg.prio)
             return True
         return False

@@ -479,7 +479,7 @@ class ClientGui(hildon.Program):
     def check_if_ok(self, msg):
         print "Check if ok-function"
         sender = msg.sender
-        reciever = msg.reciever
+        receiver = msg.receiver
         type = msg.type
         subtype = msg.subtype
         data = msg.unpacked_data
@@ -507,7 +507,7 @@ class ClientGui(hildon.Program):
     def start_voip(self, msg):
         print "Staring voip"
         sender = msg.sender
-        reciever = msg.reciever
+        receiver = msg.receiver
         type = msg.type
         subtype = msg.subtype
         data = msg.unpacked_data
@@ -522,7 +522,7 @@ class ClientGui(hildon.Program):
     def start_vvoip(self, msg):
         print "Staring vvoip"
         sender = msg.sender
-        reciever = msg.reciever
+        receiver = msg.receiver
         type = msg.type
         subtype = msg.subtype
         data = msg.unpacked_data

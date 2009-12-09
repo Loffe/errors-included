@@ -662,7 +662,7 @@ class Message(object):
     # The id of the message this one is a response to
     response_to = None
 
-    reciever = None
+    receiver = None
     sender = None
     # The type of this message
     type = None
@@ -676,14 +676,14 @@ class Message(object):
     # The timestamp of this message
     timestamp = None
     
-    def __init__(self, sender, reciever, type = None, subtype = None, response_to = 0, unpacked_data = None, prio = -1):
+    def __init__(self, sender, receiver, type = None, subtype = None, response_to = 0, unpacked_data = None, prio = -1):
         '''
         Constructor. Creates a message.
         @param type: the type of this message
         @param unpacked_data: the unpacked data to pack
         '''
         self.sender = sender
-        self.reciever = reciever
+        self.receiver = receiver
         self.type = type
         self.subtype = subtype
         self.unpacked_data = unpacked_data
@@ -707,7 +707,7 @@ class Message(object):
         dict["prio"] = self.prio
         dict["timestamp"] = self.timestamp.strftime("%s")
         dict["sender"] = self.sender
-        dict["reciever"] = self.reciever
+        dict["receiver"] = self.receiver
         dict["response_to"] = self.response_to
         if self.message_id is not None:
             dict["message_id"] = self.message_id
@@ -724,7 +724,7 @@ class Message(object):
         @param raw_message: the simplejson string
         @param database: a Database to reconnect FK:s to SA Objects
         '''
-        # raw_message contains sender and reciever
+        # raw_message contains sender and receiver
         self = cls(None, None)
         try:
             dict = json.loads(raw_message)
@@ -732,7 +732,7 @@ class Message(object):
             self.subtype = dict["subtype"]
             self.prio = dict["prio"]
             self.sender = dict["sender"]
-            self.reciever = dict["reciever"]
+            self.receiver = dict["receiver"]
             self.timestamp = datetime.fromtimestamp(float(dict["timestamp"]))
             self.packed_data = dict["packed_data"]
             self.response_to = dict.get("response_to", None)
@@ -813,7 +813,7 @@ class Message(object):
 
     def __repr__(self):
         repr = ("<%s: sender=%s, receiver=%s, prio=%s,\n    type=%s, sub=%s, ts=%s;\n    packed=%s>" %
-                (self.__class__.__name__, self.sender, self.reciever, self.prio,
+                (self.__class__.__name__, self.sender, self.receiver, self.prio,
                  self.type, self.subtype, self.timestamp, self.packed_data))
         try:
             return repr.encode('utf-8')

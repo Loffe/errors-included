@@ -10,9 +10,9 @@ class VoipHandler(object):
 
     def handle(self, message):
         message.unpacked_data['class'] = 'dict'
-        msg = Message(message.sender, message.reciever,
+        msg = Message(message.sender, message.receiver,
                       message.type, message.subtype,
                       unpacked_data=message.unpacked_data)
-        self.queue.enqueue(msg.reciever, msg.packed_data, msg.prio)
+        self.queue.enqueue(msg.receiver, msg.packed_data, msg.prio)
         print "forwarding", msg
 

@@ -48,13 +48,13 @@ class ServerNetworkHandler(dbus.service.Object):
 
     @dbus.service.method(dbus_interface='included.errors.Server',
                          in_signature='ssi', out_signature='s')
-    def enqueue(self, reciever, msg, prio):
+    def enqueue(self, receiver, msg, prio):
         '''
-        @param reciever the name of the unit to send to
+        @param receiver the name of the unit to send to
         @param msg the packed_data to send
         @param prio priority of the message
         '''
-        queue = self.outqueues[reciever]
+        queue = self.outqueues[receiver]
         queue.enqueue(unicode(msg), prio)
         print "Enqueue called"
         return "Enqueue :)"
