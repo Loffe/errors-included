@@ -377,23 +377,56 @@ class ClientGui(hildon.Program):
         
         vbox_right.pack_start(self.back_button_box, False, False, 0)
         
-        self.pj_button_box = gtk.HBox(False, 10)
-        self.pj_button_box.set_size_request(0, 60)
-        self.screens["pj_button_box"] = self.pj_button_box
+        vbox_right.pack_start(self.create_pj_message_buttons(), False, False, 0)
+
+        vbox_right.pack_start(self.create_pj_request_buttons(), False, False, 0)
+
+        vbox_right.pack_start(self.create_change_buttons(), False, False, 0)
+
+        self.window.connect("destroy", lambda event: self.mainloop.quit())
+        self.window.connect("key-press-event", self.on_key_press)
+        self.window.connect("window-state-event", self.on_window_state_change)
+
+        # Change to default True?
+        self.window_in_fullscreen = False
+        log.info("ClientGui created")
+
+    def create_pj_message_buttons(self):
+        pj_button_box = gtk.HBox(False, 10)
+        pj_button_box.set_size_request(0, 60)
+        self.screens["pj_button_box"] = pj_button_box
         
         
         no_button = gtk.Button("Neka")
         no_button.connect("clicked", self.no_button_function)
         no_button.set_flags(gtk.CAN_DEFAULT)
-        self.pj_button_box.pack_start(no_button)
+        pj_button_box.pack_start(no_button)
         
         ok_button = gtk.Button("Bevilja")
         ok_button.connect("clicked", self.ok_button_function)
         ok_button.set_flags(gtk.CAN_DEFAULT)
-        self.pj_button_box.pack_start(ok_button)
+        pj_button_box.pack_start(ok_button)
         
-        vbox_right.pack_start(self.pj_button_box, False, False, 0)
+        return pj_button_box
+
+    def create_pj_request_buttons(self):
+        pj_button_box = gtk.HBox(False, 10)
+        pj_button_box.set_size_request(0, 60)
+        self.screens["pj_request_button_box"] = pj_button_box
         
+        back_button = gtk.Button()
+        back_button.add(self.build_icon("Bakåt", "icons/edit-undo.png", "h"))
+        pj_button_box.pack_start(back_button)
+        back_button.connect("clicked", self.back_button_function)
+
+        ok_button = gtk.Button("Begär ny journal")
+        ok_button.connect("clicked", self.ok_button_function)
+        ok_button.set_flags(gtk.CAN_DEFAULT)
+        pj_button_box.pack_start(ok_button)
+        
+        return pj_button_box
+
+    def create_change_buttons(self):
         # add back-, change- and delete-button (used in ChangeObstacleScreen etc)
         self.change_buttons = gtk.HBox(False, 0)
         self.change_buttons.set_size_request(0, 60)
@@ -419,15 +452,7 @@ class ClientGui(hildon.Program):
         change_button.set_flags(gtk.CAN_DEFAULT)
         self.change_buttons.pack_start(change_button)
         
-        vbox_right.pack_start(self.change_buttons, False, False, 0)
-
-        self.window.connect("destroy", lambda event: self.mainloop.quit())
-        self.window.connect("key-press-event", self.on_key_press)
-        self.window.connect("window-state-event", self.on_window_state_change)
-
-        # Change to default True?
-        self.window_in_fullscreen = False
-        log.info("ClientGui created")
+        return self.change_buttons
 
     def new_message(self,event):
         print "*****************"
@@ -721,7 +746,7 @@ class ClientGui(hildon.Program):
             combo.append_text(mission.event_type)
     
     def show_journals(self, event):
-        self.toggle_show("mission", ["notifications", "patient_journal", "buttons"], 
+        self.toggle_show("mission", ["notifications", "patient_journal", "pj_request_button_box"], 
                          "Här kan du hämta patient journaler")
     
     def show_faq(self, event):

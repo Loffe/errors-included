@@ -12,6 +12,23 @@ class Screen(gtk.Widget):
     def no_button_function(self, event):
         pass
 
+    def create_entry(labeltext, parent):
+        ''' Creates a label and en entry in a HBox and adds the HBox to
+            parent. Returns entry.
+        '''
+        hbox = gtk.HBox(True,0)
+        label = gtk.Label(labeltext)
+        label.set_alignment(0, 0.5)
+        entry = gtk.Entry()
+        entry.set_max_length(300)
+        entry.set_text("")
+        # TODO: usuable?
+        entry.select_region(0, len(entry.get_text()))
+        hbox.add(label)
+        hbox.add(entry)
+        parent.add(hbox)
+        return entry
+
     def new_entry(self, labeltext, left_box, right_box):
         label = gtk.Label(labeltext)
         label.set_alignment(0, 0.5)
