@@ -14,7 +14,6 @@ class JournalHandler(object):
         for u in self.database.get_all_units():
             if u.type == UnitType.commander:
                 print "Sending to", u.name
-                message.unpacked_data["class"] = "dict"
                 msg = Message(message.sender, u.name, MessageType.journal,
                               JournalType.request, 
                               unpacked_data = message.unpacked_data, prio = message.prio)

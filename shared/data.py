@@ -452,6 +452,8 @@ class JournalRequest(Base, Packable):
     why = Column(UnicodeText)
     ssn = Column(UnicodeText)
     sender = Column(UnicodeText)
+    # @TODO: check prio in spec
+    prio = 8
     
     def __init__(self, why, ssn, sender, id = None):
         self.why = why
