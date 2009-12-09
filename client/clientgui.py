@@ -266,7 +266,7 @@ class ClientGui(hildon.Program):
         self.contact_menu.add(video)
 
         # Mission buttons and their menu
-        self.mission_menu = gtk.HBox(False, 0)
+        self.mission_menu = gtk.HBox(True, 0)
         self.mission_menu.set_size_request(0, 60)
         vbox_right.pack_start(self.mission_menu, False, False, 0)
         self.screens["mission_menu"] = self.mission_menu
@@ -280,7 +280,7 @@ class ClientGui(hildon.Program):
                                            "icons/text-x-generic.png", "h"))
         journal_button.connect("clicked", self.show_journals)
         faq_button = gtk.Button()
-        faq_button.add(self.build_icon("FAQ","icons/text-x-generic.png", "h"))
+        faq_button.add(self.build_icon("FAQ","icons/help-browser.png", "h"))
         faq_button.connect("clicked", self.show_faq)
         self.mission_menu.add(info_button)
 #        self.mission_menu.add(status_button)
@@ -322,7 +322,7 @@ class ClientGui(hildon.Program):
 #        self.activities.add(self.ac)  
 
         # Add object buttons and their menu
-        self.add_object_menu = gtk.HBox(False, 0)
+        self.add_object_menu = gtk.HBox(True, 0)
         self.add_object_menu.set_size_request(0, 60)
         vbox_right.pack_start(self.add_object_menu, False, False, 0)
         self.screens["add_object_menu"] = self.add_object_menu
@@ -339,26 +339,29 @@ class ClientGui(hildon.Program):
             self.add_object_menu.add(create_mission_button)
 
         # add back- and ok-button (used in alarmscreen, obstaclescreen etc)
-        self.buttons_box = gtk.HBox(False, 10)
+        self.buttons_box = gtk.HBox(True, 0)
         self.buttons_box.set_size_request(0, 60)
         self.screens["buttons"] = self.buttons_box
         
-        back_button = gtk.Button("Bakåt")
+        back_button = gtk.Button()
+        back_button.add(self.build_icon("Bakåt", "icons/edit-undo.png", "h"))
         self.buttons_box.pack_start(back_button)
         back_button.connect("clicked", self.back_button_function)
 
-        ok_button = gtk.Button("OK")
+        ok_button = gtk.Button()
+        ok_button.add(self.build_icon("OK", "icons/list-add.png", "h"))
         ok_button.connect("clicked", self.ok_button_function)
         ok_button.set_flags(gtk.CAN_DEFAULT)
         self.buttons_box.pack_start(ok_button)
         
         vbox_right.pack_start(self.buttons_box, False, False, 0)
         
-        self.back_button_box = gtk.HBox(False, 10)
+        self.back_button_box = gtk.HBox(True, 0)
         self.back_button_box.set_size_request(0, 60)
         self.screens["back_button_box"] = self.back_button_box
         
-        back_button2 = gtk.Button("Bakåt")
+        back_button2 = gtk.Button()
+        back_button2.add(self.build_icon("Bakåt", "icons/edit-undo.png", "h"))
         self.back_button_box.pack_start(back_button2)
         back_button2.connect("clicked", self.back_button_function)
         
@@ -382,20 +385,26 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.pj_button_box, False, False, 0)
         
         # add back-, change- and delete-button (used in ChangeObstacleScreen etc)
-        self.change_buttons = gtk.HBox(False, 10)
+        self.change_buttons = gtk.HBox(False, 0)
         self.change_buttons.set_size_request(0, 60)
         self.screens["change_buttons"] = self.change_buttons
         
-        change_back_button = gtk.Button("Bakåt")
+        change_back_button = gtk.Button()
+        change_back_button.add(self.build_icon("Bakåt", 
+                                               "icons/edit-undo.png", "h"))
         self.change_buttons.pack_start(change_back_button)
         change_back_button.connect("clicked", self.back_button_function)
         
-        delete_button = gtk.Button("Ta bort")
+        delete_button = gtk.Button()
+        delete_button.add(self.build_icon("Ta bort", 
+                                          "icons/emblem-unreadable.png", "h"))
         delete_button.connect("clicked", self.delete_button_function)
         delete_button.set_flags(gtk.CAN_DEFAULT)
         self.change_buttons.pack_start(delete_button)
 
-        change_button = gtk.Button("Spara ändringar")
+        change_button = gtk.Button()
+        change_button.add(self.build_icon("Spara ändringar", 
+                                          "icons/document-save.png", "h"))
         change_button.connect("clicked", self.change_button_function)
         change_button.set_flags(gtk.CAN_DEFAULT)
         self.change_buttons.pack_start(change_button)
@@ -750,7 +759,7 @@ class ClientGui(hildon.Program):
        
         combo = self.screens["output"].combo_box
         combo.get_model().clear()
-        combo.append_text("Välj textmeddeland...")
+        combo.append_text("Välj textmeddelande...")
         combo.set_active(0)
          
         for textmessages in self.db.textmessages():
