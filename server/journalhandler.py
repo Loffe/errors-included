@@ -11,6 +11,7 @@ class JournalHandler(object):
 
     def handle(self, message):
         print "handles journalrequest", message
+        self.database.add(message.unpacked_data)
         for u in self.database.get_all_units():
             if u.type == UnitType.commander:
                 print "Sending to", u.name
