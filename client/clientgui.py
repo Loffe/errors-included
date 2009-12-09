@@ -502,7 +502,8 @@ class ClientGui(hildon.Program):
                                   type=shared.data.MessageType.voip, 
                                   subtype=shared.data.VOIPType.request,
                                   unpacked_data={"ip": get_ip(), "port": 5432,
-                                                 "class": "dict"})
+                                                 "class": "dict"},
+                                  prio = 5)
         self.queue.enqueue(msg.packed_data, msg.prio)
         self.out_call_popup(msg)
         
@@ -512,7 +513,8 @@ class ClientGui(hildon.Program):
                                   type=shared.data.MessageType.vvoip, 
                                   subtype=shared.data.VVOIPType.request,
                                   unpacked_data={"ip": get_ip(), "port1": 5432, 
-                                                 "port2": 5434, "class": "dict"})
+                                                 "port2": 5434, "class": "dict"},
+                                  prio = 5)
         self.queue.enqueue(msg.packed_data, msg.prio)
         self.out_call_popup(msg)
     
@@ -555,7 +557,8 @@ class ClientGui(hildon.Program):
                                       type=shared.data.MessageType.voip, 
                                       subtype=shared.data.VOIPType.response,
                                       unpacked_data={"ip": get_ip(), "port": 5432, 
-                                                     "class": "dict"})
+                                                     "class": "dict"},
+                                      prio = 5)
         self.queue.enqueue(message.packed_data, message.prio)
         self.show_voice(ip=data["ip"], port=data["port"])
         
@@ -570,7 +573,8 @@ class ClientGui(hildon.Program):
                                   type=shared.data.MessageType.vvoip, 
                                   subtype=shared.data.VVOIPType.response,
                                   unpacked_data={"ip": get_ip(), "port1": 5432,
-                                                 "port2": 5434, "class": "dict"})
+                                                 "port2": 5434, "class": "dict"},
+                                  prio = 5)
         self.queue.enqueue(message.packed_data, message.prio)
         self.show_cam(ip=data["ip"], port1=data["port1"], port2=data["port2"])
     
