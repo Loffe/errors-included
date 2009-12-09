@@ -9,6 +9,7 @@ import datetime
 import gobject
 from selectunit import SelectUnitButton
 from selectunit import SelectUnitDialog
+from shared.data import JournalRequest
 import config
 
 class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
@@ -55,9 +56,9 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
         self.show_all()
        
     def ok_button_function(self, event):
-        data = {"why": self.why_entry.get_text(), "ssn": self.ssn_entry.get_text(), "class": "dict"}
-        msg = shared.data.Message(config.client.name, "server", shared.data.MessageType.journal, shared.data.JournalType.request, unpacked_data = data,  prio = 8)
-        self.queue.enqueue(msg.packed_data, msg.prio)
+        data = JournalRequest(self.why_entry.get_text(),
+                              self.ssn_entry.get_text(), config.client.name)
+        self.db.add(data)
 #        text = shared.data.PatientJournalMessage(why_entry=unicode(self.why_entry2.get_text()), 
 #                                       social_security_number=unicode(self.social_security_number2.get_text()),
 #                                       timestamp=datetime.datetime.now(),

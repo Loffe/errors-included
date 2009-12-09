@@ -1,4 +1,4 @@
-from shared.data import Database, Message, MessageType, ActionType, IDType, ObjectID, TextMessage
+from shared.data import Database, Message, MessageType, ActionType, IDType, ObjectID, TextMessage, JournalType, JournalRequest
 import config
 import gobject
 
@@ -52,11 +52,15 @@ class ClientDatabase(Database):
         
         # enqueue a message with the added object
         if object.__class__ == TextMessage:
-            msgtype = MessageType.text
+            msg = Message(self.name, "server", MessageType.text,
+                          unpacked_data=object)
+        elif object.__class__ == JournalRequest:
+            msg = Message(self.name, "server", MessageType.journal, JournalType.request,
+                          unpacked_data = object)
         else:
-            msgtype = MessageType.object
-        msg = Message(self.name, "server", msgtype, ActionType.add,
-                      unpacked_data=object)
+            msg = Message(self.name, "server", MessageType.object, ActionType.add,
+                          unpacked_data=object)
+
         self.queue.enqueue(msg.packed_data, msg.prio)
         self.emit("mapobject-added", object)
 
