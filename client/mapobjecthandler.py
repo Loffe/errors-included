@@ -1,11 +1,14 @@
+# coding: utf-8
 from shared.data import Message, MessageType, UnitData, MissionData, Alarm, ActionType, Database
+import gobject
 
-class MapObjectHandler(object):
+class MapObjectHandler(gobject.GObject):
     database = None
     queue = None
     controller = None
 
     def __init__(self, database, queue):
+        gobject.GObject.__init__(self)
         self.database = database
         self.queue = queue
 
@@ -21,9 +24,7 @@ class MapObjectHandler(object):
                 for unit in object.units:
                     if self.controller is not None:
                         if unit.id == self.controller.unit_data.id:
-                            for mission in self.controller.missions:
-                                if mission.id == object.id:
-                                    mission = object
+                            self.emit("got-new-mission")
 
         elif subtype == ActionType.add:
             Database.add(self.database, object)
@@ -32,12 +33,13 @@ class MapObjectHandler(object):
                 if self.controller is not None and object.name == self.controller.name:
                     self.controller.unit_data = object
             # if a mission with my unit_data was added, assign me to it (show it)
-            if object.__class__ == MissionData:                
+            if object.__class__ == MissionData:
+                print self.controller.unit_data.id        
                 for unit in object.units:
                     if self.controller is not None:
                         if unit.id == self.controller.unit_data.id:
-                            self.controller.add_mission(object)
-                            
+                            self.emit("got-new-mission")
+
         elif subtype == ActionType.delete:
             Database.delete(self.database, object)
             self.database.emit("mapobject-deleted", object)
@@ -45,3 +47,6 @@ class MapObjectHandler(object):
             raise Error("Invalid subtype")
 
         return True
+
+gobject.type_register(MapObjectHandler)
+gobject.signal_new("got-new-mission", MapObjectHandler, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())

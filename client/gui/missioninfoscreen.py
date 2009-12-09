@@ -36,6 +36,7 @@ class MissionInfoScreen(gtk.ScrolledWindow, gui.Screen):
         hbox.pack_start(right_box)
         vbox.pack_start(hbox)
 
+        self.mission_combo_box = gtk.combo_box_new_text()
         if many_missions:
             # create my missions label
             type_label = gtk.Label("Mina uppdrag:")
@@ -43,7 +44,6 @@ class MissionInfoScreen(gtk.ScrolledWindow, gui.Screen):
             type_label.set_alignment(0, 0.5)
             left_box.pack_start(type_label, True, True, 0)
             # create and pack combobox
-            self.mission_combo_box = gtk.combo_box_new_text()
             self.mission_combo_box.set_size_request(300,50)
             self.mission_combo_box.append_text("Välj uppdrag...")
             self.mission_combo_box.connect('changed', self.select_mission)
@@ -89,6 +89,13 @@ class MissionInfoScreen(gtk.ScrolledWindow, gui.Screen):
 
     '''Handle events
     '''
+    def set_missions(self, missions):
+        self.mission_combo_box.get_model().clear()
+        self.mission_combo_box.append_text("Välj uppdrag...")
+        for m in missions:
+            self.mission_combo_box.append_text(m.event_type)
+        self.mission_combo_box.set_active(0)
+    
     def set_entries(self, mission):
         self.mission = mission
         self.event_entry.set_text(mission.event_type)
