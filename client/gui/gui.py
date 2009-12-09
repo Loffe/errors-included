@@ -25,7 +25,7 @@ class Screen(gtk.Widget):
         self.entries.append(entry)
         return entry
     
-    def new_coordlabel(self, labeltext, left_box, right_box):
+    def new_label(self, labeltext, left_box, right_box):
         label = gtk.Label(labeltext)
         label.modify_font(pango.FontDescription("sans 12"))
         label.set_alignment(0, 0.5)

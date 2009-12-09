@@ -52,9 +52,9 @@ class ObstacleScreen(gtk.ScrolledWindow, gui.Screen):
         
         self.new_section("Position:", left_box, right_box)
         
-        self.location_entry2 = self.new_coordlabel("Longitud:", left_box, right_box)      
+        self.location_entry2 = self.new_label("Longitud:", left_box, right_box)      
                 
-        self.location_entry3 = self.new_coordlabel("Latitud:", left_box, right_box)
+        self.location_entry3 = self.new_label("Latitud:", left_box, right_box)
 
         # add selectable types
         types = {}

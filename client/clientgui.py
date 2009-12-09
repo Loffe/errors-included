@@ -27,6 +27,7 @@ from gui.obstaclescreen import ObstacleScreen
 from gui.changeobstaclescreen import ChangeObstacleScreen
 from gui.missionscreen import MissionScreen
 from gui.changemissionscreen import ChangeMissionScreen
+from gui.unitscreen import UnitScreen
 from gui.newmessagescreen import NewMessageScreen
 from gui.outboxscreen import OutboxScreen
 from gui.faqscreen import FAQScreen
@@ -232,6 +233,10 @@ class ClientGui(hildon.Program):
         self.change_mission_screen = ChangeMissionScreen(self.db)
         vbox_right.pack_start(self.change_mission_screen, True, True, 0)
         self.screens["change_mission"] = self.change_mission_screen
+        
+        self.unit_screen = UnitScreen()
+        vbox_right.pack_start(self.unit_screen, True, True, 0)
+        self.screens["view_unit"] = self.unit_screen
 
         self.faq_screen = FAQScreen(self.db)               
         vbox_right.pack_start(self.faq_screen, True, True, 0)
@@ -447,6 +452,8 @@ class ClientGui(hildon.Program):
             self.change_obstacle(object)
         elif object.__class__ == MissionData:
             self.change_mission(object)
+        elif object.__class__ == UnitData:
+            self.view_unit(object)
             
     def change_obstacle(self, poi):
         self.show(["change_obstacle", "change_buttons"])
@@ -455,6 +462,10 @@ class ClientGui(hildon.Program):
     def change_mission(self, mission):
         self.show(["change_mission", "change_buttons"])
         self.screens["change_mission"].set_entries(mission)
+        
+    def view_unit(self, unit):
+        self.show(["view_unit", "back_button_box"])
+        self.screens["view_unit"].set_entries(unit)
 
     def sending_voip(self, event):
         msg = shared.data.Message(self.controller.name, 
