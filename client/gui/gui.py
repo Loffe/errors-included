@@ -12,7 +12,7 @@ class Screen(gtk.Widget):
     def no_button_function(self, event):
         pass
 
-    def create_entry(labeltext, parent):
+    def create_entry(self, labeltext, parent):
         ''' Creates a label and en entry in a HBox and adds the HBox to
             parent. Returns entry.
         '''

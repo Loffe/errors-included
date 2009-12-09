@@ -12,6 +12,18 @@ from selectunit import SelectUnitDialog
 from shared.data import JournalRequest
 import config
 
+class RequestDialog(gtk.Dialog, gui.Screen):
+    def __init__(self):
+        gtk.Dialog.__init__(self, "Begär patientjournal",
+                None,
+                gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                ("Avbryt", 0, "Begär patientjournal", 1))
+        self.set_size_request(400, 200)
+        self.ssn_entry = self.create_entry("Personnummer",self.vbox)
+        self.why_entry = self.create_entry("Anledning",self.vbox)
+        self.vbox.show_all()
+
+
 class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
     '''
     The screen in which you create a new PatientJournalRequest
@@ -21,6 +33,7 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
     subject_entry = None
     message_entry = None
     db = None
+    dialog = RequestDialog()
 
     def __init__(self, db, queue):
         '''
@@ -35,11 +48,6 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
         
         main_box = gtk.VBox(False,0)
         self.add_with_viewport(main_box)
-        '''
-        self.add_with_viewport(vbox)
-        label, self.why_entry = new_entry("Varför",vbox)
-        label, self.ssn_entry = new_entry("Personnummer",vbox)
-        '''
 
         # create and pack combobox
         self.combo_box = gtk.combo_box_new_text()
@@ -65,10 +73,18 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
         pass
        
     def ok_button_function(self, event):
-        data = JournalRequest(unicode(self.why_entry.get_text()),
-                              unicode(self.ssn_entry.get_text()), 
-                              config.client.name)
-        self.db.add(data)
+        self.dialog.show()
+        result = self.dialog.run()
+        if result == 1:
+            ssn = self.dialog.ssn_entry.get_text()
+            why = self.dialog.why_entry.get_text()
+            print "Requesting journal for %s: %s" % (ssn, why)
+            data = JournalRequest(unicode(why),
+                                  unicode(ssn),
+                                  config.client.name)
+            self.db.add(data)
+
+        self.dialog.hide()
         self.emit("okbutton_clicked_PatientJournalScreen")
         
 gobject.type_register(PatientJournalScreen)
