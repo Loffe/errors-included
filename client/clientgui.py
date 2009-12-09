@@ -690,14 +690,17 @@ class ClientGui(hildon.Program):
     # mission buttons event handlers
     def show_mission_info(self, event):
         self.show(["info", "change_buttons"])
-        combo = self.screens["info"].mission_combo_box
-        combo.get_model().clear()
-        combo.append_text("Välj uppdrag...")
-        combo.set_active(0)
+        
+        mission_combo_box = self.screens["info"].mission_combo_box
+        mission_combo_box.get_model().clear()
+        mission_combo_box.append_text("Välj uppdrag...")
+        mission_combo_box.set_active(0)
         for mission in self.controller.missions:
             #if mission.status != "done":
-            combo.append_text(mission.event_type)
-    
+            mission_combo_box.append_text(mission.event_type)
+            
+        
+          
     def show_status(self, event):
         self.toggle_show("mission", ["notifications", "status", "buttons"], 
                          "Här kan du välj en status")
