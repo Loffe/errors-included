@@ -293,7 +293,7 @@ class ClientGui(hildon.Program):
         faq_button.add(self.build_icon("FAQ","icons/help-browser.png", "h"))
         faq_button.connect("clicked", self.show_faq)
         self.mission_menu.add(info_button)
-#        self.mission_menu.add(status_button)
+        #self.mission_menu.add(status_button)
         self.mission_menu.add(journal_button)
         self.mission_menu.add(faq_button)
         
@@ -322,14 +322,14 @@ class ClientGui(hildon.Program):
         #panels.pack_start(vbox2, False, False, 0)
         vbox2.set_size_request(150,0)
         
-#        self.activities = gtk.VBox(False,0)
+        #self.activities = gtk.VBox(False,0)
         self.activities = Activities(self.db)
         vbox2.pack_start(self.activities, False, False, 0)
         self.screens["act"] = self.activities 
-#        self.activities = Activities(self.db)
+        #self.activities = Activities(self.db)
              
-#        self.ac = Activities(self.db)
-#        self.activities.add(self.ac)  
+        #self.ac = Activities(self.db)
+        #self.activities.add(self.ac)  
 
         # Add object buttons and their menu
         self.add_object_menu = gtk.HBox(True, 0)
@@ -607,16 +607,6 @@ class ClientGui(hildon.Program):
         question.show()
         inc_dialog.vbox.pack_start(question)
         inc_dialog.show_all()
-#        result = inc_dialog.run()
-#        if result == 77:
-#            if msg.type == shared.data.MessageType.voip:
-#                start_voip = True
-#            elif msg.type == shared.data.MessageType.vvoip:
-#                start_vvoip = True
-#        elif result == 666:
-#            # @todo: return nack if we dont want to answer
-#            print "upptaget"
-        
         
     def out_call_popup(self, msg):
         print "Utgående samtal = popup"
@@ -737,7 +727,7 @@ class ClientGui(hildon.Program):
     def show_status(self, event):
         self.toggle_show("mission", ["notifications", "status", "buttons"], 
                          "Här kan du välj en status")
-    
+
         combo = self.screens["status"].combo_box
         combo.get_model().clear()
         combo.append_text("Välj uppdrag...")
@@ -788,12 +778,10 @@ class ClientGui(hildon.Program):
         #self.show(["new_message", "buttons"])
         
     def show_cam(self,ip, port1, port2, event = None):
-#        self.screens["camera"].start_video_send(self.screens["contact"].ip)
         self.screens["camera"].start_vvoip(ip, port1, port2)
         self.show(["camera"])
         
     def show_voice(self, ip, port, event = None):
-#        self.screens["camera"].start_video_send(self.screens["contact"].ip)
         self.screens["camera"].start_voip(ip, port)
         self.show(["camera"])
         
