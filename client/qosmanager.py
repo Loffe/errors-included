@@ -244,10 +244,10 @@ class QoSManager(dbus.service.Object):
             # calculate and set the service level
             if battery == "low" and signal == "offline":
                 self.service_level = "mega-low"
-                self.gps_update_interval = 60
+                self.gps_update_interval = 120
             if battery == "low" and (signal == "low" or signal == "high"):
                 self.service_level = "energysaving"
-                self.gps_update_interval = 30
+                self.gps_update_interval = 120
             if (battery == "high" or battery == "charging") and signal == "offline":
                 self.service_level = "ad-hoc"
                 self.gps_update_interval = 30
@@ -262,7 +262,7 @@ class QoSManager(dbus.service.Object):
             if self.service_level != current_level:
                 self.signal_changed_service_level(self.service_level)
             elif self.testing:
-                self.service_level = "send-few"
+                self.service_level = "max"
                 self.signal_changed_service_level(self.service_level)
             print "service level:", self.service_level
 
