@@ -59,8 +59,8 @@ class AlarmScreen(gtk.ScrolledWindow, gui.Screen):
         self.other_entry = self.new_entry("Övrigt:", left_box, right_box)
         
         self.new_section("Position", left_box, right_box)
-        self.coordx_entry = self.new_coordlabel("Longitud:", left_box, right_box)
-        self.coordy_entry = self.new_coordlabel("Latitud:", left_box, right_box)
+        self.coordx_entry = self.new_label("Longitud:", left_box, right_box)
+        self.coordy_entry = self.new_label("Latitud:", left_box, right_box)
 
         self.new_section("Kontaktperson:", left_box, right_box)
         

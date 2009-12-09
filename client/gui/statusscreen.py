@@ -62,8 +62,8 @@ class StatusScreen(gtk.ScrolledWindow, gui.Screen):
         # create entries
         self.event_entry = self.new_entry("     Händelse:", left_box, right_box)
 
-        self.location_entry2 = self.new_coordlabel("     Skadeplats: lon-Gps", left_box, right_box)
-        self.location_entry3 = self.new_coordlabel("     Skadeplats: lat-Gps", left_box, right_box)        
+        self.location_entry2 = self.new_label("     Skadeplats: lon-Gps", left_box, right_box)
+        self.location_entry3 = self.new_label("     Skadeplats: lat-Gps", left_box, right_box)        
         self.hurted_entry = self.new_entry("     Antal skadade:", left_box, right_box)
         self.new_section("Kontaktperson", left_box, right_box)
         self.name_entry = self.new_entry("     Namn:", left_box, right_box)
