@@ -269,7 +269,7 @@ class ClientGui(hildon.Program):
         self.contact_menu.set_size_request(0, 60)
         vbox_right.pack_start(self.contact_menu, False, False, 0)
         self.screens["contact_menu"] = self.contact_menu
-        call = gtk.Button("BRÖSTsamtal")
+        call = gtk.Button("Röstsamtal")
         call.connect("clicked", self.sending_voip)
         video = gtk.Button("Videosamtal")
         video.connect("clicked", self.sending_vvoip)
