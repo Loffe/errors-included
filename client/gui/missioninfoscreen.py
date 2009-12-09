@@ -101,7 +101,7 @@ class MissionInfoScreen(gtk.ScrolledWindow, gui.Screen):
 
         self.status_combo_box.get_model().clear()
         self.status_combo_box.append_text(mission.status)
-        statuslist = [u"active", u"done", u"alarm", u"aborted"]
+        statuslist = [u"active", u"done", u"aborted"]
         for status in statuslist:
             if status != mission.status:
                 self.status_combo_box.append_text(status)
