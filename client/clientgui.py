@@ -154,7 +154,7 @@ class ClientGui(hildon.Program):
         self.menu_buttons["messages"] = self.messages_button
         
         patient_journal_message = gtk.ToggleButton()
-        patient_journal_message.add(self.build_icon("Patient\nJournal",
+        patient_journal_message.add(self.build_icon("Patient-\njournal",
                                                     "icons/text-x-generic.png"))
         patient_journal_message.connect("clicked", self.show_patient_journal_message) 
         #self.textmessagehandler.connect("got-new-message", self.new_message)
@@ -279,7 +279,7 @@ class ClientGui(hildon.Program):
         info_button.connect("clicked", self.show_mission_info)
 #        status_button = gtk.Button("Status")
 #        status_button.connect("clicked", self.show_status)
-        journal_button = gtk.Button("Patient\nJournal")
+        journal_button = gtk.Button("Patient-\njournal")
         journal_button.connect("clicked", self.show_journals)
         faq_button = gtk.Button("FAQ")
         faq_button.connect("clicked", self.show_faq)
