@@ -9,11 +9,12 @@ import datetime
 import gobject
 from selectunit import SelectUnitButton
 from selectunit import SelectUnitDialog
+from shared.data import JournalRequest
 import config
 
 class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
     '''
-    The screen in which you create a new 
+    The screen in which you create a new PatientJournalRequest
     '''
    # the entries
     to_entry = None
@@ -21,10 +22,9 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
     message_entry = None
     db = None
 
-
     def __init__(self, db, queue):
         '''
-        Constructor. Create the alarmscreen and its entries.
+        Constructor. Create the request screen and its entries.
         '''
         gtk.ScrolledWindow.__init__(self)
         self.db = db
@@ -55,15 +55,10 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
         self.show_all()
        
     def ok_button_function(self, event):
-        data = {"why": self.why_entry.get_text(), "ssn": self.ssn_entry.get_text(), "class": "dict"}
-        msg = shared.data.Message(config.client.name, "server", shared.data.MessageType.journal, shared.data.JournalType.request, unpacked_data = data,  prio = 8)
-        self.queue.enqueue(msg.packed_data, msg.prio)
-#        text = shared.data.PatientJournalMessage(why_entry=unicode(self.why_entry2.get_text()), 
-#                                       social_security_number=unicode(self.social_security_number2.get_text()),
-#                                       timestamp=datetime.datetime.now(),
-#                                       units=units, 
-#                                       sender=config.client.name
-#                                       ) 
+        data = JournalRequest(unicode(self.why_entry.get_text()),
+                              unicode(self.ssn_entry.get_text()), 
+                              config.client.name)
+        self.db.add(data)
         self.emit("okbutton_clicked_PatientJournalScreen")
         
 gobject.type_register(PatientJournalScreen)

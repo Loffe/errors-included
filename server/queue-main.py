@@ -21,7 +21,7 @@ import data
 class ServerNetworkHandler(dbus.service.Object):
     input = [sys.stdin]
     output = []
-    message_handler = None
+    service_level_handler = None
 
     def __init__(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -43,19 +43,18 @@ class ServerNetworkHandler(dbus.service.Object):
         self.outqueues = {}
         self._init_queues()
         self.mainloop = None
-        self.message_handler = handler.MessageHandler(self)
         if config.server.primary == False:
             self.primary_alive = False
 
     @dbus.service.method(dbus_interface='included.errors.Server',
                          in_signature='ssi', out_signature='s')
-    def enqueue(self, reciever, msg, prio):
+    def enqueue(self, receiver, msg, prio):
         '''
-        @param reciever the name of the unit to send to
+        @param receiver the name of the unit to send to
         @param msg the packed_data to send
         @param prio priority of the message
         '''
-        queue = self.outqueues[reciever]
+        queue = self.outqueues[receiver]
         queue.enqueue(unicode(msg), prio)
         print "Enqueue called"
         return "Enqueue :)"
@@ -65,6 +64,12 @@ class ServerNetworkHandler(dbus.service.Object):
     def dequeue(self, variant):
         print "Popped called"
         return "Popped :)"
+    
+    @dbus.service.method(dbus_interface='included.errors.Server',
+                         in_signature='ss', out_signature='s')
+    def set_service_level(self, sender, service_level):
+        self.outqueues[sender].queue.set_service_level(service_level)
+        return "Set new service_level"
 
     @dbus.service.signal(dbus_interface='included.errors.Server',
                          signature='ii')

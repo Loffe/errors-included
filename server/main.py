@@ -51,6 +51,13 @@ class ServerManager(object):
         self.messagedispatcher.connect_to_type(shared.data.MessageType.text, self.textmessagehandler.handle)
         self.messagedispatcher.connect_to_type(MessageType.object, self.mapobjecthandler.handle)
         self.messagedispatcher.connect_to_type(MessageType.journal, self.journalhandler.handle)
+        self.messagedispatcher.connect_to_type(MessageType.service_level, self.service_level_handler)
+
+    def service_level_handler(self, message):
+        service_level = message.unpacked_data["service_level"]
+        sender = message.sender
+        self.queue.set_service_level(sender, service_level)
+        return True
 
     def _user_login(self, username):
         print "User %s logged in to queue" % username
@@ -78,8 +85,6 @@ class ServerManager(object):
                 self.mainloop.run()
             except KeyboardInterrupt:
                 self.mainloop.quit()
-
-
 
 if __name__ == "__main__":
     import sys

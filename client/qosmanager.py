@@ -43,6 +43,9 @@ class QoSManager(dbus.service.Object):
         except:
             pass
         
+        # boolean used to determine if testing or not
+        self.testing = False
+        
         # the service level
         self.service_level = "None"
 
@@ -205,7 +208,7 @@ class QoSManager(dbus.service.Object):
                 # Not in N810, got no GPS-device; do nothing...
                 print "gps failure"
                 # @todo: REMOVE, THIS IS ONLY A TEST!
-#                self.signal_new_gps_coord("15.5726","58.4035")
+                self.signal_new_gps_coord("15.5726","58.4035")
     
     def service_level_updater(self):
         '''
@@ -225,7 +228,7 @@ class QoSManager(dbus.service.Object):
             except:
                 # Not in N810, modules doesn't work; do nothing...
                 print "battery level: failure"
-                self.signal_changed_service_level("mega-low")
+                self.testing = True
 
             # get signal strength
             try:
@@ -249,7 +252,7 @@ class QoSManager(dbus.service.Object):
                 self.service_level = "ad-hoc"
                 self.gps_update_interval = 30
             if (battery == "high" or battery == "charging") and signal == "low":
-                self.service_level = "send few"
+                self.service_level = "send-few"
                 self.gps_update_interval = 30
             if (battery == "high" or battery == "charging") and signal == "high":
                 self.service_level = "max"
@@ -258,7 +261,9 @@ class QoSManager(dbus.service.Object):
             # signal if service level changed!
             if self.service_level != current_level:
                 self.signal_changed_service_level(self.service_level)
-                
+            elif self.testing:
+                self.service_level = "send-few"
+                self.signal_changed_service_level(self.service_level)
             print "service level:", self.service_level
 
     def close(self):

@@ -452,6 +452,8 @@ class JournalRequest(Base, Packable):
     why = Column(UnicodeText)
     ssn = Column(UnicodeText)
     sender = Column(UnicodeText)
+    # @TODO: check prio in spec
+    prio = 8
     
     def __init__(self, why, ssn, sender, id = None):
         self.why = why
@@ -467,7 +469,32 @@ class JournalRequest(Base, Packable):
             return repr.encode('utf-8')
         except:
             return repr
-        
+
+class JournalResponse(Base, Packable):
+    __tablename__ = 'JournalResponse'
+    id = Column(Integer, primary_key = True)
+    response_to = Column(Integer)
+    allowed = Column(Boolean)
+    why = Column(UnicodeText)
+    ssn = Column(UnicodeText)
+    journal = Column(UnicodeText)
+
+    def __init__(self, response_to, allowed, why, ssn, journal, id = None):
+        self.response_to = response_to
+        self.allowed = allowed
+        self.why = why
+        self.ssn = ssn
+        self.journal = journal
+        self.id = id
+
+    def __repr__(self):
+        repr = ("<%s: allowed=%s; ssn=%s, response_to=%s>" %
+                (self.__class__.__name__, self.allowed, self.ssn, self.response_to))
+        try:
+            return repr.encode('utf-8')
+        except:
+            return repr
+
 class Alarm(Base, Packable):
     __tablename__ = 'Alarm'
     id = Column(Integer, primary_key = True)
@@ -506,6 +533,12 @@ class Alarm(Base, Packable):
             return repr.encode('utf-8')
         except:
             return repr
+        
+class MissionStatus(object):
+    done = u"done" # genomfört, avslutat
+    active = u"active" # genomförs, under arbete,
+    alarm = u"alarm" # just larmad, ej påbörjat
+    aborted = u"aborted" # avbrutet 
 
 class MissionData(Base, Packable):
     '''
@@ -583,6 +616,7 @@ class MessageType(object):
     ack = u"ack"
     text = u"text"
     id = u"id"
+    service_level = "service_level"
 
     # @TODO: Remove?
     mission = "mission"
@@ -628,7 +662,7 @@ class Message(object):
     # The id of the message this one is a response to
     response_to = None
 
-    reciever = None
+    receiver = None
     sender = None
     # The type of this message
     type = None
@@ -642,14 +676,14 @@ class Message(object):
     # The timestamp of this message
     timestamp = None
     
-    def __init__(self, sender, reciever, type = None, subtype = None, response_to = 0, unpacked_data = None, prio = -1):
+    def __init__(self, sender, receiver, type = None, subtype = None, response_to = 0, unpacked_data = None, prio = -1):
         '''
         Constructor. Creates a message.
         @param type: the type of this message
         @param unpacked_data: the unpacked data to pack
         '''
         self.sender = sender
-        self.reciever = reciever
+        self.receiver = receiver
         self.type = type
         self.subtype = subtype
         self.unpacked_data = unpacked_data
@@ -673,7 +707,7 @@ class Message(object):
         dict["prio"] = self.prio
         dict["timestamp"] = self.timestamp.strftime("%s")
         dict["sender"] = self.sender
-        dict["reciever"] = self.reciever
+        dict["receiver"] = self.receiver
         dict["response_to"] = self.response_to
         if self.message_id is not None:
             dict["message_id"] = self.message_id
@@ -690,7 +724,7 @@ class Message(object):
         @param raw_message: the simplejson string
         @param database: a Database to reconnect FK:s to SA Objects
         '''
-        # raw_message contains sender and reciever
+        # raw_message contains sender and receiver
         self = cls(None, None)
         try:
             dict = json.loads(raw_message)
@@ -698,7 +732,7 @@ class Message(object):
             self.subtype = dict["subtype"]
             self.prio = dict["prio"]
             self.sender = dict["sender"]
-            self.reciever = dict["reciever"]
+            self.receiver = dict["receiver"]
             self.timestamp = datetime.fromtimestamp(float(dict["timestamp"]))
             self.packed_data = dict["packed_data"]
             self.response_to = dict.get("response_to", None)
@@ -762,7 +796,7 @@ class Message(object):
                         except Exception, e:
                             print e
                             raise ValueError("Failed with class: %s, dict: %s"
-                                    % (classname, str(dict)))
+                                    % (classname, str(encodeddict)))
 
                 # create and set data
                 self.unpacked_data = create(self.packed_data)
@@ -779,7 +813,7 @@ class Message(object):
 
     def __repr__(self):
         repr = ("<%s: sender=%s, receiver=%s, prio=%s,\n    type=%s, sub=%s, ts=%s;\n    packed=%s>" %
-                (self.__class__.__name__, self.sender, self.reciever, self.prio,
+                (self.__class__.__name__, self.sender, self.receiver, self.prio,
                  self.type, self.subtype, self.timestamp, self.packed_data))
         try:
             return repr.encode('utf-8')

@@ -29,9 +29,8 @@ from gui.missionscreen import MissionScreen
 from gui.changemissionscreen import ChangeMissionScreen
 from gui.newmessagescreen import NewMessageScreen
 from gui.outboxscreen import OutboxScreen
-from gui.alarminboxscreen import AlarmInboxScreen
 from gui.faqscreen import FAQScreen
-from gui.infoscreen import InfoScreen
+from gui.missioninfoscreen import MissionInfoScreen
 from gui.statusscreen import StatusScreen
 from gui.patientjournalscreen import PatientJournalScreen
 from gui.contactscreen import ContactScreen
@@ -99,6 +98,21 @@ class ClientGui(hildon.Program):
         # create gui
         self.create_gui()
     
+    def build_icon(self, label, icon, box_type = "v"):
+        image = gtk.Image()
+        image.set_from_file(icon)
+
+        if box_type == "v":
+            vbox = gtk.VBox()
+            vbox.add(image)
+            vbox.add(gtk.Label(label))
+            return vbox
+        else:
+            hbox = gtk.HBox(True, 0)
+            hbox.add(image)
+            hbox.add(gtk.Label(label))
+            return hbox
+
     def create_gui(self):
         # Creates a empty list that contains previous screens
         self.prev_page = []
@@ -119,33 +133,44 @@ class ClientGui(hildon.Program):
         vbox.set_size_request(150,350)
 
         # Buttons (menu)
-        mission_button = gtk.ToggleButton("Uppdrag")
+        mission_button = gtk.ToggleButton()
+        mission_button.add(self.build_icon("Uppdrag",
+                                           "icons/emblem-important.png"))
         mission_button.connect("clicked", self.show_mission)
         self.menu_buttons["mission"] = mission_button
 
-        add_object_button = gtk.ToggleButton("Skapa")
+        add_object_button = gtk.ToggleButton()
+        add_object_button.add(self.build_icon("Skapa",
+                                              "icons/list-add.png"))
         add_object_button.connect("clicked", self.show_add_object)
         self.menu_buttons["add_object"] = add_object_button
 
-        contacts_button = gtk.ToggleButton("Kontakter")
+        contacts_button = gtk.ToggleButton()
+        contacts_button.add(self.build_icon("Kontakter",
+                                            "icons/x-office-address-book.png"))
         contacts_button.connect("clicked", self.show_contacts)
         self.menu_buttons["contacts"] = contacts_button
 
-        self.messages_button = BlinkToggleButton("Meddelande")
+        self.messages_button = BlinkToggleButton()
+        self.messages_button.add(self.build_icon("Meddelande",
+                                                 "icons/internet-mail.png"))
         self.messages_button.connect("clicked", self.show_messages) 
         self.textmessagehandler.connect("got-new-message", self.new_message)
         self.menu_buttons["messages"] = self.messages_button
-        
-        patient_journal_message = gtk.ToggleButton("Patient Journal")
-        patient_journal_message.connect("clicked", self.show_patient_journal_message) 
-        #self.textmessagehandler.connect("got-new-message", self.new_message)
-        self.menu_buttons["patient_journal_message"] = patient_journal_message
 
         vbox.add(mission_button)
         vbox.add(add_object_button)
         vbox.add(contacts_button)
         vbox.add(self.messages_button)
-        vbox.add(patient_journal_message)
+        
+        if config.client.type == 'commander':
+            patient_journal_message = gtk.ToggleButton()
+            patient_journal_message.add(self.build_icon("Patient-\njournal",
+                                                        "icons/text-x-generic.png"))
+            patient_journal_message.connect("clicked", self.show_patient_journal_message) 
+            #self.textmessagehandler.connect("got-new-message", self.new_message)
+            self.menu_buttons["patient_journal_message"] = patient_journal_message
+            vbox.add(patient_journal_message)      
 
         # Right panel
         vbox_right = gtk.VBox(False, 0)
@@ -153,10 +178,6 @@ class ClientGui(hildon.Program):
         
         # adding the notification bar
         self.notifications = NotificationScreen()
-#        notifications = gtk.Label("Team Med Fel")
-#        notifications.set_alignment(0,0)
-#        notifications.modify_font(pango.FontDescription("sans 14"))
-#        notifications.set_size_request(0, 25)
         vbox_right.pack_start(self.notifications, False, False, 0)
         self.screens["notifications"] = self.notifications
 
@@ -168,7 +189,8 @@ class ClientGui(hildon.Program):
 
         # add the alarm screen
         self.alarm_screen = AlarmScreen(self.db)
-        self.alarm_screen.connect("okbutton-alarm-clicked", self.back_button_function) 
+        self.alarm_screen.connect("okbutton-alarm-clicked",
+                                  self.back_button_function) 
         vbox_right.pack_start(self.alarm_screen, True, True, 0)
         self.screens["alarm"] = self.alarm_screen
 
@@ -178,21 +200,19 @@ class ClientGui(hildon.Program):
         self.screens["message"] = self.message_screen
         
         self.new_message_screen = NewMessageScreen(self.db)
-        self.new_message_screen.connect("okbutton_clicked_new_message", self.back_button_function) 
+        self.new_message_screen.connect("okbutton_clicked_new_message",
+                                        self.back_button_function) 
         vbox_right.pack_start(self.new_message_screen, True, True, 0)
         self.screens["new_message"] = self.new_message_screen
         
         self.outbox_screen = OutboxScreen(self.db)
         vbox_right.pack_start(self.outbox_screen, True, True, 0)
         self.screens["output"] = self.outbox_screen
-        
-        self.alarm_inbox_screen = AlarmInboxScreen(self.db)               
-        vbox_right.pack_start(self.alarm_inbox_screen, True, True, 0)
-        self.screens["alarms"] = self.alarm_inbox_screen
 
         # add the obstacle screen
         self.obstacle_screen = ObstacleScreen(self.db)
-        self.obstacle_screen.connect("okbutton-obstacle-clicked", self.back_button_function)
+        self.obstacle_screen.connect("okbutton-obstacle-clicked",
+                                     self.back_button_function)
         vbox_right.pack_start(self.obstacle_screen, True, True, 0)
         self.screens["obstacle"] = self.obstacle_screen
         
@@ -203,15 +223,13 @@ class ClientGui(hildon.Program):
         
         # add the create_mission screen
         self.mission_screen = MissionScreen(self.db)
-        self.mission_screen.connect("okbutton-mission-clicked", self.back_button_function)
+        self.mission_screen.connect("okbutton-mission-clicked",
+                                    self.back_button_function)
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
-        
-                
+
         # add the change mission screen
         self.change_mission_screen = ChangeMissionScreen(self.db)
-        
-#        self.change_mission_screen.connect("okbutton-mission-clicked", self.back_button_function)
         vbox_right.pack_start(self.change_mission_screen, True, True, 0)
         self.screens["change_mission"] = self.change_mission_screen
 
@@ -219,16 +237,13 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.faq_screen, True, True, 0)
         self.screens["faq"] = self.faq_screen
         
-        self.info_screen = InfoScreen(self.db)               
+        self.info_screen = MissionInfoScreen(self.db)               
         vbox_right.pack_start(self.info_screen, True, True, 0)
         self.screens["info"] = self.info_screen
-        
-        self.status_screen = StatusScreen(self.db)               
-        vbox_right.pack_start(self.status_screen, True, True, 0)
-        self.screens["status"] = self.status_screen
 
         self.patient_journal_screen = PatientJournalScreen(self.db, self.queue)
-        self.patient_journal_screen.connect("okbutton_clicked_PatientJournalScreen", self.back_button_function)               
+        self.patient_journal_screen.connect("okbutton_clicked_PatientJournalScreen",
+                                            self.back_button_function)               
         vbox_right.pack_start(self.patient_journal_screen, True, True, 0)
         self.screens["patient_journal"] = self.patient_journal_screen        
 
@@ -256,21 +271,24 @@ class ClientGui(hildon.Program):
         self.contact_menu.add(video)
 
         # Mission buttons and their menu
-        self.mission_menu = gtk.HBox(False, 0)
+        self.mission_menu = gtk.HBox(True, 0)
         self.mission_menu.set_size_request(0, 60)
         vbox_right.pack_start(self.mission_menu, False, False, 0)
         self.screens["mission_menu"] = self.mission_menu
 
-        info_button = gtk.Button("Info")
+        info_button = gtk.Button()
+        info_button.add(self.build_icon("Mina Uppdrag",
+                                        "icons/emblem-important.png", "h"))
         info_button.connect("clicked", self.show_mission_info)
-        status_button = gtk.Button("Status")
-        status_button.connect("clicked", self.show_status)
-        journal_button = gtk.Button("Patient\nJournal")
+        journal_button = gtk.Button()
+        journal_button.add(self.build_icon("Patient-\njournal",
+                                           "icons/text-x-generic.png", "h"))
         journal_button.connect("clicked", self.show_journals)
-        faq_button = gtk.Button("FAQ")
+        faq_button = gtk.Button()
+        faq_button.add(self.build_icon("FAQ","icons/help-browser.png", "h"))
         faq_button.connect("clicked", self.show_faq)
         self.mission_menu.add(info_button)
-        self.mission_menu.add(status_button)
+#        self.mission_menu.add(status_button)
         self.mission_menu.add(journal_button)
         self.mission_menu.add(faq_button)
         
@@ -286,8 +304,6 @@ class ClientGui(hildon.Program):
         inbox.connect("clicked", self.show_inbox)
         outbox = gtk.Button("Utkorg")
         outbox.connect("clicked", self.show_outbox)
-        in_alarms = gtk.Button("Inkomna larm")
-        in_alarms.connect("clicked", self.show_alarms)
         self.message_menu.add(new_mess)
         self.message_menu.add(inbox)
         self.message_menu.add(outbox)
@@ -297,20 +313,9 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.patient_journal_message_screen, True, True, 0)
         self.screens["patient_journal_message_screen"] = self.patient_journal_message_screen
         
-        patient_journal_message
-        
-        #fyller ingen funktion
-        #self.message_menu.add(in_alarms)
-        
-        #Istället för popup så kopper en panel upp vid sidan.         
-
-       
         vbox2 = gtk.VBox(False,0)
         #panels.pack_start(vbox2, False, False, 0)
         vbox2.set_size_request(150,0)
-        
-
-
         
 #        self.activities = gtk.VBox(False,0)
         self.activities = Activities(self.db)
@@ -321,9 +326,8 @@ class ClientGui(hildon.Program):
 #        self.ac = Activities(self.db)
 #        self.activities.add(self.ac)  
 
-
         # Add object buttons and their menu
-        self.add_object_menu = gtk.HBox(False, 0)
+        self.add_object_menu = gtk.HBox(True, 0)
         self.add_object_menu.set_size_request(0, 60)
         vbox_right.pack_start(self.add_object_menu, False, False, 0)
         self.screens["add_object_menu"] = self.add_object_menu
@@ -340,26 +344,29 @@ class ClientGui(hildon.Program):
             self.add_object_menu.add(create_mission_button)
 
         # add back- and ok-button (used in alarmscreen, obstaclescreen etc)
-        self.buttons_box = gtk.HBox(False, 10)
+        self.buttons_box = gtk.HBox(True, 0)
         self.buttons_box.set_size_request(0, 60)
         self.screens["buttons"] = self.buttons_box
         
-        back_button = gtk.Button("Bakåt")
+        back_button = gtk.Button()
+        back_button.add(self.build_icon("Bakåt", "icons/edit-undo.png", "h"))
         self.buttons_box.pack_start(back_button)
         back_button.connect("clicked", self.back_button_function)
 
-        ok_button = gtk.Button("OK")
+        ok_button = gtk.Button()
+        ok_button.add(self.build_icon("OK", "icons/list-add.png", "h"))
         ok_button.connect("clicked", self.ok_button_function)
         ok_button.set_flags(gtk.CAN_DEFAULT)
         self.buttons_box.pack_start(ok_button)
         
         vbox_right.pack_start(self.buttons_box, False, False, 0)
         
-        self.back_button_box = gtk.HBox(False, 10)
+        self.back_button_box = gtk.HBox(True, 0)
         self.back_button_box.set_size_request(0, 60)
         self.screens["back_button_box"] = self.back_button_box
         
-        back_button2 = gtk.Button("Bakåt")
+        back_button2 = gtk.Button()
+        back_button2.add(self.build_icon("Bakåt", "icons/edit-undo.png", "h"))
         self.back_button_box.pack_start(back_button2)
         back_button2.connect("clicked", self.back_button_function)
         
@@ -371,7 +378,7 @@ class ClientGui(hildon.Program):
         
         
         no_button = gtk.Button("Neka")
-        no_button.connect("clicked", self.ok_button_function)
+        no_button.connect("clicked", self.no_button_function)
         no_button.set_flags(gtk.CAN_DEFAULT)
         self.pj_button_box.pack_start(no_button)
         
@@ -380,25 +387,29 @@ class ClientGui(hildon.Program):
         ok_button.set_flags(gtk.CAN_DEFAULT)
         self.pj_button_box.pack_start(ok_button)
         
-        
-        
         vbox_right.pack_start(self.pj_button_box, False, False, 0)
         
         # add back-, change- and delete-button (used in ChangeObstacleScreen etc)
-        self.change_buttons = gtk.HBox(False, 10)
+        self.change_buttons = gtk.HBox(False, 0)
         self.change_buttons.set_size_request(0, 60)
         self.screens["change_buttons"] = self.change_buttons
         
-        change_back_button = gtk.Button("Bakåt")
+        change_back_button = gtk.Button()
+        change_back_button.add(self.build_icon("Bakåt", 
+                                               "icons/edit-undo.png", "h"))
         self.change_buttons.pack_start(change_back_button)
         change_back_button.connect("clicked", self.back_button_function)
         
-        delete_button = gtk.Button("Ta bort")
+        delete_button = gtk.Button()
+        delete_button.add(self.build_icon("Ta bort", 
+                                          "icons/emblem-unreadable.png", "h"))
         delete_button.connect("clicked", self.delete_button_function)
         delete_button.set_flags(gtk.CAN_DEFAULT)
         self.change_buttons.pack_start(delete_button)
 
-        change_button = gtk.Button("Spara ändringar")
+        change_button = gtk.Button()
+        change_button.add(self.build_icon("Spara ändringar", 
+                                          "icons/document-save.png", "h"))
         change_button.connect("clicked", self.change_button_function)
         change_button.set_flags(gtk.CAN_DEFAULT)
         self.change_buttons.pack_start(change_button)
@@ -468,7 +479,7 @@ class ClientGui(hildon.Program):
     def check_if_ok(self, msg):
         print "Check if ok-function"
         sender = msg.sender
-        reciever = msg.reciever
+        receiver = msg.receiver
         type = msg.type
         subtype = msg.subtype
         data = msg.unpacked_data
@@ -486,7 +497,8 @@ class ClientGui(hildon.Program):
             if subtype == shared.data.VVOIPType.response:
                 print "vvoip response"
                 self.out_dialog.destroy()
-                self.show_cam(ip=data["ip"], port1=data["port1"], port2=data["port2"])
+                self.show_cam(ip=data["ip"], port1=data["port1"],
+                              port2=data["port2"])
             elif subtype == shared.data.VVOIPType.request:
                 shared.util.set_color(0,0,255)
                 print "vvoip request"
@@ -495,7 +507,7 @@ class ClientGui(hildon.Program):
     def start_voip(self, msg):
         print "Staring voip"
         sender = msg.sender
-        reciever = msg.reciever
+        receiver = msg.receiver
         type = msg.type
         subtype = msg.subtype
         data = msg.unpacked_data
@@ -510,7 +522,7 @@ class ClientGui(hildon.Program):
     def start_vvoip(self, msg):
         print "Staring vvoip"
         sender = msg.sender
-        reciever = msg.reciever
+        receiver = msg.receiver
         type = msg.type
         subtype = msg.subtype
         data = msg.unpacked_data
@@ -605,9 +617,12 @@ class ClientGui(hildon.Program):
         self.window.show_all()
         self.show_default()
         # connect service level signal from controller
-        self.controller.interface.connect_to_signal("signal_changed_service_level", self.update_service_level)
-        self.message_dispatcher.connect_to_type(shared.data.MessageType.vvoip, self.check_if_ok)
-        self.message_dispatcher.connect_to_type(shared.data.MessageType.voip, self.check_if_ok)
+        self.controller.interface.connect_to_signal("signal_changed_service_level",
+                                                    self.update_service_level)
+        self.message_dispatcher.connect_to_type(shared.data.MessageType.vvoip,
+                                                self.check_if_ok)
+        self.message_dispatcher.connect_to_type(shared.data.MessageType.voip,
+                                                self.check_if_ok)
 
     def run(self):
         '''
@@ -633,12 +648,17 @@ class ClientGui(hildon.Program):
 
     def update_service_level(self, service_level):
         self.screens["notifications"].update_label(service_level)
+        unpacked_data = {"class": "dict", "service_level": service_level}
+        if service_level == "ad-hoc" or service_level == "mega-low":
+            pass
+        else:
+            msg = Message(self.controller.name, "server",
+                          shared.data.MessageType.service_level,
+                          unpacked_data = unpacked_data)
+            self.queue.enqueue(msg.packed_data, msg.prio)
 
-    ''' Handle events
-    ''' 
     def back_button_function(self, event):
         self.show(self.prev_page[-2])
-        
 
     def ok_button_function(self, event):
         for screen in self.screens.values():
@@ -649,9 +669,7 @@ class ClientGui(hildon.Program):
         for screen in self.screens.values():
             if screen.props.visible and isinstance(screen, Screen):
                 screen.no_button_function(event)
-                
-    
-                
+
     def change_button_function(self, event):
         for screen in self.screens.values():
             if screen.props.visible and isinstance(screen, Screen):
@@ -667,13 +685,12 @@ class ClientGui(hildon.Program):
     # mission view event handlers
     def show_mission(self, event):
         self.toggle_show("mission", ["notifications", "map", "mission_menu"], 
-                         "Här visas dina uppdrag")
+                         "Här visas information relaterade till dina uppdrag")
 
     # mission buttons event handlers
     def show_mission_info(self, event):
-        self.toggle_show("mission", ["notifications", "info", "buttons"], 
-                         "Här visas info om ditt uppdrag")
-        combo = self.screens["info"].combo_box
+        self.show(["info", "change_buttons"])
+        combo = self.screens["info"].mission_combo_box
         combo.get_model().clear()
         combo.append_text("Välj uppdrag...")
         combo.set_active(0)
@@ -692,7 +709,6 @@ class ClientGui(hildon.Program):
         for mission in self.controller.missions:
             combo.append_text(mission.event_type)
     
-    
     def show_journals(self, event):
         self.toggle_show("mission", ["notifications", "patient_journal", "buttons"], 
                          "Här kan du hämta patient journaler")
@@ -710,8 +726,8 @@ class ClientGui(hildon.Program):
     # add object buttons event handlers
     def create_alarm(self, event):
         self.show(["alarm", "buttons"])
-        self.screens["alarm"].location_entry2.set_text(str(self.screens["map"].gps_x))
-        self.screens["alarm"].location_entry3.set_text(str(self.screens["map"].gps_y))
+        self.screens["alarm"].coordx_entry.set_text(str(self.screens["map"].gps_x))
+        self.screens["alarm"].coordy_entry.set_text(str(self.screens["map"].gps_y))
             
     def create_obstacle(self, event):
         self.show(["obstacle", "buttons"])
@@ -720,8 +736,8 @@ class ClientGui(hildon.Program):
     
     def create_mission(self, event):
         self.show(["make_mission", "buttons"])
-        self.screens["make_mission"].location_entry2.set_text(str(self.screens["map"].gps_x))
-        self.screens["make_mission"].location_entry3.set_text(str(self.screens["map"].gps_y))
+        self.screens["make_mission"].coordx_entry.set_text(str(self.screens["map"].gps_x))
+        self.screens["make_mission"].coordy_entry.set_text(str(self.screens["map"].gps_y))
 
         combo = self.screens["make_mission"].combo_box
         combo.get_model().clear()
@@ -751,7 +767,7 @@ class ClientGui(hildon.Program):
        
         combo = self.screens["output"].combo_box
         combo.get_model().clear()
-        combo.append_text("Välj textmeddeland...")
+        combo.append_text("Välj textmeddelande...")
         combo.set_active(0)
          
         for textmessages in self.db.textmessages():
@@ -768,7 +784,7 @@ class ClientGui(hildon.Program):
                 combo.append_text(receiverandsubject)
        
     def show_inbox(self, event):
-        self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här ska bara inkomna meddelande finnas")
+        self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här visas dina inkomna meddelanden")
         
         self.update_messagesbox(event)
         shared.util.set_color(0,0,0)
@@ -776,9 +792,6 @@ class ClientGui(hildon.Program):
         self.messages_button.set_attention(False)
         label = self.messages_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
-
-    def show_alarms(self, event):
-        self.show(["alarms", "message_menu"])
         
     # contacts view event handlers
     def show_contacts(self,event):
@@ -796,11 +809,9 @@ class ClientGui(hildon.Program):
 
     # messages view event handlers
     def show_messages(self, event):
-        self.toggle_show("messages", ["notifications", "map","message_menu"], "Här visas dina meddelanden")
+        self.toggle_show("messages", ["notifications", "map","message_menu"], "Här kan du hantera dina meddelanden")
         
         self.update_messagesbox(event)
-        
-        
             
     def update_messagesbox(self, event):
         combo = self.screens["message"].combo_box
@@ -862,8 +873,6 @@ class ClientGui(hildon.Program):
             self.screens[key].hide_all()
         for key in keys:
             self.screens[key].show_all()
-            
-    
             
     def show_default(self):
         '''

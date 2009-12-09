@@ -10,11 +10,12 @@ import datetime
 import gui
 import pango
 import config
+from shared.data import JournalResponse
 
 
 class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
     '''
-    The screen in which you create a new alarm.
+    The screen in which you allow a client access to a journal
     '''
     # the entries
     db = None
@@ -53,10 +54,10 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
         label, self.why_entry = new_entry("Varför",vbox)
         label, self.ssn_entry = new_entry("Personnummer",vbox)
         
-#        # add event handler
-        self.combo_box.connect('changed', self.select_m)
-#
-#        # set the first item added as active
+        # add event handler
+        self.combo_box.connect('changed', self.select_journal)
+
+        # set the first item added as active
         self.combo_box.set_active(0)
 
         # show 'em all! (:
@@ -65,26 +66,36 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
     '''Handle events
     '''
 
-    def select_m(self, combobox):
+    def select_journal(self, combobox):
         
         '''
         Call when combobox changes to switch obstacle type.
         @param combobox: the changed combobox
         '''
         # set the selected type
-        self.selected_m = self.combo_box.get_active_text()
+        selected_m = self.combo_box.get_active_text()
         for request in self.db.get_journal_requests():
             text = "varför: " + str(request.why) + "    personumer: " + str(request.ssn)
-            if text == self.selected_m:
+            if text == selected_m:
+                self.selected_request = request
                 self.why_entry.set_text(request.why)
                 self.ssn_entry.set_text(request.ssn)
+                break
                 
     def add_request(self, event):
         print "new request added, start blinkin'!"
                 
     def ok_button_function(self, event):
-        pass
+        req = self.selected_request
+        response = JournalResponse(req.id, True, u"Därför",
+                                   req.ssn, u"kalle kamel är en häst")
+        self.db.add(response)
+        print "OK"
     
     def no_button_function(self, event):
-        pass
-    
+        req = self.selected_request
+        response = JournalResponse(req.id, False, u"Därför",
+                                   req.ssn, u"")
+        self.db.add(response)
+        print "NO"
+

@@ -22,6 +22,7 @@ class DatabaseQueue(Queue.Queue):
     def _empty(self):
         session = self.db._Session()
         if self.item_type == data.NetworkOutQueueItem:
+            print "sending few (no) messages!"
             return session.query(data.NetworkOutQueueItem).filter(data.NetworkOutQueueItem.sent == 0).count() == 0
         if self.item_type == data.NetworkInQueueItem:
             return session.query(data.NetworkInQueueItem).filter(data.NetworkInQueueItem.sent == 0).count() == 0
@@ -118,13 +119,23 @@ class DatabaseInQueue(DatabaseQueue):
 
 class DatabaseOutQueue(DatabaseQueue):
     name = None
+    service_level = None
+    
     def __init__(self, database, name):
         DatabaseQueue.__init__(self, database, DatabaseQueue.direction_out)
         self.name = name
 
+    def set_service_level(self, level):
+        self.service_level = level
+
     def _empty(self):
         session = self.db._Session()
-        result = session.query(NetworkOutQueueItem).filter_by(sent = 0).filter_by(name=self.name).count() == 0
+        result = None
+        if self.service_level == "send-few" or self.service_level == "energysaving":
+            row = session.execute("SELECT COUNT(*) AS num FROM OutQueue WHERE name = '%s' AND sent = 0 AND prio >= 5" % (self.name)).fetchone()
+            result = row[0] == 0
+        else:
+            result = session.query(NetworkOutQueueItem).filter_by(sent = 0).filter_by(name=self.name).count() == 0
         session.close()
         return result
 
@@ -141,15 +152,20 @@ class DatabaseOutQueue(DatabaseQueue):
         # @TODO
         session = self.db._Session()
         print "_get"
-        q = session.query(NetworkOutQueueItem).filter_by(sent = False) \
-                .filter_by(name = self.name) \
-                .order_by(NetworkOutQueueItem.prio.desc()) \
-                .order_by(NetworkOutQueueItem.id.asc())
-                #.order_by(NetworkOutQueueItem.timestamp.desc())
+        if self.service_level == "send-few" or self.service_level == "energysaving":
+            q = session.query(NetworkOutQueueItem).filter_by(sent = False) \
+                    .filter_by(name = self.name) \
+                    .filter("prio>=5") \
+                    .order_by(NetworkOutQueueItem.prio.desc()) \
+                    .order_by(NetworkOutQueueItem.id.asc())
+        else:
+            q = session.query(NetworkOutQueueItem).filter_by(sent = False) \
+                    .filter_by(name = self.name) \
+                    .order_by(NetworkOutQueueItem.prio.desc()) \
+                    .order_by(NetworkOutQueueItem.id.asc())
         item = q.first()
         session.close()
         return item.data, item.id
-
 
 if __name__ == "__main__":
     import data
