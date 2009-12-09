@@ -8,6 +8,7 @@ import map
 from map.mapdata import *
 from datetime import datetime
 import gobject
+import config
 
 class MapScreen(gtk.DrawingArea, gui.Screen):
     db = None
@@ -202,6 +203,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         for item in objects:
             x, y = self.gps_to_pixel(objects[item].map_object_data.coords[0],
                                      objects[item].map_object_data.coords[1])
+            if objects[item].map_object_data.name == config.client.name:
+                objects[item].picture.is_me = True
 
             if x != 0 and y != 0:
                 objects[item].picture.draw(self.context, x, y)
@@ -302,6 +305,8 @@ class MapScreen(gtk.DrawingArea, gui.Screen):
         found = False # only mark one object
         for obj in self.mapdata.objects.values():
             data = obj.map_object_data
+#            if data.name == config.client.name:
+#                obj.picture.is_me = True
             if (data.coordx >= min_gps_x and 
                 data.coordx <= max_gps_x and 
                 data.coordy >= max_gps_y and
