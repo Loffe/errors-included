@@ -10,7 +10,7 @@ import dbus.service
 import shared.networkqueue
 import config
 from shared.dbqueue import DatabaseInQueue
-from shared.util import getLogger
+from shared.util import getLogger, print_color
 from shared.networkqueue import NetworkOutQueue
 from database import ServerDatabase
 log = getLogger("server.log")
@@ -226,6 +226,8 @@ class ServerNetworkHandler(dbus.service.Object):
                             m = shared.data.Message.unpack(data, self.db)
                         except ValueError, ve:
                             log.info("Crappy data = ! JSON")
+                            print_color(str(ve.orig_error), 'red')
+                            print_color(ve.data, 'red')
                             log.info(ve)
                             continue
 

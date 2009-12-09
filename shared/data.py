@@ -807,7 +807,10 @@ class Message(object):
                 self.unpacked_data = dict["packed_data"]
             return self
         except KeyError, ke:
-            raise ValueError("Not a valid Message. Missing any keys maybe?")
+            error = ValueError("Not a valid Message. Missing any keys maybe?")
+            error.orig_error = ke
+            error.data = raw_message
+            raise error
 
     unpack = classmethod(unpack)
 
