@@ -712,7 +712,7 @@ class ClientGui(hildon.Program):
                 if u.name == config.client.name:
                     missions.append(m)
         self.screens["info"].set_missions(missions)
-    
+
     def show_status(self, event):
         self.toggle_show("mission", ["notifications", "status", "buttons"], 
                          "Här kan du välj en status")

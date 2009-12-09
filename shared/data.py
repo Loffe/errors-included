@@ -282,6 +282,8 @@ class POISubType(object):
     hospital = u"hospital"
     base = u"base"
     other = u"other"
+    
+
 
 class NetworkInQueueItem(Base):
     __tablename__ = 'InQueue'
