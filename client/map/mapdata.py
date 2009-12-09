@@ -289,7 +289,8 @@ class Unit(MapObject):
             path = "map/data/icons/tank.png"
         elif unit_data.type == shared.data.UnitType.srsa:
             path = "map/data/icons/firetruck.png"
-        self.picture = Picture(path)    
+        self.picture = Picture(path)
+        self.picture.center = True 
 
 class POI(MapObject):
     
