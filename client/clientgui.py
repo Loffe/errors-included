@@ -173,10 +173,6 @@ class ClientGui(hildon.Program):
         
         # adding the notification bar
         self.notifications = NotificationScreen()
-#        notifications = gtk.Label("Team Med Fel")
-#        notifications.set_alignment(0,0)
-#        notifications.modify_font(pango.FontDescription("sans 14"))
-#        notifications.set_size_request(0, 25)
         vbox_right.pack_start(self.notifications, False, False, 0)
         self.screens["notifications"] = self.notifications
 
@@ -222,8 +218,7 @@ class ClientGui(hildon.Program):
         self.mission_screen.connect("okbutton-mission-clicked", self.back_button_function)
         vbox_right.pack_start(self.mission_screen, True, True, 0)
         self.screens["make_mission"] = self.mission_screen
-        
-                
+
         # add the change mission screen
         self.change_mission_screen = ChangeMissionScreen(self.db)
         vbox_right.pack_start(self.change_mission_screen, True, True, 0)
@@ -236,11 +231,6 @@ class ClientGui(hildon.Program):
         self.info_screen = MissionInfoScreen(self.db)               
         vbox_right.pack_start(self.info_screen, True, True, 0)
         self.screens["info"] = self.info_screen
-        
-        # WE HAVE NO VALID AND USEFUL STATUSSCREEN
-#        self.status_screen = StatusScreen(self.db)               
-#        vbox_right.pack_start(self.status_screen, True, True, 0)
-#        self.screens["status"] = self.status_screen
 
         self.patient_journal_screen = PatientJournalScreen(self.db, self.queue)
         self.patient_journal_screen.connect("okbutton_clicked_PatientJournalScreen", self.back_button_function)               
@@ -276,10 +266,8 @@ class ClientGui(hildon.Program):
         vbox_right.pack_start(self.mission_menu, False, False, 0)
         self.screens["mission_menu"] = self.mission_menu
 
-        info_button = gtk.Button("Info")
+        info_button = gtk.Button("Mina Uppdrag")
         info_button.connect("clicked", self.show_mission_info)
-#        status_button = gtk.Button("Status")
-#        status_button.connect("clicked", self.show_status)
         journal_button = gtk.Button("Patient-\njournal")
         journal_button.connect("clicked", self.show_journals)
         faq_button = gtk.Button("FAQ")
@@ -322,7 +310,6 @@ class ClientGui(hildon.Program):
              
 #        self.ac = Activities(self.db)
 #        self.activities.add(self.ac)  
-
 
         # Add object buttons and their menu
         self.add_object_menu = gtk.HBox(False, 0)
@@ -637,8 +624,6 @@ class ClientGui(hildon.Program):
         msg = Message(self.controller.name, "server", shared.data.MessageType.service_level, unpacked_data = unpacked_data)
         self.queue.enqueue(msg.packed_data, msg.prio)
 
-    ''' Handle events
-    ''' 
     def back_button_function(self, event):
         self.show(self.prev_page[-2])
 
@@ -651,9 +636,7 @@ class ClientGui(hildon.Program):
         for screen in self.screens.values():
             if screen.props.visible and isinstance(screen, Screen):
                 screen.no_button_function(event)
-                
-    
-                
+
     def change_button_function(self, event):
         for screen in self.screens.values():
             if screen.props.visible and isinstance(screen, Screen):
@@ -692,7 +675,6 @@ class ClientGui(hildon.Program):
         combo.set_active(0)
         for mission in self.controller.missions:
             combo.append_text(mission.event_type)
-    
     
     def show_journals(self, event):
         self.toggle_show("mission", ["notifications", "patient_journal", "buttons"], 
@@ -769,7 +751,7 @@ class ClientGui(hildon.Program):
                 combo.append_text(receiverandsubject)
        
     def show_inbox(self, event):
-        self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här ska bara inkomna meddelande finnas")
+        self.toggle_show("messages", ["notifications", "message","back_button_box"], "Här visas dina inkomna meddelanden")
         
         self.update_messagesbox(event)
         shared.util.set_color(0,0,0)
@@ -794,11 +776,9 @@ class ClientGui(hildon.Program):
 
     # messages view event handlers
     def show_messages(self, event):
-        self.toggle_show("messages", ["notifications", "map","message_menu"], "Här visas dina meddelanden")
+        self.toggle_show("messages", ["notifications", "map","message_menu"], "Här kan du hantera dina meddelanden")
         
         self.update_messagesbox(event)
-        
-        
             
     def update_messagesbox(self, event):
         combo = self.screens["message"].combo_box
@@ -860,8 +840,6 @@ class ClientGui(hildon.Program):
             self.screens[key].hide_all()
         for key in keys:
             self.screens[key].show_all()
-            
-    
             
     def show_default(self):
         '''
