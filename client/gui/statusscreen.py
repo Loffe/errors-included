@@ -7,6 +7,8 @@ import shared.data
 import datetime
 import gui
 import pango
+from selectunit import SelectUnitButton
+from selectunit import SelectUnitDialog
 
 class StatusScreen(gtk.ScrolledWindow, gui.Screen):
     
@@ -38,27 +40,22 @@ class StatusScreen(gtk.ScrolledWindow, gui.Screen):
         
         self.entries = []
         
-        # create layout boxes
-        vbox = gtk.VBox(False,0)
-        hbox = gtk.HBox(False,0)
-        self.add_with_viewport(vbox)
-        left_box = gtk.VBox(True,0)
-        right_box = gtk.VBox(True,0)
-        hbox.pack_start(left_box,False,False,0)
-        hbox.add(right_box)
-        vbox.pack_start(hbox)
-        
-        # create type label
-        type_label = gtk.Label("Mina uppdrag:")
-        type_label.modify_font(pango.FontDescription("sans 12"))
-        type_label.set_alignment(0, 0.5)
-        left_box.pack_start(type_label, True, True, 0)
-        
-        # create and pack combobox
+         # create layout boxes
+        outer_container = gtk.VBox(False,0)
+        #create and pack combobox
         self.combo_box = gtk.combo_box_new_text()
         self.combo_box.set_size_request(300,50)
-        self.combo_box.append_text("Välj larm...")
-        right_box.pack_start(self.combo_box, True,False, 0)
+        self.combo_box.append_text("Välj uppdrag...")
+        outer_container.pack_start(self.combo_box, True, True, 0)
+        main_box = gtk.HBox(False,0)
+        outer_container.pack_start(main_box, True, True, 0)
+        self.add_with_viewport(outer_container)
+        left_box = gtk.VBox(False,0)
+        right_box = gtk.VBox(False,0)
+        main_box.pack_start(left_box,False,False,0)
+        main_box.add(right_box)
+        
+       
         
         label = self.new_section("Nytt uppdrag", left_box, right_box)
         
@@ -73,6 +70,11 @@ class StatusScreen(gtk.ScrolledWindow, gui.Screen):
         self.number_entry = self.new_entry("     Nummer:", left_box, right_box)
         self.new_section("Övrigt", left_box, right_box)
         self.random_entry = self.new_entry("     Information:", left_box, right_box)
+        self.status_entry = self.new_entry("     Status:", left_box, right_box)
+        
+
+        self.select_unit_button = SelectUnitButton(self.db)
+        #vbox.add(self.select_unit_button)
 
         
 
@@ -83,7 +85,7 @@ class StatusScreen(gtk.ScrolledWindow, gui.Screen):
         self.combo_box.set_active(0)
 
         # show 'em all! (:
-        vbox.show_all()
+        main_box.show_all()
         
         
         
@@ -92,11 +94,10 @@ class StatusScreen(gtk.ScrolledWindow, gui.Screen):
         self.selected_mission = self.combo_box.get_active_text()
         for mission in self.db.get_all_missions():
             if mission.event_type == self.selected_mission:
+                pass
                 
-                print mission.status
-                mission.status = "klart"
-                print mission.status
-                #self.db.change(mission_data)
+                
+                
 
     def select_mission(self, combobox):
         '''
@@ -114,7 +115,19 @@ class StatusScreen(gtk.ScrolledWindow, gui.Screen):
                 self.name_entry.set_text(mission.contact_person)
                 self.number_entry.set_text(mission.contact_number)
                 self.random_entry.set_text(mission.other)
-
+                self.status_entry.set_text(mission.status)
+                ids = []
+                for unit in mission.units:
+                    ids.append(unit.id)
+                    self.select_unit_button.selected_ids = ids
+                    selected_units = self.db.get_units(ids)
+                    names = [u.name for u in selected_units][:3]
+                    text = ", ".join(names)
+                if len(selected_units) > 3:
+                    text += "..."
+                
+                    
+    
         
         
         
