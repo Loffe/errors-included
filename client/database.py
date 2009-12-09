@@ -1,4 +1,4 @@
-from shared.data import Database, Message, MessageType, ActionType, IDType, ObjectID, TextMessage, JournalType, JournalRequest
+from shared.data import Database, Message, MessageType, ActionType, IDType, ObjectID, TextMessage, JournalType, JournalRequest, JournalResponse
 import config
 import gobject
 
@@ -56,6 +56,9 @@ class ClientDatabase(Database):
                           unpacked_data=object)
         elif object.__class__ == JournalRequest:
             msg = Message(self.name, "server", MessageType.journal, JournalType.request,
+                          unpacked_data = object)
+        elif object.__class__ == JournalResponse:
+            msg = Message(self.name, "server", MessageType.journal, JournalType.response,
                           unpacked_data = object)
         else:
             msg = Message(self.name, "server", MessageType.object, ActionType.add,
