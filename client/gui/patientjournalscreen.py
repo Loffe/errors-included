@@ -34,7 +34,7 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
         self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         
         main_box = gtk.VBox(False,0)
-        #self.add_with_viewport(main_box)
+        self.add_with_viewport(main_box)
         '''
         self.add_with_viewport(vbox)
         label, self.why_entry = new_entry("Varför",vbox)
