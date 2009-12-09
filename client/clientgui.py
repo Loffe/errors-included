@@ -605,9 +605,12 @@ class ClientGui(hildon.Program):
         self.window.show_all()
         self.show_default()
         # connect service level signal from controller
-        self.controller.interface.connect_to_signal("signal_changed_service_level", self.update_service_level)
-        self.message_dispatcher.connect_to_type(shared.data.MessageType.vvoip, self.check_if_ok)
-        self.message_dispatcher.connect_to_type(shared.data.MessageType.voip, self.check_if_ok)
+        self.controller.interface.connect_to_signal("signal_changed_service_level",
+                                                    self.update_service_level)
+        self.message_dispatcher.connect_to_type(shared.data.MessageType.vvoip,
+                                                self.check_if_ok)
+        self.message_dispatcher.connect_to_type(shared.data.MessageType.voip,
+                                                self.check_if_ok)
 
     def run(self):
         '''
@@ -632,10 +635,13 @@ class ClientGui(hildon.Program):
         self.mapobjecthandler.controller = self.controller
 
     def update_service_level(self, service_level):
-        self.screens["notifications"].update_label(service_level)
-        unpacked_data = {"class": "dict", "service_level": service_level}
-        msg = Message(self.controller.name, "server", shared.data.MessageType.service_level, unpacked_data = unpacked_data)
-        self.queue.enqueue(msg.packed_data, msg.prio)
+        if service_level == "ad-hoc" or service_level == "mega-low": 
+            self.screens["notifications"].update_label(service_level)
+            unpacked_data = {"class": "dict", "service_level": service_level}
+            msg = Message(self.controller.name, "server",
+                          shared.data.MessageType.service_level,
+                          unpacked_data = unpacked_data)
+            self.queue.enqueue(msg.packed_data, msg.prio)
 
     ''' Handle events
     ''' 
