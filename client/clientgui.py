@@ -134,11 +134,12 @@ class ClientGui(hildon.Program):
         vbox.set_size_request(150,350)
 
         # Buttons (menu)
-        mission_button = gtk.ToggleButton()
-        mission_button.add(self.build_icon("Uppdrag",
+        self.mission_button = BlinkToggleButton()
+        self.mission_button.add(self.build_icon("Uppdrag",
                                            "icons/emblem-important.png"))
-        mission_button.connect("clicked", self.show_mission)
-        self.menu_buttons["mission"] = mission_button
+        self.mission_button.connect("clicked", self.show_mission)
+        self.mapobjecthandler.connect("got-new-mission", self.new_mission)
+        self.menu_buttons["mission"] = self.mission_button
 
         add_object_button = gtk.ToggleButton()
         add_object_button.add(self.build_icon("Skapa",
@@ -159,7 +160,7 @@ class ClientGui(hildon.Program):
         self.textmessagehandler.connect("got-new-message", self.new_message)
         self.menu_buttons["messages"] = self.messages_button
 
-        vbox.add(mission_button)
+        vbox.add(self.mission_button)
         vbox.add(add_object_button)
         vbox.add(contacts_button)
         vbox.add(self.messages_button)
@@ -464,6 +465,9 @@ class ClientGui(hildon.Program):
         shared.util.play_uri("snd/mail3b.wav")
         label = self.messages_button.get_child()
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("green"))
+        
+    def new_mission(self,event):
+        self.mission_button.set_attention(True)
 
     def change_object(self, event, object):
         keys = []
@@ -716,14 +720,13 @@ class ClientGui(hildon.Program):
     # mission buttons event handlers
     def show_mission_info(self, event):
         self.show(["info", "change_buttons"])
-        combo = self.screens["info"].mission_combo_box
-        combo.get_model().clear()
-        combo.append_text("Välj uppdrag...")
-        combo.set_active(0)
-        for mission in self.controller.missions:
-            #if mission.status != "done":
-            combo.append_text(mission.event_type)
-    
+        missions = []
+        for m in self.db.get_all_missions():
+            for u in m.units:
+                if u.name == config.client.name:
+                    missions.append(m)
+        self.screens["info"].set_missions(missions)
+
     def show_status(self, event):
         self.toggle_show("mission", ["notifications", "status", "buttons"], 
                          "Här kan du välj en status")
