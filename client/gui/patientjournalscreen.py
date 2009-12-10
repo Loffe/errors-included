@@ -89,7 +89,10 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
         self.update_list()
 
     def selected(self, combobox):
-        selected = self.liststore[self.combo_box.get_active()]
+        index = self.combo_box.get_active()
+        if index < 1:
+            return
+        selected = self.liststore[index]
         selected_id = selected[2]
         session = self.db._Session()
         journal = session.query(JournalResponse).filter_by(id=selected_id).first()

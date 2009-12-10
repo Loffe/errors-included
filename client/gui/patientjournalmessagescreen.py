@@ -35,6 +35,17 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
 
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
+        def new_label(labeltext, parent):
+            hbox = gtk.HBox(True,0)
+            label = gtk.Label(labeltext)
+            label.set_alignment(0, 0.5)
+            entry = gtk.Label()
+            entry.set_text("")
+            hbox.add(label)
+            hbox.add(entry)
+            parent.add(hbox)
+            return (label, entry)
+
         def new_entry(labeltext, parent):
             hbox = gtk.HBox(True,0)
             label = gtk.Label(labeltext)
@@ -56,8 +67,9 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
         self.combo_box.append_text("Välj patientjournalförfrågan")
         vbox.pack_start(self.combo_box, True,True, 0)
         
-        label, self.why_entry = new_entry("Varför",vbox)
-        label, self.ssn_entry = new_entry("Personnummer",vbox)
+        label, self.why_label = new_label("Varför",vbox)
+        label, self.ssn_label = new_label("Personnummer",vbox)
+        label, self.why_entry = new_entry("Anledning",vbox)
         
         # add event handler
         self.combo_box.connect('changed', self.select_journal)
@@ -83,8 +95,8 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
             text = "varför: " + str(request.why) + "    personumer: " + str(request.ssn)
             if text == selected_m:
                 self.selected_request = request
-                self.why_entry.set_text(request.why)
-                self.ssn_entry.set_text(request.ssn)
+                self.why_label.set_text(request.why)
+                self.ssn_label.set_text(request.ssn)
                 break
                 
     def add_request(self, event):
@@ -99,8 +111,8 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
     
     def no_button_function(self, event):
         req = self.selected_request
-        response = JournalResponse(req.id, False, u"Därför",
-                                   req.ssn, u"")
+        response = JournalResponse(req.id, False, u"",
+                                   req.ssn, unicode(self.why_entry.get_text()))
         self.db.add(response)
         print "NO"
 
