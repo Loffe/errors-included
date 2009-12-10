@@ -50,11 +50,14 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
         self.add_with_viewport(main_box)
 
         # create and pack combobox
-        self.liststore = gtk.ListStore(str, int)
+        self.liststore = gtk.ListStore(str, str, int)
         self.combo_box = gtk.ComboBox(self.liststore)
         cell = gtk.CellRendererText()
+        cell2 = gtk.CellRendererText()
         self.combo_box.pack_start(cell, True)
+        self.combo_box.pack_start(cell2, True)
         self.combo_box.add_attribute(cell, 'text', 0)  
+        self.combo_box.add_attribute(cell2, 'text', 1)  
 
         #combo_box.set_size_request(300,50)
         main_box.pack_start(self.combo_box, False, False, 0)
@@ -75,9 +78,10 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
 
     def update_list(self):
         self.combo_box.get_model().clear()
-        self.combo_box.get_model().append(("Välj journal...", 0))
+        self.combo_box.get_model().append(("Välj journal...","", 0))
         for j in self.db.get_journals():
-            self.combo_box.get_model().append((j.ssn, j.id))
+            allowed_text = "Tillåten" if j.allowed else "Ej tillåten"
+            self.combo_box.get_model().append((j.ssn, allowed_text, j.id))
 
 
     def got_journal_response(self, event):
@@ -86,13 +90,14 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
 
     def selected(self, combobox):
         selected = self.liststore[self.combo_box.get_active()]
-        selected_id = selected[1]
+        selected_id = selected[2]
         session = self.db._Session()
         journal = session.query(JournalResponse).filter_by(id=selected_id).first()
 
-        buffer = gtk.TextBuffer()
-        buffer.set_text(journal.journal)
-        self.textview.set_buffer(buffer)
+        if journal is not None:
+            buffer = gtk.TextBuffer()
+            buffer.set_text(journal.journal)
+            self.textview.set_buffer(buffer)
         session.close()
        
     def ok_button_function(self, event):
