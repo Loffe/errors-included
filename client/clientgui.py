@@ -467,6 +467,7 @@ class ClientGui(hildon.Program):
         label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("green"))
         
     def new_mission(self,event):
+        shared.util.set_color(255,0,0)
         self.mission_button.set_attention(True)
 
     def change_object(self, event, object):
@@ -718,6 +719,8 @@ class ClientGui(hildon.Program):
 
     # mission view event handlers
     def show_mission(self, event):
+        shared.util.set_color(0,0,0)
+        self.mission_button.set_attention(False)
         self.toggle_show("mission", ["notifications", "map", "mission_menu"], 
                          "Här visas information relaterade till dina uppdrag")
 
