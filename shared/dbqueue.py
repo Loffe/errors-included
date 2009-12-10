@@ -56,9 +56,10 @@ class DatabaseQueue(Queue.Queue):
                 match2 = re.findall(r'"id": %s' % id, row.data)
                 if len(match1) > 0 and len(match2) > 0:
                     #print_color(str(row), 'red')
-                    to_del.append(row)
-            for obj in to_del:
-                session.delete(obj)
+                    to_del.append(str(row.id))
+            #print "to_del", to_del
+            if len(to_del) > 0:
+                session.execute("DELETE FROM OutQueue WHERE id IN (" + ",".join(to_del) + ")")
         session.add(item)
         session.flush()
         d = json.loads(item.data)
