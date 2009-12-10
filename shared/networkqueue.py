@@ -36,7 +36,6 @@ class NetworkOutQueue(NetworkQueue):
             self.need_connection = False
 
     def enqueue(self, packed_data, prio):
-        print "enqueued"
         local_id = self.queue.put(unicode(packed_data), prio)
         if not self.sending:
             self.start_sending()
@@ -48,7 +47,6 @@ class NetworkOutQueue(NetworkQueue):
         '''
         if self.need_connection:
             return
-        print "starting send burst"
         self.sending = True
         threading.Thread(target=self.send_loop).start()
 
@@ -74,7 +72,7 @@ class NetworkOutQueue(NetworkQueue):
             try:
                 # send 6 bytes containing content length
                 content_length = '0x%04x' % len(item)
-                log.info(content_length)
+                log.info("content-length" + str(content_length))
                 self.socket.send(content_length)
                 # send json data
                 self.socket.send(item)

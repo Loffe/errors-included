@@ -61,7 +61,6 @@ class ServerNetworkHandler(dbus.service.Object):
         queue = self.outqueues[receiver]
         assert queue is not None
         queue.enqueue(unicode(msg), prio)
-        print "Enqueue finished"
         return "Enqueue :)"
 
     @dbus.service.method(dbus_interface='included.errors.Server',

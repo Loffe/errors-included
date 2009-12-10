@@ -62,10 +62,12 @@ class DatabaseQueue(Queue.Queue):
                 session.execute("DELETE FROM OutQueue WHERE id IN (" + ",".join(to_del) + ")")
         session.add(item)
         session.flush()
-        d = json.loads(item.data)
         try:
+            d = json.loads(item.data)
             d["message_id"] = item.id
             item.data = unicode(json.dumps(d))
+        except ValueError, e:
+            print_color("not a valid json string. Trunkated by TCP?", 'red')
         except TypeError, e:
             print "Stop being stupid"
             print type(d), item.id
