@@ -10,7 +10,7 @@ import datetime
 import gui
 import pango
 import config
-from shared.data import JournalResponse
+from shared.data import JournalResponse, JournalRequest
 
 
 class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
@@ -62,10 +62,19 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
         vbox = gtk.VBox(False,0)
         self.add_with_viewport(vbox)
 
-        self.combo_box = gtk.combo_box_new_text()
-        self.combo_box.set_size_request(300,50)
-        self.combo_box.append_text("Välj patientjournalförfrågan")
-        vbox.pack_start(self.combo_box, True,True, 0)
+        # create and pack combobox
+        self.liststore = gtk.ListStore(str, str, str, int)
+        self.combo_box = gtk.ComboBox(self.liststore)
+        cell = gtk.CellRendererText()
+        cell2 = gtk.CellRendererText()
+        cell3 = gtk.CellRendererText()
+        self.combo_box.pack_start(cell, True)
+        self.combo_box.pack_start(cell2, True)
+        self.combo_box.pack_start(cell3, True)
+        self.combo_box.add_attribute(cell, 'text', 0)
+        self.combo_box.add_attribute(cell2, 'text', 1)
+        self.combo_box.add_attribute(cell3, 'text', 2)
+        vbox.pack_start(self.combo_box, True, True, 0)
         
         label, self.why_label = new_label("Varför",vbox)
         label, self.ssn_label = new_label("Personnummer",vbox)
@@ -75,10 +84,20 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
         self.combo_box.connect('changed', self.select_journal)
 
         # set the first item added as active
-        self.combo_box.set_active(0)
 
         # show 'em all! (:
         self.show_all()
+
+    def update_list(self):
+        self.combo_box.get_model().clear()
+        self.combo_box.get_model().append(("Välj journal...","","", 0))
+        for req in self.db.get_journal_requests():
+            self.combo_box.get_model().append((
+                "Persnr: " + req.ssn,
+                "Från: " + req.sender,
+                "Anledning: " + req.why,
+                req.id))
+        self.combo_box.set_active(0)
 
     '''Handle events
     '''
@@ -89,16 +108,19 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
         Call when combobox changes to switch obstacle type.
         @param combobox: the changed combobox
         '''
-        # set the selected type
-        selected_m = self.combo_box.get_active_text()
-        for request in self.db.get_journal_requests():
-            text = "varför: " + str(request.why) + "    personumer: " + str(request.ssn)
-            if text == selected_m:
-                self.selected_request = request
-                self.why_label.set_text(request.why)
-                self.ssn_label.set_text(request.ssn)
-                break
-                
+        index = self.combo_box.get_active()
+        if index < 1:
+            return
+        selected = self.liststore[index]
+        selected_id = selected[3]
+        session = self.db._Session()
+        request = session.query(JournalRequest).filter_by(id=selected_id).first()
+
+        self.selected_request = request
+        self.why_label.set_text(request.why)
+        self.ssn_label.set_text(request.ssn)
+        session.close()
+
     def add_request(self, event):
         print "new request added, start blinkin'!"
                 

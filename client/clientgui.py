@@ -866,14 +866,7 @@ class ClientGui(hildon.Program):
     def show_patient_journal_message(self, event):
         self.toggle_show("patient_journal_message", ["notifications", "patient_journal_message_screen","pj_button_box"], "Här visas dina meddelanden")
         
-        combo = self.screens["patient_journal_message_screen"].combo_box
-        combo.get_model().clear()
-        combo.append_text("Välj textmeddelande...")
-        combo.set_active(0)
-        
-        for request in self.db.get_journal_requests():
-            text = "varför: " + str(request.why) + "    personumer: " + str(request.ssn)
-            combo.append_text(text)
+        self.screens["patient_journal_message_screen"].update_list()
 
     # show certain screen methods
     def toggle_show(self, button_key, screen_keys, notification_text = ""):
