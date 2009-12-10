@@ -50,17 +50,24 @@ class DatabaseQueue(Queue.Queue):
             id = res[0]
             #print "dumping old changes for id:", id
             res = session.query(NetworkOutQueueItem)
+            to_del = []
             for row in res:
                 match1 = re.findall(r'"subtype": "change"', row.data)
                 match2 = re.findall(r'"id": %s' % id, row.data)
                 if len(match1) > 0 and len(match2) > 0:
                     #print_color(str(row), 'red')
-                    session.delete(row)
+                    to_del.append(row)
+            for obj in to_del:
+                session.delete(obj)
         session.add(item)
         session.flush()
         d = json.loads(item.data)
-        d["message_id"] = item.id
-        item.data = unicode(json.dumps(d))
+        try:
+            d["message_id"] = item.id
+            item.data = unicode(json.dumps(d))
+        except TypeError, e:
+            print "Stop being stupid"
+            print type(d), item.id
         session.add(item)
         session.commit()
         session.close()
