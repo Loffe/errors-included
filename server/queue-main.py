@@ -54,9 +54,14 @@ class ServerNetworkHandler(dbus.service.Object):
         @param msg the packed_data to send
         @param prio priority of the message
         '''
-        queue = self.outqueues[receiver]
-        queue.enqueue(unicode(msg), prio)
         print "Enqueue called"
+        receiver = str(receiver)
+        msg = str(msg)
+        prio = int(prio)
+        queue = self.outqueues[receiver]
+        assert queue is not None
+        queue.enqueue(unicode(msg), prio)
+        print "Enqueue finished"
         return "Enqueue :)"
 
     @dbus.service.method(dbus_interface='included.errors.Server',
@@ -96,7 +101,7 @@ class ServerNetworkHandler(dbus.service.Object):
             if self.server:
                 self.server.close()
             log.info("Could not open socket: " + message)
-            sys.exit()
+            sys.exit(2)
 
     def start(self):
         if config.server.primary:
@@ -234,6 +239,9 @@ class ServerNetworkHandler(dbus.service.Object):
                         if m.type == shared.data.MessageType.login:
                             self._login_client(s, m)
                         else:
+                            assert type(local_id) is long
+                            assert hasattr(m, "response_to")
+                            assert type(m.response_to) is int
                             self.message_received(local_id, m.response_to)
                     else:
                         self._disconnect_client(s)
