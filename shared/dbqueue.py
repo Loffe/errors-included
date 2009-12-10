@@ -1,4 +1,5 @@
 import Queue
+import re
 import data as data
 import simplejson as json
 from data import NetworkInQueueItem, NetworkOutQueueItem
@@ -39,6 +40,22 @@ class DatabaseQueue(Queue.Queue):
         before commit to database
         '''
         session = self.db._Session()
+        if item.__class__ == NetworkOutQueueItem and \
+                "\"subtype\": \"change\"" in item.data:
+            ''' Check for old events for the same unit and remove them.
+                This will speedup the startup of clients.
+            '''
+            res = re.findall(r'"id": (\d*)', item.data)
+            assert len(res) == 1
+            id = res[0]
+            #print "dumping old changes for id:", id
+            res = session.query(NetworkOutQueueItem)
+            for row in res:
+                match1 = re.findall(r'"subtype": "change"', row.data)
+                match2 = re.findall(r'"id": %s' % id, row.data)
+                if len(match1) > 0 and len(match2) > 0:
+                    #print_color(str(row), 'red')
+                    session.delete(row)
         session.add(item)
         session.flush()
         d = json.loads(item.data)
@@ -149,9 +166,7 @@ class DatabaseOutQueue(DatabaseQueue):
 
     # Get an item from the queue
     def _get(self):
-        # @TODO
         session = self.db._Session()
-        print "_get"
         if self.service_level == "send-few" or self.service_level == "energysaving":
             q = session.query(NetworkOutQueueItem).filter_by(sent = False) \
                     .filter_by(name = self.name) \
