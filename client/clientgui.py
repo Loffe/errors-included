@@ -269,7 +269,7 @@ class ClientGui(hildon.Program):
         self.contact_menu.set_size_request(0, 60)
         vbox_right.pack_start(self.contact_menu, False, False, 0)
         self.screens["contact_menu"] = self.contact_menu
-        call = gtk.Button("Bröstsamtal")
+        call = gtk.Button("Röstsamtal")
         call.connect("clicked", self.sending_voip)
         video = gtk.Button("Videosamtal")
         video.connect("clicked", self.sending_vvoip)
@@ -294,7 +294,7 @@ class ClientGui(hildon.Program):
         faq_button.add(self.build_icon("FAQ","icons/help-browser.png", "h"))
         faq_button.connect("clicked", self.show_faq)
         self.mission_menu.add(info_button)
-#        self.mission_menu.add(status_button)
+        #self.mission_menu.add(status_button)
         self.mission_menu.add(journal_button)
         self.mission_menu.add(faq_button)
         
@@ -323,14 +323,14 @@ class ClientGui(hildon.Program):
         #panels.pack_start(vbox2, False, False, 0)
         vbox2.set_size_request(150,0)
         
-#        self.activities = gtk.VBox(False,0)
+        #self.activities = gtk.VBox(False,0)
         self.activities = Activities(self.db)
         vbox2.pack_start(self.activities, False, False, 0)
         self.screens["act"] = self.activities 
-#        self.activities = Activities(self.db)
+        #self.activities = Activities(self.db)
              
-#        self.ac = Activities(self.db)
-#        self.activities.add(self.ac)  
+        #self.ac = Activities(self.db)
+        #self.activities.add(self.ac)  
 
         # Add object buttons and their menu
         self.add_object_menu = gtk.HBox(True, 0)
@@ -378,23 +378,56 @@ class ClientGui(hildon.Program):
         
         vbox_right.pack_start(self.back_button_box, False, False, 0)
         
-        self.pj_button_box = gtk.HBox(False, 10)
-        self.pj_button_box.set_size_request(0, 60)
-        self.screens["pj_button_box"] = self.pj_button_box
+        vbox_right.pack_start(self.create_pj_message_buttons(), False, False, 0)
+
+        vbox_right.pack_start(self.create_pj_request_buttons(), False, False, 0)
+
+        vbox_right.pack_start(self.create_change_buttons(), False, False, 0)
+
+        self.window.connect("destroy", lambda event: self.mainloop.quit())
+        self.window.connect("key-press-event", self.on_key_press)
+        self.window.connect("window-state-event", self.on_window_state_change)
+
+        # Change to default True?
+        self.window_in_fullscreen = False
+        log.info("ClientGui created")
+
+    def create_pj_message_buttons(self):
+        pj_button_box = gtk.HBox(False, 10)
+        pj_button_box.set_size_request(0, 60)
+        self.screens["pj_button_box"] = pj_button_box
         
         
         no_button = gtk.Button("Neka")
         no_button.connect("clicked", self.no_button_function)
         no_button.set_flags(gtk.CAN_DEFAULT)
-        self.pj_button_box.pack_start(no_button)
+        pj_button_box.pack_start(no_button)
         
         ok_button = gtk.Button("Bevilja")
         ok_button.connect("clicked", self.ok_button_function)
         ok_button.set_flags(gtk.CAN_DEFAULT)
-        self.pj_button_box.pack_start(ok_button)
+        pj_button_box.pack_start(ok_button)
         
-        vbox_right.pack_start(self.pj_button_box, False, False, 0)
+        return pj_button_box
+
+    def create_pj_request_buttons(self):
+        pj_button_box = gtk.HBox(False, 10)
+        pj_button_box.set_size_request(0, 60)
+        self.screens["pj_request_button_box"] = pj_button_box
         
+        back_button = gtk.Button()
+        back_button.add(self.build_icon("Bakåt", "icons/edit-undo.png", "h"))
+        pj_button_box.pack_start(back_button)
+        back_button.connect("clicked", self.back_button_function)
+
+        ok_button = gtk.Button("Begär ny journal")
+        ok_button.connect("clicked", self.ok_button_function)
+        ok_button.set_flags(gtk.CAN_DEFAULT)
+        pj_button_box.pack_start(ok_button)
+        
+        return pj_button_box
+
+    def create_change_buttons(self):
         # add back-, change- and delete-button (used in ChangeObstacleScreen etc)
         self.change_buttons = gtk.HBox(False, 0)
         self.change_buttons.set_size_request(0, 60)
@@ -420,15 +453,7 @@ class ClientGui(hildon.Program):
         change_button.set_flags(gtk.CAN_DEFAULT)
         self.change_buttons.pack_start(change_button)
         
-        vbox_right.pack_start(self.change_buttons, False, False, 0)
-
-        self.window.connect("destroy", lambda event: self.mainloop.quit())
-        self.window.connect("key-press-event", self.on_key_press)
-        self.window.connect("window-state-event", self.on_window_state_change)
-
-        # Change to default True?
-        self.window_in_fullscreen = False
-        log.info("ClientGui created")
+        return self.change_buttons
 
     def new_message(self,event):
         print "*****************"
@@ -478,7 +503,8 @@ class ClientGui(hildon.Program):
                                   type=shared.data.MessageType.voip, 
                                   subtype=shared.data.VOIPType.request,
                                   unpacked_data={"ip": get_ip(), "port": 5432,
-                                                 "class": "dict"})
+                                                 "class": "dict"},
+                                  prio = 5)
         self.queue.enqueue(msg.packed_data, msg.prio)
         self.out_call_popup(msg)
         
@@ -488,7 +514,8 @@ class ClientGui(hildon.Program):
                                   type=shared.data.MessageType.vvoip, 
                                   subtype=shared.data.VVOIPType.request,
                                   unpacked_data={"ip": get_ip(), "port1": 5432, 
-                                                 "port2": 5434, "class": "dict"})
+                                                 "port2": 5434, "class": "dict"},
+                                  prio = 5)
         self.queue.enqueue(msg.packed_data, msg.prio)
         self.out_call_popup(msg)
     
@@ -531,7 +558,8 @@ class ClientGui(hildon.Program):
                                       type=shared.data.MessageType.voip, 
                                       subtype=shared.data.VOIPType.response,
                                       unpacked_data={"ip": get_ip(), "port": 5432, 
-                                                     "class": "dict"})
+                                                     "class": "dict"},
+                                      prio = 5)
         self.queue.enqueue(message.packed_data, message.prio)
         self.show_voice(ip=data["ip"], port=data["port"])
         
@@ -546,7 +574,8 @@ class ClientGui(hildon.Program):
                                   type=shared.data.MessageType.vvoip, 
                                   subtype=shared.data.VVOIPType.response,
                                   unpacked_data={"ip": get_ip(), "port1": 5432,
-                                                 "port2": 5434, "class": "dict"})
+                                                 "port2": 5434, "class": "dict"},
+                                  prio = 5)
         self.queue.enqueue(message.packed_data, message.prio)
         self.show_cam(ip=data["ip"], port1=data["port1"], port2=data["port2"])
     
@@ -587,16 +616,6 @@ class ClientGui(hildon.Program):
         question.show()
         inc_dialog.vbox.pack_start(question)
         inc_dialog.show_all()
-#        result = inc_dialog.run()
-#        if result == 77:
-#            if msg.type == shared.data.MessageType.voip:
-#                start_voip = True
-#            elif msg.type == shared.data.MessageType.vvoip:
-#                start_vvoip = True
-#        elif result == 666:
-#            # @todo: return nack if we dont want to answer
-#            print "upptaget"
-        
         
     def out_call_popup(self, msg):
         print "Utgående samtal = popup"
@@ -718,7 +737,7 @@ class ClientGui(hildon.Program):
     def show_status(self, event):
         self.toggle_show("mission", ["notifications", "status", "buttons"], 
                          "Här kan du välj en status")
-    
+
         combo = self.screens["status"].combo_box
         combo.get_model().clear()
         combo.append_text("Välj uppdrag...")
@@ -727,7 +746,7 @@ class ClientGui(hildon.Program):
             combo.append_text(mission.event_type)
     
     def show_journals(self, event):
-        self.toggle_show("mission", ["notifications", "patient_journal", "buttons"], 
+        self.toggle_show("mission", ["notifications", "patient_journal", "pj_request_button_box"], 
                          "Här kan du hämta patient journaler")
     
     def show_faq(self, event):
@@ -769,12 +788,10 @@ class ClientGui(hildon.Program):
         #self.show(["new_message", "buttons"])
         
     def show_cam(self,ip, port1, port2, event = None):
-#        self.screens["camera"].start_video_send(self.screens["contact"].ip)
         self.screens["camera"].start_vvoip(ip, port1, port2)
         self.show(["camera"])
         
     def show_voice(self, ip, port, event = None):
-#        self.screens["camera"].start_video_send(self.screens["contact"].ip)
         self.screens["camera"].start_voip(ip, port)
         self.show(["camera"])
         
