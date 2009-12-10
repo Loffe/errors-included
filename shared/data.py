@@ -186,6 +186,14 @@ class Database(gobject.GObject):
         session.close()
         return textmessages
     
+    def get_journals(self):
+        session = self._Session()
+        list = []
+        for j in session.query(JournalResponse):
+            list.append(j)
+        session.close()
+        return list
+
     def get_journal_requests(self):
         session = self._Session()
         requests = []

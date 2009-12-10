@@ -9,7 +9,7 @@ import datetime
 import gobject
 from selectunit import SelectUnitButton
 from selectunit import SelectUnitDialog
-from shared.data import JournalRequest
+from shared.data import JournalRequest, JournalResponse
 import config
 
 class RequestDialog(gtk.Dialog, gui.Screen):
@@ -50,7 +50,12 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
         self.add_with_viewport(main_box)
 
         # create and pack combobox
-        self.combo_box = gtk.combo_box_new_text()
+        self.liststore = gtk.ListStore(str, int)
+        self.combo_box = gtk.ComboBox(self.liststore)
+        cell = gtk.CellRendererText()
+        self.combo_box.pack_start(cell, True)
+        self.combo_box.add_attribute(cell, 'text', 0)  
+
         #combo_box.set_size_request(300,50)
         main_box.pack_start(self.combo_box, False, False, 0)
         self.textview = gtk.TextView()
@@ -61,16 +66,34 @@ class PatientJournalScreen(gtk.ScrolledWindow, gui.Screen):
         # add event handler
         self.combo_box.connect('changed', self.selected)
         
-        self.combo_box.append_text("Välj journal...")
-        self.combo_box.append_text("Diabetes")
+        self.update_list()
         # set the first item added as active
         self.combo_box.set_active(0)
 
         # show 'em all! (:
         self.show_all()
 
+    def update_list(self):
+        self.combo_box.get_model().clear()
+        self.combo_box.get_model().append(("Välj journal...", 0))
+        for j in self.db.get_journals():
+            self.combo_box.get_model().append((j.ssn, j.id))
+
+
+    def got_journal_response(self, event):
+        print "got new journal"
+        self.update_list()
+
     def selected(self, combobox):
-        pass
+        selected = self.liststore[self.combo_box.get_active()]
+        selected_id = selected[1]
+        session = self.db._Session()
+        journal = session.query(JournalResponse).filter_by(id=selected_id).first()
+
+        buffer = gtk.TextBuffer()
+        buffer.set_text(journal.journal)
+        self.textview.set_buffer(buffer)
+        session.close()
        
     def ok_button_function(self, event):
         self.dialog.show()

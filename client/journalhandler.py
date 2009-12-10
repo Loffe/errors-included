@@ -17,6 +17,9 @@ class JournalHandler(gobject.GObject):
             Database.add(self.database, message.unpacked_data)
             self.emit("got-new-journal-request")
             return True
+        elif message.subtype == JournalType.response:
+            self.emit("got-new-journal-response")
     
 gobject.type_register(JournalHandler)
 gobject.signal_new("got-new-journal-request", JournalHandler, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
+gobject.signal_new("got-new-journal-response", JournalHandler, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())

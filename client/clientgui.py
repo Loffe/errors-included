@@ -316,6 +316,8 @@ class ClientGui(hildon.Program):
         
         self.patient_journal_message_screen = PatientJournalMessageScreen(self.db)
         self.journalhandler.connect("got-new-journal-request", self.patient_journal_message_screen.add_request)
+        self.journalhandler.connect("got-new-journal-response",
+                                    self.screens["patient_journal"].got_journal_response)
         vbox_right.pack_start(self.patient_journal_message_screen, True, True, 0)
         self.screens["patient_journal_message_screen"] = self.patient_journal_message_screen
         
