@@ -20,6 +20,11 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
     # the entries
     db = None
     
+    journals = [
+            u'Kalle kamel är en häst',
+            u'Freddie har en hjärnskada och behöver behandlas med lakrits och extra kaffe',
+            u'DT är från Småland och därför snål.'
+            ]
 
     def __init__(self, db):
         '''
@@ -88,7 +93,7 @@ class PatientJournalMessageScreen(gtk.ScrolledWindow, gui.Screen):
     def ok_button_function(self, event):
         req = self.selected_request
         response = JournalResponse(req.id, True, u"Därför",
-                                   req.ssn, u"kalle kamel är en häst")
+                                   req.ssn, self.journals[req.id%len(self.journals)])
         self.db.add(response)
         print "OK"
     
