@@ -54,7 +54,8 @@ class DatabaseQueue(Queue.Queue):
             for row in res:
                 # Remove old change events
                 match1 = re.findall(r'"subtype": "change"', row.data)
-                match2 = re.findall(r'"id": %s' % id, row.data)
+                # find id matching id number and terminator
+                match2 = re.findall(r'"id": %s[,}]' % id, row.data)
                 if len(match1) > 0 and len(match2) > 0:
                     #print_color(str(row), 'red')
                     to_del.append(str(row.id))
