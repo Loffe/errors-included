@@ -64,7 +64,7 @@ class ServerManager(object):
         units = self.database.get_all_units()
         for unit in units:
             unit_msg = Message("server", username,
-                               MessageType.object, ActionType.add,
+                               MessageType.object, ActionType.change,
                                unpacked_data=unit);
             # Send initial messages with high prio
             self.queue.enqueue(username, unit_msg.packed_data, 9)
