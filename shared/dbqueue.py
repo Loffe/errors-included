@@ -203,6 +203,8 @@ class DatabaseOutQueue(DatabaseQueue):
                     .order_by(NetworkOutQueueItem.id.asc())
         item = q.first()
         session.close()
+        if item is None:
+            raise IndexError, "No such item i queue"
         return item.data, item.id
 
 if __name__ == "__main__":

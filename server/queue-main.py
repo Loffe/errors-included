@@ -152,7 +152,6 @@ class ServerNetworkHandler(dbus.service.Object):
         m = message
         id = m.sender
         if self.db.is_valid_login(m.sender, m.unpacked_data["password"]):
-            self.outqueues[id].replace_socket(socket)
 
             if 'unit_type' in m.unpacked_data.keys():
                 session = self.db._Session()
@@ -162,12 +161,13 @@ class ServerNetworkHandler(dbus.service.Object):
                 session.commit()
                 session.close()
             
-            log.info("%s logged in and now has a named queue" % id)
+            log.info("%s logged in and activated outqueue" % id)
             ack = shared.data.Message("server", id, response_to=m.message_id,
                                       type=shared.data.MessageType.ack,
                                       unpacked_data={"result": "yes", "class": "dict"})
             self.enqueue(m.sender, ack.packed_data, 9)
             self.user_login(m.sender)
+            self.outqueues[id].replace_socket(socket)
         else:
             log.info("login denied")
             nack = shared.data.Message("server", id, response_to=m.message_id,

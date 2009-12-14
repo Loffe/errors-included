@@ -65,6 +65,10 @@ class NetworkOutQueue(NetworkQueue):
             try:
                 item, id = self.queue.get(block=False)
                 log.debug("trying to send: " + str(item))
+            except IndexError, e:
+                self.sending = False
+                log.info("send burst completed early")
+                return
             except Queue.Empty, e:
                 self.sending = False
                 log.info("send burst complete")
@@ -72,7 +76,7 @@ class NetworkOutQueue(NetworkQueue):
             try:
                 # send 6 bytes containing content length
                 content_length = '0x%04x' % len(item)
-                log.info("content-length" + str(content_length))
+                #log.debug("content-length" + str(content_length))
                 self.socket.send(content_length)
                 # send json data
                 self.socket.send(item)
