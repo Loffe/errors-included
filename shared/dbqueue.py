@@ -154,14 +154,14 @@ class DatabaseInQueue(DatabaseQueue):
 
 class DatabaseOutQueue(DatabaseQueue):
     name = None
-    service_level = None
+    service_level = 'max'
     
     def __init__(self, database, name):
         DatabaseQueue.__init__(self, database, DatabaseQueue.direction_out)
         self.name = name
 
     def set_service_level(self, level):
-        self.service_level = level
+        self.service_level = 'max'
 
     def _empty(self):
         session = self.db._Session()

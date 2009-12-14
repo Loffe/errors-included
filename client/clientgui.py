@@ -692,7 +692,7 @@ class ClientGui(hildon.Program):
             msg = Message(self.controller.name, "server",
                           shared.data.MessageType.service_level,
                           unpacked_data = unpacked_data)
-            self.queue.enqueue(msg.packed_data, msg.prio)
+            #self.queue.enqueue(msg.packed_data, msg.prio)
 
     def back_button_function(self, event):
         self.show(self.prev_page[-2])
