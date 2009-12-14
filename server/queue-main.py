@@ -230,8 +230,10 @@ class ServerNetworkHandler(dbus.service.Object):
                             m = shared.data.Message.unpack(data, self.db)
                         except ValueError, ve:
                             log.info("Crappy data = ! JSON")
-                            print_color(str(ve.orig_error), 'red')
-                            print_color(ve.data, 'red')
+                            if hasattr(ve, "origerror"):
+                                print_color(str(ve.orig_error), 'red')
+                            if hasattr(ve, "data"):
+                                print_color(ve.data, 'red')
                             log.info(ve)
                             continue
 

@@ -49,7 +49,7 @@ class DatabaseQueue(Queue.Queue):
             assert len(res) == 1
             id = res[0]
             #print "dumping old changes for id:", id
-            res = session.query(NetworkOutQueueItem)
+            res = session.query(NetworkOutQueueItem).filter_by(name=self.name)
             to_del = []
             for row in res:
                 match1 = re.findall(r'"subtype": "change"', row.data)
@@ -60,6 +60,7 @@ class DatabaseQueue(Queue.Queue):
             #print "to_del", to_del
             if len(to_del) > 0:
                 session.execute("DELETE FROM OutQueue WHERE id IN (" + ",".join(to_del) + ")")
+            #print "to_add", item.data
         session.add(item)
         session.flush()
         try:
@@ -159,8 +160,14 @@ class DatabaseOutQueue(DatabaseQueue):
         session = self.db._Session()
         result = None
         if self.service_level == "send-few" or self.service_level == "energysaving":
-            row = session.execute("SELECT COUNT(*) AS num FROM OutQueue WHERE name = '%s' AND sent = 0 AND prio >= 5" % (self.name)).fetchone()
-            result = row[0] == 0
+            q = session.query(NetworkOutQueueItem).filter_by(sent = False) \
+                    .filter_by(name = self.name) \
+                    .filter("prio>=5") \
+                    .order_by(NetworkOutQueueItem.prio.desc()) \
+                    .order_by(NetworkOutQueueItem.id.asc()).count()
+            result = (q == 0)
+            #row = session.execute("SELECT COUNT(*) AS num FROM OutQueue WHERE name = '%s' AND sent = 0 AND prio >= 5" % (self.name)).fetchone()
+            #result = row[0] == 0
         else:
             result = session.query(NetworkOutQueueItem).filter_by(sent = 0).filter_by(name=self.name).count() == 0
         session.close()
