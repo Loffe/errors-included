@@ -6,7 +6,7 @@ from config import Config
 
 server = Config()
 server.port = 50000
-server.ssh = False
+server.ssh = True
 server.primary = True
 server.database = 'mysql://eriel743:PoAQjf29f@localhost/eriel743'
 
