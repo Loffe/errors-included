@@ -49,13 +49,19 @@ class DatabaseQueue(Queue.Queue):
             assert len(res) == 1
             id = res[0]
             #print "dumping old changes for id:", id
-            res = session.query(NetworkOutQueueItem).filter_by(name=self.name)
+            res = session.query(NetworkOutQueueItem).filter_by(name=self.name, sent=0)
             to_del = []
             for row in res:
+                # Remove old change events
                 match1 = re.findall(r'"subtype": "change"', row.data)
                 match2 = re.findall(r'"id": %s' % id, row.data)
                 if len(match1) > 0 and len(match2) > 0:
                     #print_color(str(row), 'red')
+                    to_del.append(str(row.id))
+
+                # Remove old service levels
+                match_service_level = re.findall(r'"type": "service_level"', row.data)
+                if len(match_service_level) > 0:
                     to_del.append(str(row.id))
             #print "to_del", to_del
             if len(to_del) > 0:
