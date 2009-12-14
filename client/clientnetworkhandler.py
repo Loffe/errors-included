@@ -177,6 +177,7 @@ class ClientNetworkHandler(dbus.service.Object):
         print "socket-broken"
         if self.connected:
             self.connected = False
+            self.use_backup = not self.use_backup
             self.inputs.remove(self.socket)
             threading.Thread(target=self._check_connection()).start()
 
