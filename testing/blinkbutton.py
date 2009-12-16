@@ -12,6 +12,9 @@ class BlinkButton(gtk.Button):
     attention = False
     def __init__(self, label):
         gtk.Button.__init__(self, label)
+        for i in range(4):
+            self.get_style().bg_pixmap[i] = None
+        #self.get_style().detach()
 
 
     def set_attention(self, attention=True):
@@ -44,8 +47,7 @@ class BlinkButton(gtk.Button):
 
 
 
-
-if __name__ == "__main__":
+def run():
     win = gtk.Window()
 
     button = BlinkButton("HellO")
@@ -62,3 +64,6 @@ if __name__ == "__main__":
     win.connect("destroy", gtk.main_quit)
 
     gtk.main()
+
+if __name__ == "__main__":
+    run()
