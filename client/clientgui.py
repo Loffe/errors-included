@@ -750,6 +750,7 @@ class ClientGui(hildon.Program):
     def show_journals(self, event):
         self.toggle_show("mission", ["notifications", "patient_journal", "pj_request_button_box"], 
                          "Här kan du hämta patient journaler")
+        self.screens["patient_journal"].update_list()
     
     def show_faq(self, event):
         self.toggle_show("mission", ["notifications", "faq", "back_button_box"], 
